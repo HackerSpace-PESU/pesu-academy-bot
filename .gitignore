@@ -1,0 +1,9 @@
+bot/
+src/__pycache__/
+.vscode/
+test/
+.env
+test*.py
+chromedriver
+*.pdf
+requirements-backup.txt
