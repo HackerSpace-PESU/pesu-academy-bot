@@ -1,6 +1,7 @@
 import re
 import os
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy.engine import result
 from sqlalchemy.orm import sessionmaker
 from dbmodels import Student, Guild
 from dotenv import load_dotenv
@@ -15,8 +16,11 @@ pesudb_session = pesudb_Session()
 guilddb_engine = create_engine(os.environ["SERVER_CHANNEL_DATABASE_URL"])
 guilddb_connection = guilddb_engine.connect()
 guilddb_metadata = MetaData()
+guilddb_metadata.bind = guilddb_engine
 guilddb_Session = sessionmaker(bind=guilddb_engine)
 guilddb_session = guilddb_Session()
+guilddb_table = Table("guild", guilddb_metadata,
+                      autoload=True, autoload_with=guilddb_engine)
 
 
 def processFilter(filter_type, filter):
@@ -170,21 +174,27 @@ def searchPESUDatabase(filters):
         queryType = getQueryType(query)
         query = processFilter(queryType, query)
         if queryType == "email":
-            result = pesudb_session.query(Student).filter(Student.email == query)
+            result = pesudb_session.query(
+                Student).filter(Student.email == query)
         elif queryType == "PRN":
             result = pesudb_session.query(Student).filter(Student.prn == query)
         elif queryType == "SRN":
             result = pesudb_session.query(Student).filter(Student.srn == query)
         elif queryType == "branch":
-            result = pesudb_session.query(Student).filter(Student.branch == query)
+            result = pesudb_session.query(
+                Student).filter(Student.branch == query)
         elif queryType == "section":
-            result = pesudb_session.query(Student).filter(Student.section == query)
+            result = pesudb_session.query(
+                Student).filter(Student.section == query)
         elif queryType == "cycle":
-            result = pesudb_session.query(Student).filter(Student.cycle == query)
+            result = pesudb_session.query(
+                Student).filter(Student.cycle == query)
         elif queryType == "semester":
-            result = pesudb_session.query(Student).filter(Student.semester == query)
+            result = pesudb_session.query(
+                Student).filter(Student.semester == query)
         elif queryType == "campus":
-            result = pesudb_session.query(Student).filter(Student.campus == query)
+            result = pesudb_session.query(
+                Student).filter(Student.campus == query)
         else:
             query = query.upper()
             result = pesudb_session.query(Student).filter(
@@ -197,3 +207,30 @@ def searchPESUDatabase(filters):
         filter_tags = getFilterType(filters)
         listResult, truncated = getQueryResult(filter_tags)
         return listResult, truncated
+
+
+def addGuild(guild_id, guild_name, channel_id=None, channel_type=None):
+    query = guilddb_table.insert().values(guild_id=guild_id, guild_name=guild_name,
+                                          channel_id=channel_id, channel_type=channel_type)
+    result = guilddb_connection.execute(query)
+
+
+def removeGuild(guild_id):
+    query = guilddb_table.delete().where(guilddb_table.c.guild_id == guild_id)
+    result = guilddb_connection.execute(query)
+
+
+def removeChannel(channel_id):
+    query = guilddb_table.delete().where(guilddb_table.c.channel_id == channel_id)
+    result = guilddb_connection.execute(query)
+
+
+def checkChannelExists(channel_id):
+    query = guilddb_table.select().where(guilddb_table.c.channel_id == channel_id)
+    result = guilddb_connection.execute(query).fetchall()
+    return bool(result)
+
+def getCompleteDatabase():
+    query = guilddb_table.select()
+    result = guilddb_connection.execute(query).fetchall()
+    return result

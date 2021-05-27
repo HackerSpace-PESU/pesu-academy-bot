@@ -6,13 +6,13 @@ import random
 import base64
 import asyncio
 import signal
-from io import StringIO
+import discord
 import contextlib
+from io import StringIO
 from itertools import cycle
 from datetime import datetime
 from dotenv import load_dotenv
 from selenium import webdriver
-import discord
 from discord.ext import commands, tasks
 from utils import *
 
@@ -23,7 +23,7 @@ status = cycle(["with the PRIDE of PESU", "with lives",
                "with your future", "with PESsants", "with PESts"])
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-CHANNEL_BOT_LOGS = int(os.environ["CHANNEL_BOT_LOGS"])
+CHANNEL_BOT_LOGS = 842466762985701406
 
 ARONYABAKSY_ID = int(os.environ["ARONYA_ID"])
 ADITEYABARAL_ID = int(os.environ["BARAL_ID"])
@@ -75,6 +75,13 @@ async def checkUserIsAdmin(ctx):
     return ctx.message.author.guild_permissions.administrator
 
 
+async def checkUserHasManageServerPermission(ctx):
+    '''
+    Checks if the message author has the Manage Server permission.
+    '''
+    return ctx.channel.permissions_for(ctx.author.manage_guild)
+
+
 @tasks.loop(hours=4)
 async def changeStatus():
     '''
@@ -89,14 +96,14 @@ async def on_ready():
     '''
     Initialising bot after boot
     '''
+    print("Bot is online")
     await client.change_presence(activity=discord.Game(next(status)))
 
-    if CHANNEL_BOT_LOGS is not None:
-        channel = client.get_channel(id=CHANNEL_BOT_LOGS)
-        greeting = random.choice(greetings_1)
-        embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
-                              description="Use `pes.` to access commands", color=0x03f8fc)
-        await channel.send(embed=embed)
+    # channel = client.get_channel(id=CHANNEL_BOT_LOGS)
+    # greeting = random.choice(greetings_1)
+    # embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
+    #                         description="Use `pes.` to access commands", color=0x03f8fc)
+    # await channel.send(embed=embed)
 
 
 @client.event
@@ -111,7 +118,7 @@ async def on_guild_join(guild):
     )
     embed.add_field(
         name="\u200b",
-        value="Thank you for adding the bot to your server! Use `.help` to view all supported commands.\n"
+        value="Thank you for adding the bot to your server! Use `pes.help` to view all supported commands.\n"
     )
 
     alert_embed = discord.Embed(
@@ -123,11 +130,15 @@ async def on_guild_join(guild):
         value="Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`"
     )
 
-    for channel in guild.text_channels:
-        if channel.permission_for(guild.me).send_messages:
-            await channel.send(embed=embed)
-            await channel.send(embed=alert_embed)
+    for channels in guild.text_channels:
+        if channels.permissions_for(guild.me).send_messages:
+            await channels.send(embed=embed)
+            await channels.send(embed=alert_embed)
             break
+    
+    guild_id = str(guild.id)
+    guild_name = guild.name
+    addGuild(guild_id, guild_name)
 
     server_owner = guild.owner
     try:
@@ -135,6 +146,10 @@ async def on_guild_join(guild):
     except:
         pass
 
+@client.event
+async def on_guild_remove(guild):
+    guild_id = str(guild.id)
+    removeGuild(guild_id)
 
 @client.event
 async def on_message(ctx):
@@ -164,10 +179,7 @@ async def on_command_error(ctx, error):
 @client.event
 async def on_guild_channel_delete(channel):
     channel_id = str(channel.id)
-    if channel_id == CHANNEL_BOT_LOGS:
-        CHANNEL_BOT_LOGS = None
-    if channel_id == CHANNEL_PESU_ANNOUNCEMENT:
-        CHANNEL_PESU_ANNOUNCEMENT = None
+    removeChannel(channel_id)
 
 
 @client.command(aliases=['guilds'])
@@ -180,15 +192,63 @@ async def guildscommand(ctx):
         for guild_detail in guilds_details:
             data += f"{guild_detail.name},{guild_detail.id}\n"
             count += 1
-        data += f"\nCOUNT: {count}"
-        with open('guilds.csv', 'w+') as fp:
+        with open('guilds.csv', 'w') as fp:
             fp.write(data)
-        await ctx.send("You have clearance")
         await ctx.send(file=discord.File('guilds.csv'))
+        await ctx.send(f"Count: {count}")
         fp.close()
         os.remove('guilds.csv')
     else:
         await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
+async def dbinfo(ctx):
+    if await checkUserIsBotDev(ctx):
+        db_records = getCompleteDatabase()
+        data = "SERVER ID,SERVER NAME,CHANNEL TYPE,CHANNEL ID\n\n"
+        for row in db_records:
+            row_data = list(map(str, row[1:]))
+            data += "{},{},{}".format(*row_data)
+        with open('guilds.csv', 'w') as fp:
+            fp.write(data)
+        await ctx.send(file=discord.File('guilds.csv'))
+        fp.close()
+        os.remove('guilds.csv') 
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
+async def alerts(ctx, channel: discord.TextChannel = None):
+    if channel == None:
+        await ctx.send("Please mention the channel to which you would like to forward announcements.")
+    else:
+        if checkUserHasManageServerPermission(ctx):
+            channel_id = str(channel.id)
+            if checkChannelExists(channel_id):
+                await ctx.send(f"{channel.mention} is already subscribed to PESU Academy Bot alerts.")
+            else:
+                # do something
+                pass
+        else:
+            await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
+
+
+@client.command(aliases=["log"])
+async def logging(ctx, channel: discord.TextChannel = None):
+    if channel == None:
+        await ctx.send("Please mention the channel to which you would like to forward announcements.")
+    else:
+        if checkUserHasManageServerPermission(ctx):
+            channel_id = str(channel.id)
+            if checkChannelExists(channel_id):
+                await ctx.send(f"{channel.mention} is already subscribed to PESU Academy Bot alerts.")
+            else:
+                # do something
+                pass
+        else:
+            await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
 
 
 @client.command()
@@ -204,7 +264,7 @@ async def echo(ctx, *, query=None):
     else:
         author = ctx.message.author
         greeting = random.choice(greetings_2)
-        await ctx.send(f"Aye {author.mention}, you don't have permission to do that da {greeting}")
+        await ctx.send(f"You are not authorised to run this command.")
 
 
 @client.command()
@@ -627,29 +687,21 @@ async def checkInstagramPost():
     if (curr_time - photo_time) < 600:
         await channel.send("@everyone", embed=post_embed)
 
-'''
+
 @tasks.loop(minutes=10)
 async def checkRedditPost():
     await client.wait_until_ready()
-    print("Fetching Reddit posts...")
-
     reddit_posts = await getRedditPosts(REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
     latest_reddit_post = reddit_posts[0]
     post_time = latest_reddit_post["create_time"]
     current_time = datetime.now()
-    print("Outside Loop")
-    print(f"Last Reddit post time: {post_time}\nCurrent time: {current_time}")
-    if (current_time - post_time).seconds < 600:
+    time_difference = current_time - post_time
+    if time_difference.seconds < 600 and time_difference.days == 0:
         print("Inside loop")
-        print(f"Diff = {(current_time - post_time).seconds}")
         channel = client.get_channel(CHANNEL_PESU_ANNOUNCEMENT)
         post_embed = await getRedditEmbed(latest_reddit_post)
-        # await channel.send("@everyone", embed=post_embed)
-        await channel.send(embed=post_embed)
+        await channel.send("@everyone", embed=post_embed)
 
-        log_channel = client.get_channel(CHANNEL_BOT_LOGS)
-        await log_channel.send(f"Posting Reddit announcement\ncurrent = {current_time}\npost = {post_time}\ndiff = {(current_time - post_time).seconds}")
-'''
 
 @tasks.loop(minutes=5)
 async def checkPESUAnnouncement():
@@ -707,9 +759,9 @@ async def checkNewDay():
         await cleanUp()
 
 
-checkNewDay.start()
-checkPESUAnnouncement.start()
-checkInstagramPost.start()
+# checkNewDay.start()
+# checkPESUAnnouncement.start()
+# checkInstagramPost.start()
 # checkRedditPost.start()
 changeStatus.start()
 client.run(BOT_TOKEN)
