@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from gensim.models.doc2vec import TaggedDocument
 from nltk.tokenize import word_tokenize
 from selenium.webdriver.common.by import By
-from pesudb import *
+from db import *
 from pydictionary import *
 from doc2sim import *
 from instagram import *

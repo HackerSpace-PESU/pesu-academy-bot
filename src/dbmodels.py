@@ -30,3 +30,18 @@ class Student(Base):
         self.campus = campus
         self.email = email
         self.phone = phone
+
+
+class Guild(Base):
+    __tablename__ = "guild"
+    _id = Column(Integer, autoincrement=True, primary_key=True)
+    guild_id = Column(String(50), nullable=False)
+    guild_name = Column(String(50), nullable=True)
+    channel_type = Column(String(10), nullable=True)
+    channel_id = Column(String(50), nullable=True)
+
+    def __init__(self, guild_id, guild_name, channel_id, channel_type) -> None:
+        self.guild_id = guild_id
+        self.guild_name = guild_name
+        self.channel_id = channel_id
+        self.channel_type = channel_type

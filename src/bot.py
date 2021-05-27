@@ -23,9 +23,7 @@ status = cycle(["with the PRIDE of PESU", "with lives",
                "with your future", "with PESsants", "with PESts"])
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-
-CHANNEL_BOT_LOGS = None
-CHANNEL_PESU_ANNOUNCEMENT = None
+CHANNEL_BOT_LOGS = int(os.environ["CHANNEL_BOT_LOGS"])
 
 ARONYABAKSY_ID = int(os.environ["ARONYA_ID"])
 ADITEYABARAL_ID = int(os.environ["BARAL_ID"])

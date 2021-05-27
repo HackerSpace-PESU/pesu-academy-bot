@@ -2,15 +2,21 @@ import re
 import os
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
-from pesudbmodels import Student
+from dbmodels import Student, Guild
 from dotenv import load_dotenv
 
 load_dotenv()
-engine = create_engine(os.environ["PESU_DATABASE_URL"])
-connection = engine.connect()
-metadata = MetaData()
-Session = sessionmaker(bind=engine)
-session = Session()
+pesudb_engine = create_engine(os.environ["PESU_DATABASE_URL"])
+pesudb_connection = pesudb_engine.connect()
+pesudb_metadata = MetaData()
+pesudb_Session = sessionmaker(bind=pesudb_engine)
+pesudb_session = pesudb_Session()
+
+guilddb_engine = create_engine(os.environ["SERVER_CHANNEL_DATABASE_URL"])
+guilddb_connection = guilddb_engine.connect()
+guilddb_metadata = MetaData()
+guilddb_Session = sessionmaker(bind=guilddb_engine)
+guilddb_session = guilddb_Session()
 
 
 def processFilter(filter_type, filter):
@@ -97,27 +103,27 @@ def getQueryType(query):
 
 def getQueryResult(filter_tags=None):
     if filter_tags is None:
-        result = session.query(Student).all()
+        result = pesudb_session.query(Student).all()
     else:
         if "name" in filter_tags:
             result = list()
             for name in filter_tags["name"]:
-                temp_result = session.query(Student).filter(
+                temp_result = pesudb_session.query(Student).filter(
                     Student.name.ilike(f"%{name}%"))
                 result.append(temp_result)
             result = result[0].union(*result[1:])
 
         elif "srn" in filter_tags:
-            result = session.query(Student).filter(
+            result = pesudb_session.query(Student).filter(
                 Student.srn.in_(filter_tags["srn"]))
 
         elif "prn" in filter_tags:
-            result = session.query(Student).filter(
+            result = pesudb_session.query(Student).filter(
                 Student.prn.in_(filter_tags["prn"]))
 
         else:
 
-            result = session.query(Student)
+            result = pesudb_session.query(Student)
             if "branch" in filter_tags:
                 result = result.filter(
                     Student.branch.in_(filter_tags["branch"]))
@@ -164,24 +170,24 @@ def searchPESUDatabase(filters):
         queryType = getQueryType(query)
         query = processFilter(queryType, query)
         if queryType == "email":
-            result = session.query(Student).filter(Student.email == query)
+            result = pesudb_session.query(Student).filter(Student.email == query)
         elif queryType == "PRN":
-            result = session.query(Student).filter(Student.prn == query)
+            result = pesudb_session.query(Student).filter(Student.prn == query)
         elif queryType == "SRN":
-            result = session.query(Student).filter(Student.srn == query)
+            result = pesudb_session.query(Student).filter(Student.srn == query)
         elif queryType == "branch":
-            result = session.query(Student).filter(Student.branch == query)
+            result = pesudb_session.query(Student).filter(Student.branch == query)
         elif queryType == "section":
-            result = session.query(Student).filter(Student.section == query)
+            result = pesudb_session.query(Student).filter(Student.section == query)
         elif queryType == "cycle":
-            result = session.query(Student).filter(Student.cycle == query)
+            result = pesudb_session.query(Student).filter(Student.cycle == query)
         elif queryType == "semester":
-            result = session.query(Student).filter(Student.semester == query)
+            result = pesudb_session.query(Student).filter(Student.semester == query)
         elif queryType == "campus":
-            result = session.query(Student).filter(Student.campus == query)
+            result = pesudb_session.query(Student).filter(Student.campus == query)
         else:
             query = query.upper()
-            result = session.query(Student).filter(
+            result = pesudb_session.query(Student).filter(
                 Student.name.ilike(f"%{query}%"))
         listResult, truncated = getListResult(result)
         return listResult, truncated

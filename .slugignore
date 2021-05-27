@@ -7,3 +7,4 @@ chromedriver
 *.pdf
 requirements-backup.txt
 setHerokuConfig.py
+todo.md
