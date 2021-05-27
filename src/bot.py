@@ -57,7 +57,7 @@ greetings_2 = ["PESsant", "PESt"]
 
 async def checkUserIsAdminOrBotDev(ctx):
     '''
-    Checks if the message author is an Admin or is one of the Bot Developers.
+    Checks if the message author is an Administrator or is one of the Bot Developers.
     '''
     return ctx.message.author.guild_permissions.administrator or ctx.message.author.id in BOT_DEVS
 
@@ -66,6 +66,13 @@ async def checkUserIsBotDev(ctx):
     Checks if the message author is one of the Bot Developers.
     '''
     return ctx.message.author.id in BOT_DEVS
+
+
+async def checkUserIsAdmin(ctx):
+    '''
+    Checks if the message author is an Administrator.
+    '''
+    return ctx.message.author.guild_permissions.administrator
 
 
 @tasks.loop(hours=4)
