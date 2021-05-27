@@ -156,6 +156,36 @@ async def on_command_error(ctx, error):
     await ctx.send(content)
 
 
+@client.event
+async def on_guild_channel_delete(channel):
+    channel_id = str(channel.id)
+    if channel_id == CHANNEL_BOT_LOGS:
+        CHANNEL_BOT_LOGS = None
+    if channel_id == CHANNEL_PESU_ANNOUNCEMENT:
+        CHANNEL_PESU_ANNOUNCEMENT = None
+
+
+@client.command(aliases=['guilds'])
+async def guildscommand(ctx):
+    if await checkUserIsBotDev(ctx):
+        await ctx.channel.trigger_typing()
+        count = 0
+        data = 'SERVER NAME,SERVER ID\n\n'
+        guilds_details = await client.fetch_guilds(limit=150).flatten()
+        for guild_detail in guilds_details:
+            data += f"{guild_detail.name},{guild_detail.id}\n"
+            count += 1
+        data += f"\nCOUNT: {count}"
+        with open('guilds.csv', 'w+') as fp:
+            fp.write(data)
+        await ctx.send("You have clearance")
+        await ctx.send(file=discord.File('guilds.csv'))
+        fp.close()
+        os.remove('guilds.csv')
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
 @client.command()
 async def echo(ctx, *, query=None):
     await client.wait_until_ready()
@@ -673,7 +703,7 @@ async def checkNewDay():
 
 
 checkNewDay.start()
-# checkPESUAnnouncement.start()
+checkPESUAnnouncement.start()
 checkInstagramPost.start()
 # checkRedditPost.start()
 changeStatus.start()

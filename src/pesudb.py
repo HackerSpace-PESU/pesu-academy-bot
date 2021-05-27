@@ -6,7 +6,7 @@ from pesudbmodels import Student
 from dotenv import load_dotenv
 
 load_dotenv()
-engine = create_engine(os.environ["DATABASE_URL"])
+engine = create_engine(os.environ["PESU_DATABASE_URL"])
 connection = engine.connect()
 metadata = MetaData()
 Session = sessionmaker(bind=engine)
