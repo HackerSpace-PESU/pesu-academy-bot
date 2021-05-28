@@ -287,7 +287,7 @@ async def dbinfo(ctx):
         data = "SERVER ID,SERVER NAME,CHANNEL TYPE,CHANNEL ID\n\n"
         for row in db_records:
             row_data = list(map(str, row[1:]))
-            data += "{},{},{}".format(*row_data)
+            data += "{},{},{}\n".format(*row_data)
         with open('guilds.csv', 'w') as fp:
             fp.write(data)
         await ctx.send(file=discord.File('guilds.csv'))
