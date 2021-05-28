@@ -11,7 +11,6 @@ import contextlib
 from io import StringIO
 from itertools import cycle
 from datetime import datetime
-from discord import guild
 from dotenv import load_dotenv
 from selenium import webdriver
 from discord.ext import commands, tasks
