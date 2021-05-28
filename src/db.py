@@ -1,6 +1,6 @@
 import re
 import os
-from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy import create_engine, MetaData, Table, and_
 from sqlalchemy.engine import result
 from sqlalchemy.orm import sessionmaker
 from dbmodels import Student, Guild
@@ -220,15 +220,29 @@ def removeGuild(guild_id):
     result = guilddb_connection.execute(query)
 
 
+def addChannel(guild_id, guild_name, channel_id, channel_type):
+    query = guilddb_table.select().where(and_(guilddb_table.c.guild_id == guild_id, guilddb_table.c.channel_id ==
+                                              None, guilddb_table.c.channel_type == None))
+    result = guilddb_connection.execute(query).fetchall()
+    if result:
+        query = guilddb_table.update().where(and_(guilddb_table.c.guild_id == guild_id, guilddb_table.c.channel_id ==
+                                                None, guilddb_table.c.channel_type == None)).values(channel_id=channel_id, channel_type=channel_type)
+        result = guilddb_connection.execute(query)
+    else:
+        addGuild(guild_id, guild_name, channel_id, channel_type)
+
+
 def removeChannel(channel_id):
     query = guilddb_table.delete().where(guilddb_table.c.channel_id == channel_id)
     result = guilddb_connection.execute(query)
 
 
-def checkChannelExists(channel_id):
-    query = guilddb_table.select().where(guilddb_table.c.channel_id == channel_id)
+def checkServerChannelAndTypeExists(guild_id, channel_id, channel_type):
+    query = guilddb_table.select().where(and_(guilddb_table.c.guild_id == guild_id,
+                                              guilddb_table.c.channel_id == channel_id, guilddb_table.c.channel_type == channel_type))
     result = guilddb_connection.execute(query).fetchall()
     return bool(result)
+
 
 def getCompleteDatabase():
     query = guilddb_table.select()

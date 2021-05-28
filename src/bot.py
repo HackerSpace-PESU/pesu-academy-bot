@@ -24,6 +24,7 @@ status = cycle(["with the PRIDE of PESU", "with lives",
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 CHANNEL_BOT_LOGS = 842466762985701406
+BOT_ID = 847138055978614845
 
 ARONYABAKSY_ID = int(os.environ["ARONYA_ID"])
 ADITEYABARAL_ID = int(os.environ["BARAL_ID"])
@@ -61,6 +62,7 @@ async def checkUserIsAdminOrBotDev(ctx):
     '''
     return ctx.message.author.guild_permissions.administrator or ctx.message.author.id in BOT_DEVS
 
+
 async def checkUserIsBotDev(ctx):
     '''
     Checks if the message author is one of the Bot Developers.
@@ -79,7 +81,7 @@ async def checkUserHasManageServerPermission(ctx):
     '''
     Checks if the message author has the Manage Server permission.
     '''
-    return ctx.channel.permissions_for(ctx.author.manage_guild)
+    return ctx.channel.permissions_for(ctx.author).manage_guild
 
 
 @tasks.loop(hours=4)
@@ -135,7 +137,7 @@ async def on_guild_join(guild):
             await channels.send(embed=embed)
             await channels.send(embed=alert_embed)
             break
-    
+
     guild_id = str(guild.id)
     guild_name = guild.name
     addGuild(guild_id, guild_name)
@@ -146,10 +148,12 @@ async def on_guild_join(guild):
     except:
         pass
 
+
 @client.event
 async def on_guild_remove(guild):
     guild_id = str(guild.id)
     removeGuild(guild_id)
+
 
 @client.event
 async def on_message(ctx):
@@ -214,7 +218,7 @@ async def dbinfo(ctx):
             fp.write(data)
         await ctx.send(file=discord.File('guilds.csv'))
         fp.close()
-        os.remove('guilds.csv') 
+        os.remove('guilds.csv')
     else:
         await ctx.send("You are not authorised to run this command.")
 
@@ -222,15 +226,22 @@ async def dbinfo(ctx):
 @client.command()
 async def alerts(ctx, channel: discord.TextChannel = None):
     if channel == None:
-        await ctx.send("Please mention the channel to which you would like to forward announcements.")
+        await ctx.send("Please mention the channel in which you would like to forward announcements.")
     else:
-        if checkUserHasManageServerPermission(ctx):
+        if await checkUserHasManageServerPermission(ctx):
             channel_id = str(channel.id)
-            if checkChannelExists(channel_id):
+            guild_id = str(ctx.guild.id)
+            guild_name = str(ctx.guild.name)
+            if checkServerChannelAndTypeExists(guild_id, channel_id, "publish"):
                 await ctx.send(f"{channel.mention} is already subscribed to PESU Academy Bot alerts.")
             else:
-                # do something
-                pass
+                client_member = ctx.guild.get_member(BOT_ID)
+                client_permissions = client_member.permissions_in(channel)
+                if client_permissions.send_messages and client_permissions.embed_links:
+                    addChannel(guild_id, guild_name, channel_id, "publish")
+                    await ctx.send(f"**Success!** You will now receive PESU Academy Bot alerts on {channel.mention}")
+                else:
+                    await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages` and `Embed Links` for me.")
         else:
             await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
 
@@ -238,15 +249,22 @@ async def alerts(ctx, channel: discord.TextChannel = None):
 @client.command(aliases=["log"])
 async def logging(ctx, channel: discord.TextChannel = None):
     if channel == None:
-        await ctx.send("Please mention the channel to which you would like to forward announcements.")
+        await ctx.send("Please mention the channel in which you would like to forward logging information.")
     else:
-        if checkUserHasManageServerPermission(ctx):
+        if await checkUserHasManageServerPermission(ctx):
             channel_id = str(channel.id)
-            if checkChannelExists(channel_id):
-                await ctx.send(f"{channel.mention} is already subscribed to PESU Academy Bot alerts.")
+            guild_id = str(ctx.guild.id)
+            guild_name = str(ctx.guild.name)
+            if checkServerChannelAndTypeExists(guild_id, channel_id, "log"):
+                await ctx.send(f"{channel.mention} is already subscribed to PESU Academy Bot logging information.")
             else:
-                # do something
-                pass
+                client_member = ctx.guild.get_member(BOT_ID)
+                client_permissions = client_member.permissions_in(channel)
+                if client_permissions.send_messages and client_permissions.embed_links:
+                    addChannel(guild_id, guild_name, channel_id, "log")
+                    await ctx.send(f"**Success!** You will now receive PESU Academy Bot logging on {channel.mention}")
+                else:
+                    await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages` and `Embed Links` for me.")
         else:
             await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
 
