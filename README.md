@@ -10,7 +10,9 @@
     <img src="https://img.shields.io/github/contributors/aditeyabaral/pesu-academy-bot"/></a>
 </p>
 
-PESU Academy Discord Bot built for PESsants and PESts
+PESU Academy Discord Bot built for PESsants and PESts of PES University
+
+You can add the bot to your Discord Server using [this link](bit.ly/pesu-academy-bot). Once the bot has joined your server, please carry out the setup instructions posted by the bot.
 
 ## How to run PESU Academy Bot?
 

@@ -374,7 +374,31 @@ async def ping(ctx):
 
 @client.command(aliases=["h"])
 async def help(ctx):
-    content = 
+    content = '''
+1. `pes.hello`: Be nice to me. Say `pes.hello` once in a while 👋
+2. `pes.ping`: Perform a `ping` test
+3. `pes.alerts`: Setup a channel to receive alerts using `pes.alerts [CHANNEL]`
+4. `pes.log`: Setup a channel to receive logging information using `pes.log [CHANNEL]`
+5. `pes.invite`: Obtain the invite link for PESU Academy Bot
+6. `pes.contribute`: Learn how to contribute to PESU Academy Bot
+7. `pes.search`: To search the PESU Class and Section Database, use `pes.search [SRN | email]`
+8. `pes.pesdb`: Search the Student PESU Database using `pes.pesdb [search 1] & [search 2]`. String together as many filters as needed. You can also use emails and names.
+9. `pes.news`: Fetch PESU Announcements using `pes.news [OPTIONAL=today] [OPTIONAL=N]`. Get today's announcements with `pes.news today`. Fetch all announcements using `pes.news`. Specify the number of news using `N`.
+10. `pes.insta`: Fetch the last Instagram post from PESU Academy
+11. `pes.reddit`: Fetch the latest posts from r/PESU using `pes.reddit [NUMBER OF POSTS]`
+12. `pes.longrip`: Create a shortened long.rip link using `pes.longrip [URL]`
+13. `pes.goto`: Create customized redirection links using `pes.goto [LONG URL] [SHORT URL]`
+14. `pes.exec`: Use this to execute Python scripts. Attach your script within blockquotes on the next line. 
+   **Example**: 
+   .exec
+```Python
+import math
+print(math.pi)```
+15. `pes.eval`: Evaluate a single Python expression using `pes.eval [EXPRESSION]`
+16. `pes.sim`: Find similarity between uploaded files using Doc2Vec. Upload files into a channel and use `pes.sim [FILENAMES]`. 
+17. `pes.spongebob` or `pes.sb`: Create a SpongeBob mocking meme. `pes.sb [top text] & [bottom-text]` or `pes.sb [bottom-text]`
+18. `pes.dict`: Search for the meaning of word using `pes.dict [word]`
+'''
     await ctx.send(content)
 
 
