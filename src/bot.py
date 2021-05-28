@@ -18,7 +18,7 @@ from utils import *
 
 
 load_dotenv()
-client = commands.Bot(command_prefix='pes.', help_command=None)
+client = commands.Bot(command_prefix='pes.', help_command=None, intents=discord.Intents.all())
 status = cycle(["with the PRIDE of PESU", "with lives",
                "with your future", "with PESsants", "with PESts"])
 
@@ -83,6 +83,26 @@ async def checkUserHasManageServerPermission(ctx):
     return ctx.channel.permissions_for(ctx.author).manage_guild
 
 
+async def sendChannel(channel_id, content=None, embed=None, file=None):
+    channel_id = int(channel_id)
+    channel = client.get_channel(channel_id)
+    if file != None:
+        await channel.send(file=file)
+    if embed == None and content != None:
+        await channel.send(content)
+    elif embed != None and content == None:
+        await channel.send(embed=embed)
+    elif embed != None and content != None:
+        await channel.send(content, embed=embed)
+    else:
+        pass
+
+
+async def sendSpecificChannels(channels, content=None, embed=None, file=None):
+    for channel_id in channels:
+        await sendChannel(channel_id, content=content, embed=embed, file=file)
+
+
 async def sendAllChannels(message_type, content=None, embed=None, file=None):
     db_records = getCompleteDatabase()
     for row in db_records:
@@ -92,18 +112,7 @@ async def sendAllChannels(message_type, content=None, embed=None, file=None):
         guild_id = int(guild_id)
         channel_id = int(channel_id)
         if channel_type == message_type:
-            channel = client.get_channel(channel_id)
-            if file != None:
-                await channel.send(file=file)
-
-            if embed == None and content != None:
-                await channel.send(content)
-            elif embed != None and content == None:
-                await channel.send(embed=embed)
-            elif embed != None and content != None:
-                await channel.send(content, embed=embed)
-            else:
-                pass
+            await sendChannel(channel_id, content=content, embed=embed, file=file)
 
 
 @tasks.loop(hours=4)
@@ -192,12 +201,12 @@ async def on_message(ctx):
 
 @client.event
 async def on_command_error(ctx, error):
-    # LOG THIS IN THAT SERVER'S LOG CHANNELS
-    # author = ctx.message.author
-    # if CHANNEL_BOT_LOGS is not None:
-    #     channel = client.get_channel(CHANNEL_BOT_LOGS)
-    #     await channel.send(
-    #         f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}")
+    guild_id = str(ctx.guild.id)
+    author = ctx.message.author
+    guild_logging_channels = getChannelFromServer(guild_id, "log")
+    if guild_logging_channels:
+        guild_logging_channels = [row[-1] for row in guild_logging_channels]
+        await sendSpecificChannels(guild_logging_channels, content=f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}")
     content = f"Incorrect command. Please type `pes.help` to view all commands."
     await ctx.send(content)
 
@@ -234,10 +243,10 @@ async def contribute(ctx, *params):
         embed.add_field(
             name='\u200b', value=f"{rule}: {rules[rule]}", inline=False)
 
-    # guild_object = client.get_guild(768874819474292746)
-    # aditeyabaral = guild_object.get_member(543143780925177857).mention
-    # abaksy = guild_object.get_member(543143780925177857).mention
-    # embed.add_field(name="Reviewers", value=f"`aditeyabaral` - {aditeyabaral}\n`abaksy` - {abaksy}", inline=False)
+    guild_object = client.get_guild(768874819474292746)
+    aditeyabaral = guild_object.get_member(ADITEYABARAL_ID).mention
+    abaksy = guild_object.get_member(ARONYABAKSY_ID).mention
+    embed.add_field(name="Reviewers", value=f"`aditeyabaral` - {aditeyabaral}\n`abaksy` - {abaksy}", inline=False)
     embed.add_field(
         name="Important", value="**Under no circumstances is anyone allowed to merge to the main branch.**", inline=False)
     embed.add_field(
@@ -571,13 +580,13 @@ async def execute(ctx, *, code):
                 await ctx.reply(f"**{e}**: Execution halted.", mention_author=True)
             signal.alarm(0)
     else:
-        greeting = random.choice(greetings_2)
         await ctx.reply(f"Usage of `os` and `subprocess` is not allowed.", mention_author=True)
-        # LOG IN LOGGING OF SERVER
-        # if CHANNEL_BOT_LOGS is not None:
-        #     channel = client.get_channel(CHANNEL_BOT_LOGS)
-        #     author = ctx.message.author
-        #     await channel.send(f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
+        guild_id = str(ctx.guild.id)
+        author = ctx.message.author
+        guild_logging_channels = getChannelFromServer(guild_id, "log")
+        if guild_logging_channels:
+            guild_logging_channels = [row[-1] for row in guild_logging_channels]
+            await sendSpecificChannels(guild_logging_channels, content=f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
 
 
 @client.command(aliases=["eval"])
@@ -592,13 +601,13 @@ async def evaluate(ctx, *, code):
             await ctx.reply(f"**{e}**: Execution halted.", mention_author=True)
         signal.alarm(0)
     else:
-        greeting = random.choice(greetings_2)
         await ctx.reply(f"Usage of `os` and `subprocess` is not allowed.", mention_author=True)
-        # LOG IN LOGGING OF SERVER
-        # if CHANNEL_BOT_LOGS is not None:
-        #     channel = client.get_channel(CHANNEL_BOT_LOGS)
-        #     author = ctx.message.author
-        #     await channel.send(f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
+        guild_id = str(ctx.guild.id)
+        author = ctx.message.author
+        guild_logging_channels = getChannelFromServer(guild_id, "log")
+        if guild_logging_channels:
+            guild_logging_channels = [row[-1] for row in guild_logging_channels]
+            await sendSpecificChannels(guild_logging_channels, content=f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
 
 
 @client.command(aliases=["sim"])
@@ -829,9 +838,9 @@ async def checkNewDay():
         await cleanUp()
 
 
-checkNewDay.start()
-checkPESUAnnouncement.start()
-checkInstagramPost.start()
-checkRedditPost.start()
-changeStatus.start()
+# checkNewDay.start()
+# checkPESUAnnouncement.start()
+# checkInstagramPost.start()
+# checkRedditPost.start()
+# changeStatus.start()
 client.run(BOT_TOKEN)

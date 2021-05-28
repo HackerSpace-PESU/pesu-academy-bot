@@ -248,3 +248,9 @@ def getCompleteDatabase():
     query = guilddb_table.select()
     result = guilddb_connection.execute(query).fetchall()
     return result
+
+
+def getChannelFromServer(guild_id, channel_type):
+    query = guilddb_table.select().where(and_(guilddb_table.c.guild_id == guild_id,guilddb_table.c.channel_type == channel_type))
+    result = guilddb_connection.execute(query).fetchall()
+    return result
