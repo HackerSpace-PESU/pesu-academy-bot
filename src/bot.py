@@ -467,13 +467,13 @@ async def search(ctx, query):
                               color=discord.Color.blue())
         for prn, srn, name, semester, section, cycle, department, branch, campus in result:
             embed.add_field(name=f"**{name}**", value=f'''**PRN**: {prn}
-                **SRN**: {srn}
-                **Semester**: {semester}
-                **Section**: {section}
-                **Cycle**: {cycle}
-                **Department**: {department}
-                **Branch**: {branch}
-                **Campus**: {campus}'''
+**SRN**: {srn}
+**Semester**: {semester}
+**Section**: {section}
+**Cycle**: {cycle}
+**Department**: {department}
+**Branch**: {branch}
+**Campus**: {campus}'''
             )
         await ctx.send(embed=embed)
     driver.quit()
@@ -489,15 +489,15 @@ async def pesdb(ctx, *, query):
                               color=discord.Color.blue())
         for prn, srn, name, semester, section, cycle, department, branch, campus, phone, email in result:
             embed.add_field(name=f"**{name}**", value=f'''**PRN**: {prn}
-                **SRN**: {srn}
-                **Semester**: {semester}
-                **Section**: {section}
-                **Cycle**: {cycle}
-                **Department**: {department}
-                **Branch**: {branch}
-                **Campus**: {campus}
-                **Phone**: {phone}
-                **E-Mail**: {email}'''
+**SRN**: {srn}
+**Semester**: {semester}
+**Section**: {section}
+**Cycle**: {cycle}
+**Department**: {department}
+**Branch**: {branch}
+**Campus**: {campus}
+**Phone**: {phone}
+**E-Mail**: {email}'''
             )
         await ctx.send(embed=embed)
         if truncated and ctx is not None:
