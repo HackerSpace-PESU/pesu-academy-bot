@@ -124,10 +124,9 @@ async def on_ready():
     print("Bot is online")
     await client.change_presence(activity=discord.Game(next(status)))
 
-    
     greeting = random.choice(greetings_1)
     embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
-                            description="Use `pes.` to access commands", color=discord.Color.blue())
+                          description="Use `pes.` to access commands", color=discord.Color.blue())
     await sendAllChannels(message_type="log", embed=embed)
 
 
@@ -212,13 +211,15 @@ async def on_guild_channel_delete(channel):
 
 @client.command()
 async def invite(ctx):
-    embed = discord.Embed(title="Invite PESU Academy Bot to your Discord Server", url="http://bit.ly/pesu-academy-bot", description="Use the following link: http://bit.ly/pesu-academy-bot" ,color=discord.Color.blue())
+    embed = discord.Embed(title="Invite PESU Academy Bot to your Discord Server", url="http://bit.ly/pesu-academy-bot",
+                          description="Use the following link: http://bit.ly/pesu-academy-bot", color=discord.Color.blue())
     await ctx.send(embed=embed)
 
 
 @client.command(aliases=['support'])
 async def contribute(ctx, *params):
-    embed = discord.Embed(title="Contribute to PESU Academy Bot", color=discord.Color.blue())
+    embed = discord.Embed(
+        title="Contribute to PESU Academy Bot", color=discord.Color.blue())
     embed.add_field(
         name="Github repository", value="https://github.com/aditeyabaral/pesu-academy-bot", inline=False)
     embed.add_field(
@@ -231,7 +232,8 @@ async def contribute(ctx, *params):
         5: "Wait for approval for reviewers. Your PR may be directly accepted or requested for further changes"
     }
     for rule in rules:
-        embed.add_field(name='\u200b', value=f"{rule}: {rules[rule]}", inline=False)
+        embed.add_field(
+            name='\u200b', value=f"{rule}: {rules[rule]}", inline=False)
 
     # guild_object = client.get_guild(768874819474292746)
     # aditeyabaral = guild_object.get_member(543143780925177857).mention
@@ -308,7 +310,7 @@ async def alerts(ctx, channel: discord.TextChannel = None):
                 client_permissions = client_member.permissions_in(channel)
                 if client_permissions.send_messages and client_permissions.embed_links and client_permissions.attach_files and client_permissions.read_message_history:
                     addChannel(guild_id, guild_name, channel_id, "publish")
-                    await ctx.send(f"**Success!** You will now receive PESU Academy Bot alerts on {channel.mention}")
+                    await ctx.send(f"**Success!** You will now receive PESU Academy Bot alerts on {channel.mention}. You can optionally also give the Bot permission to ping `@everyone` and `@here` roles to receive notifications.")
                 else:
                     await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages`, `Embed Links`, `Read History` and `Attach Files` permissions for me.")
         else:
@@ -331,7 +333,7 @@ async def logging(ctx, channel: discord.TextChannel = None):
                 client_permissions = client_member.permissions_in(channel)
                 if client_permissions.send_messages and client_permissions.embed_links and client_permissions.read_message_history:
                     addChannel(guild_id, guild_name, channel_id, "log")
-                    await ctx.send(f"**Success!** You will now receive PESU Academy Bot logging on {channel.mention}")
+                    await ctx.send(f"**Success!** You will now receive PESU Academy Bot logging on {channel.mention}. You can optionally also give the Bot permission to ping `@everyone` and `@here` roles to receive notifications.")
                 else:
                     await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages`, `Embed Links`, and `Read History` permissions for me.")
         else:
