@@ -306,7 +306,7 @@ async def alerts(ctx, channel: discord.TextChannel = None):
             else:
                 client_member = ctx.guild.get_member(BOT_ID)
                 client_permissions = client_member.permissions_in(channel)
-                if client_permissions.send_messages and client_permissions.embed_links and channel.permissions.attach_files and channel.permissions.read_history:
+                if client_permissions.send_messages and client_permissions.embed_links and client_permissions.attach_files and client_permissions.read_message_history:
                     addChannel(guild_id, guild_name, channel_id, "publish")
                     await ctx.send(f"**Success!** You will now receive PESU Academy Bot alerts on {channel.mention}")
                 else:
@@ -329,11 +329,11 @@ async def logging(ctx, channel: discord.TextChannel = None):
             else:
                 client_member = ctx.guild.get_member(BOT_ID)
                 client_permissions = client_member.permissions_in(channel)
-                if client_permissions.send_messages and client_permissions.embed_links  and channel.permissions.attach_files and channel.permissions.read_history:
+                if client_permissions.send_messages and client_permissions.embed_links and client_permissions.read_message_history:
                     addChannel(guild_id, guild_name, channel_id, "log")
                     await ctx.send(f"**Success!** You will now receive PESU Academy Bot logging on {channel.mention}")
                 else:
-                    await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages`, `Embed Links`, `Read History` and `Attach Files` permissions for me.")
+                    await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages`, `Embed Links`, and `Read History` permissions for me.")
         else:
             await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
 
