@@ -18,7 +18,8 @@ from utils import *
 
 
 load_dotenv()
-client = commands.Bot(command_prefix='pes.', help_command=None, intents=discord.Intents.all())
+client = commands.Bot(command_prefix='pes.',
+                      help_command=None, intents=discord.Intents.all())
 status = cycle(["with the PRIDE of PESU", "with lives",
                "with your future", "with PESsants", "with PESts"])
 
@@ -246,7 +247,8 @@ async def contribute(ctx, *params):
     guild_object = client.get_guild(768874819474292746)
     aditeyabaral = guild_object.get_member(ADITEYABARAL_ID).mention
     abaksy = guild_object.get_member(ARONYABAKSY_ID).mention
-    embed.add_field(name="Reviewers", value=f"`aditeyabaral` - {aditeyabaral}\n`abaksy` - {abaksy}", inline=False)
+    embed.add_field(
+        name="Reviewers", value=f"`aditeyabaral` - {aditeyabaral}\n`abaksy` - {abaksy}", inline=False)
     embed.add_field(
         name="Important", value="**Under no circumstances is anyone allowed to merge to the main branch.**", inline=False)
     embed.add_field(
@@ -297,7 +299,7 @@ async def announcecommand(ctx, *, message: str = None):
         if message == None:
             await ctx.send("Please enter a valid message.")
         else:
-            await sendAllChannels(message_type="publish", content=f"**NEW MESSAGE FROM THE BOT DEVS\n{message}**")
+            await sendAllChannels(message_type="publish", content=f"**NEW MESSAGE FROM THE BOT DEVS**\n\n{message}")
     else:
         await ctx.send("You are not authorised to run this command.")
 
@@ -585,7 +587,8 @@ async def execute(ctx, *, code):
         author = ctx.message.author
         guild_logging_channels = getChannelFromServer(guild_id, "log")
         if guild_logging_channels:
-            guild_logging_channels = [row[-1] for row in guild_logging_channels]
+            guild_logging_channels = [row[-1]
+                                      for row in guild_logging_channels]
             await sendSpecificChannels(guild_logging_channels, content=f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
 
 
@@ -606,7 +609,8 @@ async def evaluate(ctx, *, code):
         author = ctx.message.author
         guild_logging_channels = getChannelFromServer(guild_id, "log")
         if guild_logging_channels:
-            guild_logging_channels = [row[-1] for row in guild_logging_channels]
+            guild_logging_channels = [row[-1]
+                                      for row in guild_logging_channels]
             await sendSpecificChannels(guild_logging_channels, content=f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
 
 
@@ -838,9 +842,9 @@ async def checkNewDay():
         await cleanUp()
 
 
-# checkNewDay.start()
-# checkPESUAnnouncement.start()
-# checkInstagramPost.start()
-# checkRedditPost.start()
-# changeStatus.start()
+checkNewDay.start()
+checkPESUAnnouncement.start()
+checkInstagramPost.start()
+checkRedditPost.start()
+changeStatus.start()
 client.run(BOT_TOKEN)
