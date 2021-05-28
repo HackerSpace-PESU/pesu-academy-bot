@@ -16,7 +16,8 @@ from instagram import *
 
 async def cleanUp():
     files = [fname for fname in os.listdir() if Path(fname).suffix in [
-        ".pdf", ".png", ".jpg", ".jpeg"]]
+        ".pdf", ".png", ".jpg", ".jpeg"]
+    ]
     for fname in files:
         try:
             os.remove(fname)
@@ -69,8 +70,8 @@ async def searchPESUAcademy(driver, query):
 
 
 async def checkMaliciousCode(source_code):
-    bad_codes = ["from os", "from subprocess",
-                 "import os", "import subprocess"]
+    bad_codes = ["from os", "from subprocess", "from sys",
+                 "import os", "import subprocess", "import sys"]
     for code_segment in bad_codes:
         if code_segment in source_code:
             return True
