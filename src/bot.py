@@ -24,8 +24,7 @@ status = cycle(["with the PRIDE of PESU", "with lives",
                "with your future", "with PESsants", "with PESts"])
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-CHANNEL_BOT_LOGS = 842466762985701406
-BOT_ID = 847138055978614845
+BOT_ID = int(os.environ["BOT_ID"])
 
 ARONYABAKSY_ID = int(os.environ["ARONYA_ID"])
 ADITEYABARAL_ID = int(os.environ["BARAL_ID"])
@@ -276,6 +275,17 @@ async def dbinfo(ctx):
         await ctx.send(file=discord.File('guilds.csv'))
         fp.close()
         os.remove('guilds.csv')
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command(aliases=['announce'])
+async def announcecommand(ctx, *, message: str = None):
+    if await checkUserIsBotDev(ctx):
+        if message == None:
+            await ctx.send("Please enter a valid message.")
+        else:
+            await sendAllChannels(message_type="publish", content=f"**NEW MESSAGE FROM THE BOT DEVS\n{message}**")
     else:
         await ctx.send("You are not authorised to run this command.")
 
@@ -559,11 +569,12 @@ async def execute(ctx, *, code):
             signal.alarm(0)
     else:
         greeting = random.choice(greetings_2)
-        await ctx.reply(f"Aye {greeting}, what are you trying to do?\nUsage of `os` and `subprocess` is not allowed.", mention_author=True)
-        if CHANNEL_BOT_LOGS is not None:
-            channel = client.get_channel(CHANNEL_BOT_LOGS)
-            author = ctx.message.author
-            await channel.send(f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
+        await ctx.reply(f"Usage of `os` and `subprocess` is not allowed.", mention_author=True)
+        # LOG IN LOGGING OF SERVER
+        # if CHANNEL_BOT_LOGS is not None:
+        #     channel = client.get_channel(CHANNEL_BOT_LOGS)
+        #     author = ctx.message.author
+        #     await channel.send(f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
 
 
 @client.command(aliases=["eval"])
@@ -579,11 +590,12 @@ async def evaluate(ctx, *, code):
         signal.alarm(0)
     else:
         greeting = random.choice(greetings_2)
-        await ctx.reply(f"Aye {greeting}, what are you trying to do?\nUsage of `os` and `subprocess` is not allowed.", mention_author=True)
-        if CHANNEL_BOT_LOGS is not None:
-            channel = client.get_channel(CHANNEL_BOT_LOGS)
-            author = ctx.message.author
-            await channel.send(f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
+        await ctx.reply(f"Usage of `os` and `subprocess` is not allowed.", mention_author=True)
+        # LOG IN LOGGING OF SERVER
+        # if CHANNEL_BOT_LOGS is not None:
+        #     channel = client.get_channel(CHANNEL_BOT_LOGS)
+        #     author = ctx.message.author
+        #     await channel.send(f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
 
 
 @client.command(aliases=["sim"])
