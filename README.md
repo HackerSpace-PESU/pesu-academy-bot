@@ -15,11 +15,11 @@ You can add the bot to your Discord Server using [this link](http://bit.ly/pesu-
 
 ## What can PESU Academy Bot do?
 
-1. It periodically fetches PESU announcements and notifies you immediately, thus you never need to open PESU Academy ever
+1. It periodically fetches PESU announcements and notifies you immediately (thus eliminating any reason to open PESU Academy)
 2. It is connected to a student database, and allows you to perform a query based lookup to search
 3. It updates you about Instagram posts made by clubs
 4. It also follows PES social media handles - Instagram and Reddit
-4. It contains two URL shortners - [long.rip](http://www.long.rip/) by [Adarsh Shetty](https://github.com/ObliviousParadigm) and [redirector](https://github.com/aditeyabaral/redirector) by me.
+4. It contains two URL shortners - [long.rip](http://www.long.rip/) by [Adarsh Shetty](https://github.com/ObliviousParadigm) and [redirector](https://github.com/aditeyabaral/redirector) by me
 5. You can also execute Python code!
 6. It features a meme-generator - [SaaS](https://github.com/aditeyabaral/spongebob-as-a-service) and an [English Dictionary](https://github.com/aditeyabaral/pydictionary)
 
