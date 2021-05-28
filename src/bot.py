@@ -11,6 +11,7 @@ import contextlib
 from io import StringIO
 from itertools import cycle
 from datetime import datetime
+from discord import guild
 from dotenv import load_dotenv
 from selenium import webdriver
 from discord.ext import commands, tasks
@@ -82,6 +83,24 @@ async def checkUserHasManageServerPermission(ctx):
     Checks if the message author has the Manage Server permission.
     '''
     return ctx.channel.permissions_for(ctx.author).manage_guild
+
+
+async def sendAllChannels(message_type, content=None, embed=None):
+    db_records = getCompleteDatabase()
+    for row in db_records:
+        guild_id, _, channel_type, channel_id = row[1:]
+        guild_id = int(guild_id)
+        channel_id = int(channel_id)
+        if channel_type == message_type:
+            channel = await client.get_channel(channel_id)
+            if embed == None and content != None:
+                await channel.send(content)
+            elif embed != None and content == None:
+                await channel.send(embed=embed)
+            elif embed != None and content != None:
+                await channel.send(content, embed=embed)
+            else:
+                pass
 
 
 @tasks.loop(hours=4)
@@ -184,6 +203,40 @@ async def on_command_error(ctx, error):
 async def on_guild_channel_delete(channel):
     channel_id = str(channel.id)
     removeChannel(channel_id)
+
+
+@client.command()
+async def invite(ctx):
+    embed = discord.Embed(title="Invite PESU Academy Bot to your Discord Server", url="http://bit.ly/pesu-academy-bot", description="Use the following link: http://bit.ly/pesu-academy-bot" ,color=discord.Color.blue())
+    await ctx.send(embed=embed)
+
+
+@client.command(aliases=['support'])
+async def contribute(ctx, *params):
+    embed = discord.Embed(title="Contribute to PESU Academy Bot", color=discord.Color.blue())
+    embed.add_field(
+        name="Github repository", value="https://github.com/aditeyabaral/pesu-academy-bot", inline=False)
+    embed.add_field(
+        name='\u200b', value="If you wish to contribute to the bot, run these steps:", inline=False)
+    rules = {
+        1: "Fork this repository",
+        2: "Create a new branch called `username-beta`",
+        3: "Make your changes and create a pull request with the following information in the request message: `The functionality you wish to change/add | What did you change/add`. Remember to add a few screenshots of the feature working at your end",
+        4: "Send a review request to `aditeyabaral` or `abaksy`",
+        5: "Wait for approval for reviewers. Your PR may be directly accepted or requested for further changes"
+    }
+    for rule in rules:
+        embed.add_field(name='\u200b', value=f"{rule}: {rules[rule]}", inline=False)
+
+    # guild_object = client.get_guild(768874819474292746)
+    # aditeyabaral = guild_object.get_member(543143780925177857).mention
+    # abaksy = guild_object.get_member(543143780925177857).mention
+    # embed.add_field(name="Reviewers", value=f"`aditeyabaral` - {aditeyabaral}\n`abaksy` - {abaksy}", inline=False)
+    embed.add_field(
+        name="Important", value="**Under no circumstances is anyone allowed to merge to the main branch.**", inline=False)
+    embed.add_field(
+        name="\u200b", value="You can send suggestions and feedback by raising an issue with [IMPROVEMENT] or [FEEDBACK] added to the title.")
+    await ctx.send(embed=embed)
 
 
 @client.command(aliases=['guilds'])
