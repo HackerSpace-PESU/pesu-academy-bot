@@ -85,14 +85,17 @@ async def checkUserHasManageServerPermission(ctx):
     return ctx.channel.permissions_for(ctx.author).manage_guild
 
 
-async def sendAllChannels(message_type, content=None, embed=None):
+async def sendAllChannels(message_type, content=None, embed=None, file=None):
     db_records = getCompleteDatabase()
     for row in db_records:
         guild_id, _, channel_type, channel_id = row[1:]
         guild_id = int(guild_id)
         channel_id = int(channel_id)
         if channel_type == message_type:
-            channel = await client.get_channel(channel_id)
+            channel = client.get_channel(channel_id)
+            if file != None:
+                await channel.send(file=file)
+
             if embed == None and content != None:
                 await channel.send(content)
             elif embed != None and content == None:
@@ -120,11 +123,11 @@ async def on_ready():
     print("Bot is online")
     await client.change_presence(activity=discord.Game(next(status)))
 
-    # channel = client.get_channel(id=CHANNEL_BOT_LOGS)
-    # greeting = random.choice(greetings_1)
-    # embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
-    #                         description="Use `pes.` to access commands", color=0x03f8fc)
-    # await channel.send(embed=embed)
+    
+    greeting = random.choice(greetings_1)
+    embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
+                            description="Use `pes.` to access commands", color=discord.Color.blue())
+    await sendAllChannels(message_type="log", embed=embed)
 
 
 @client.event
@@ -190,12 +193,13 @@ async def on_message(ctx):
 
 @client.event
 async def on_command_error(ctx, error):
-    author = ctx.message.author
-    if CHANNEL_BOT_LOGS is not None:
-        channel = client.get_channel(CHANNEL_BOT_LOGS)
-        await channel.send(
-            f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}")
-    content = f"Aye nakkan {author.mention}\nType `pes.help` if you do not know how to use the bot."
+    # LOG THIS IN THAT SERVER'S LOG CHANNELS
+    # author = ctx.message.author
+    # if CHANNEL_BOT_LOGS is not None:
+    #     channel = client.get_channel(CHANNEL_BOT_LOGS)
+    #     await channel.send(
+    #         f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}")
+    content = f"Incorrect command. Please type `pes.help` to view all commands."
     await ctx.send(content)
 
 
@@ -333,8 +337,6 @@ async def echo(ctx, *, query=None):
         channel = client.get_channel(int(channel[2:-1]))
         await channel.send(content)
     else:
-        author = ctx.message.author
-        greeting = random.choice(greetings_2)
         await ctx.send(f"You are not authorised to run this command.")
 
 
@@ -353,16 +355,14 @@ async def reply(ctx, *, query=None):
         parent_message = await channel.fetch_message(parent_message_id)
         await parent_message.reply(content)
     else:
-        author = ctx.message.author
-        greeting = random.choice(greetings_2)
-        await ctx.send(f"Aye {author.mention}, you don't have permission to do that da {greeting}")
+        await ctx.send(f"You are not authorised to run this command.")
 
 
 @client.command(aliases=["vc", "pride"])
 async def prideofpesu(ctx):
     greeting = random.choice(greetings_1)
     embed = discord.Embed(
-        title=f"{greeting}, may the PRIDE of PESU be with you!", color=0x03f8fc)
+        title=f"{greeting}, may the PRIDE of PESU be with you!", color=discord.Color.blue())
     await ctx.send(embed=embed)
     await ctx.send("https://tenor.com/view/pes-pesuniversity-pesu-may-the-pride-of-pes-may-the-pride-of-pes-be-with-you-gif-21274060")
 
@@ -374,29 +374,7 @@ async def ping(ctx):
 
 @client.command(aliases=["h"])
 async def help(ctx):
-    content = '''
-1. `.hello`: Be nice to me. Say `.hello` once in a while 👋
-2. `.search`: To search the Class and Section Database, use `.search [SRN | email]`
-3. `.pesdb`: Search in the PESU Database using `.pesdb [search 1] & [search 2]`. String together as many filters as needed. You can also use emails and names.
-4. `.news`: Fetch PESU Announcements using `.news [OPTIONAL=today] [OPTIONAL=N]`. Get today's announcements with `.news today`. Fetch all announcements using `.news`. Specify the number of news using `N`.
-5. `.bitly`: Create a shortened bitly link using `.bitly [LONG URL]`
-6. `.longrip`: Create a shortened long.rip link using `.longrip [URL]`
-7. `.goto`: Create customized redirection links using `.goto [LONG URL] [SHORT URL]`
-8. `.exec`: Use this to execute Python scripts. Attach your script within blockquotes on the next line. 
-   **Example**: 
-   .exec
-```Python
-import math
-print(math.pi)```
-9. `.insta`: Fetch the last Instagram post from PESU Academy
-10. `.reddit`: Fetch the latest posts from r/PESU using `.reddit [NUMBER OF POSTS]`
-11. `.sim`: Find similarity between uploaded files using Doc2Vec. Upload files into a channel and use `.sim [FILENAMES]`. 
-12. `.eval`: Evaluate a single Python expression using `.eval [EXPRESSION]`
-13. `.flames`: To calculate FLAMES scores for your ladies use `.flames [name 1] [name 2]`
-14. `.spongebob` or `.sb`: Create a SpongeBob mocking meme. `.sb [top text] & [bottom-text]` or `.sb [bottom-text]`
-15. `.8b`: Ask a question and receive an answer using `.8b [question]`
-16. `.dict`: Search for the meaning of word using `.dict [word]`
-17. `.ping`: Perform a `ping` test'''
+    content = 
     await ctx.send(content)
 
 
@@ -417,9 +395,7 @@ async def clear(ctx, amount=1):
         await asyncio.sleep(0.5)
         await ctx.channel.purge(limit=1)
     else:
-        author = ctx.message.author
-        greeting = random.choice(greetings_2)
-        await ctx.send(f"Aye {author.mention}, you don't have permission to do that da {greeting}")
+        await ctx.send(f"You are not authorised to run this command.")
 
 
 @client.command(aliases=["searchsrn", "searchpes"])
@@ -428,11 +404,10 @@ async def search(ctx, query):
         executable_path=CHROMEDRIVER_PATH, options=chrome_options)
     result = await searchPESUAcademy(driver, query)
     if result == None:
-        author = ctx.message.author
-        await ctx.send(f"Aye nakkan {author.mention}, don't make me search for imaginary people.")
+        await ctx.send("No results found.")
     else:
         embed = discord.Embed(title=f"Search Results",
-                              color=0x03f8fc)
+                              color=discord.Color.blue())
         for prn, srn, name, semester, section, cycle, department, branch, campus in result:
             embed.add_field(name=f"**{name}**", value=f'''**PRN**: {prn}
 **SRN**: {srn}
@@ -450,11 +425,10 @@ async def search(ctx, query):
 async def pesdb(ctx, *, query):
     result, truncated, base_url = await getPESUDBResults(query)
     if result == None:
-        author = ctx.message.author
-        await ctx.send(f"Aye nakkan {author.mention}, don't make me search for imaginary people.")
+        await ctx.send("No results found.")
     else:
         embed = discord.Embed(title=f"Search Results",
-                              color=0x03f8fc)
+                              color=discord.Color.blue())
         for prn, srn, name, semester, section, cycle, department, branch, campus, phone, email in result:
             embed.add_field(name=f"**{name}**", value=f'''**PRN**: {prn}
 **SRN**: {srn}
@@ -482,12 +456,11 @@ async def spongebob(ctx, *, query):
 
 @client.command(aliases=["dict"])
 async def dictionary(ctx, query, n=5):
-    author = ctx.message.author
     flag, result = await getDictionaryMeaning(query, n)
     if flag:
         meanings, antonyms = result
         embed = discord.Embed(title=f"Search Results",
-                              color=0x03f8fc)
+                              color=discord.Color.blue())
         for defn, examples, form in meanings:
             if examples:
                 tmp_examples = '\n'.join(examples)
@@ -503,18 +476,9 @@ async def dictionary(ctx, query, n=5):
 
     else:
         if result == None:
-            await ctx.send(f"Aye nakkan {author.mention}, your spelling is so bad that I don't even know what to suggest")
+            await ctx.send(f"Your spelling is so bad that I don't even know what to suggest.")
         else:
             await ctx.send(f"Word not found. Did you mean {result}?")
-
-
-'''@client.command()
-async def bitly(ctx, long_url):
-    short_url, response = await shortenLinkBitly(long_url, BITLY_TOKEN, BITLY_GUID)
-    if response.status_code == 201:
-        await ctx.send(f"{long_url} is now shortened to {short_url}")
-    else:
-        await ctx.send("Failed to create bitly link.")'''
 
 
 @client.command(aliases=["goto"])
@@ -622,7 +586,7 @@ async def similarity(ctx, *, filenames):
             f"{doc1} -- {doc2}: **{round(sim*100, 2)}%**" for doc1, doc2, sim in result]
         string = "\n\n".join(result)
         embed = discord.Embed(
-            title="Document Similarity Results", color=0x03f8fc, description=string)
+            title="Document Similarity Results", color=discord.Color.blue(), description=string)
         await ctx.send(embed=embed)
 
 
@@ -678,10 +642,10 @@ async def getAnnouncementEmbed(announcement):
     title = announcement["header"]
     if len(title) > 256:
         embed = discord.Embed(title=title[:253] + "...", description="..." +
-                              title[253:], color=0x03f8fc)
+                              title[253:], color=discord.Color.blue())
     else:
         embed = discord.Embed(
-            title=title, color=0x03f8fc)
+            title=title, color=discord.Color.blue())
 
     content_body = str(announcement["body"])
     if len(content_body) > 1024:
@@ -752,11 +716,10 @@ async def checkInstagramPost():
     print("Fetching Instagram posts...")
 
     username = 'pesuniversity'
-    channel = client.get_channel(CHANNEL_PESU_ANNOUNCEMENT)
     post_embed, photo_time = await getInstagramEmbed(username)
     curr_time = time.time()
     if (curr_time - photo_time) < 600:
-        await channel.send("@everyone", embed=post_embed)
+        await sendAllChannels(message_type="publish", content="@everyone", embed=post_embed)
 
 
 @tasks.loop(minutes=10)
@@ -768,10 +731,8 @@ async def checkRedditPost():
     current_time = datetime.now()
     time_difference = current_time - post_time
     if time_difference.seconds < 600 and time_difference.days == 0:
-        print("Inside loop")
-        channel = client.get_channel(CHANNEL_PESU_ANNOUNCEMENT)
         post_embed = await getRedditEmbed(latest_reddit_post)
-        await channel.send("@everyone", embed=post_embed)
+        await sendAllChannels(message_type="publish", content="@everyone", embed=post_embed)
 
 
 @tasks.loop(minutes=5)
@@ -793,7 +754,6 @@ async def checkPESUAnnouncement():
     ALL_ANNOUNCEMENTS_MADE.sort(key=lambda x: x["date"], reverse=True)
 
     current_date = datetime.now().date()
-    channel = client.get_channel(CHANNEL_PESU_ANNOUNCEMENT)
     for announcement in all_announcements:
         if announcement["date"] == current_date:
             if announcement not in TODAY_ANNOUNCEMENTS_MADE:
@@ -806,13 +766,13 @@ async def checkPESUAnnouncement():
                         f.write(imgdata)
                     with open(filename, 'rb') as f:
                         img_file = discord.File(f)
-                        await channel.send(file=img_file)
+                        await sendAllChannels(message_type="publish", file=img_file)
 
-                await channel.send("@everyone", embed=embed)
+                await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
                 if announcement["attachments"]:
                     for fname in announcement["attachments"]:
                         attachment_file = discord.File(fname)
-                        await channel.send(file=attachment_file)
+                        await sendAllChannels(message_type="publish", file=attachment_file)
                 TODAY_ANNOUNCEMENTS_MADE.append(announcement)
     driver.quit()
 
@@ -830,9 +790,9 @@ async def checkNewDay():
         await cleanUp()
 
 
-# checkNewDay.start()
-# checkPESUAnnouncement.start()
-# checkInstagramPost.start()
-# checkRedditPost.start()
+checkNewDay.start()
+checkPESUAnnouncement.start()
+checkInstagramPost.start()
+checkRedditPost.start()
 changeStatus.start()
 client.run(BOT_TOKEN)
