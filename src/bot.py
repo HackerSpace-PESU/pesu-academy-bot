@@ -294,11 +294,11 @@ async def alerts(ctx, channel: discord.TextChannel = None):
             else:
                 client_member = ctx.guild.get_member(BOT_ID)
                 client_permissions = client_member.permissions_in(channel)
-                if client_permissions.send_messages and client_permissions.embed_links:
+                if client_permissions.send_messages and client_permissions.embed_links and channel.permissions.attach_files and channel.permissions.read_history:
                     addChannel(guild_id, guild_name, channel_id, "publish")
                     await ctx.send(f"**Success!** You will now receive PESU Academy Bot alerts on {channel.mention}")
                 else:
-                    await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages` and `Embed Links` for me.")
+                    await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages`, `Embed Links`, `Read History` and `Attach Files` permissions for me.")
         else:
             await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
 
@@ -317,11 +317,11 @@ async def logging(ctx, channel: discord.TextChannel = None):
             else:
                 client_member = ctx.guild.get_member(BOT_ID)
                 client_permissions = client_member.permissions_in(channel)
-                if client_permissions.send_messages and client_permissions.embed_links:
+                if client_permissions.send_messages and client_permissions.embed_links  and channel.permissions.attach_files and channel.permissions.read_history:
                     addChannel(guild_id, guild_name, channel_id, "log")
                     await ctx.send(f"**Success!** You will now receive PESU Academy Bot logging on {channel.mention}")
                 else:
-                    await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages` and `Embed Links` for me.")
+                    await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages`, `Embed Links`, `Read History` and `Attach Files` permissions for me.")
         else:
             await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
 
@@ -390,7 +390,7 @@ async def help(ctx):
 13. `pes.goto`: Create customized redirection links using `pes.goto [LONG URL] [SHORT URL]`
 14. `pes.exec`: Use this to execute Python scripts. Attach your script within blockquotes on the next line. 
    **Example**: 
-   .exec
+   pes.exec
 ```Python
 import math
 print(math.pi)```
