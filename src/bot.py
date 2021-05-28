@@ -50,10 +50,14 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument('--ignore-ssl-errors=yes')
 chrome_options.add_argument('--ignore-certificate-errors')
 
+instagram_usernames = [
+    "pesuniversity",
+    "peshackerspace",
+    "peshackerspace.ecc"
+]
 TODAY_ANNOUNCEMENTS_MADE = list()
 ALL_ANNOUNCEMENTS_MADE = list()
-greetings_1 = ["PESsants", "PESts"]
-greetings_2 = ["PESsant", "PESt"]
+greetings = ["PESsants", "PESts"]
 
 
 async def checkUserIsAdminOrBotDev(ctx):
@@ -133,7 +137,7 @@ async def on_ready():
     print("Bot is online")
     await client.change_presence(activity=discord.Game(next(status)))
 
-    greeting = random.choice(greetings_1)
+    greeting = random.choice(greetings)
     embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
                           description="Use `pes.` to access commands", color=discord.Color.blue())
     await sendAllChannels(message_type="log", embed=embed)
@@ -192,7 +196,7 @@ async def on_message(ctx):
         pass
     elif client.user.mentioned_in(ctx):
         if "@everyone" not in ctx.content and "@here" not in ctx.content and ctx.reference == None:
-            greeting = random.choice(greetings_2)
+            greeting = random.choice(greetings[:-1])
             await ctx.channel.send(f"{ctx.author.mention} don't ping the bot da {greeting}")
         else:
             await client.process_commands(ctx)
@@ -384,7 +388,7 @@ async def reply(ctx, *, query=None):
 
 @client.command(aliases=["vc", "pride"])
 async def prideofpesu(ctx):
-    greeting = random.choice(greetings_1)
+    greeting = random.choice(greetings)
     embed = discord.Embed(
         title=f"{greeting}, may the PRIDE of PESU be with you!", color=discord.Color.blue())
     await ctx.send(embed=embed)
@@ -684,8 +688,7 @@ async def getInstagramEmbed(username):
 
 
 @client.command()
-async def insta(ctx):
-    username = 'pesuniversity'
+async def insta(ctx, username="pesuniversity"):
     post_embed, _ = await getInstagramEmbed(username)
     await ctx.channel.send(embed=post_embed)
 
@@ -765,13 +768,12 @@ async def pesunews(ctx, *, query=None):
 @tasks.loop(minutes=10)
 async def checkInstagramPost():
     await client.wait_until_ready()
-    print("Fetching Instagram posts...")
-
-    username = 'pesuniversity'
-    post_embed, photo_time = await getInstagramEmbed(username)
-    curr_time = time.time()
-    if (curr_time - photo_time) < 600:
-        await sendAllChannels(message_type="publish", content="@everyone", embed=post_embed)
+    for username in instagram_usernames:
+        print(f"Fetching Instagram posts from {username}...")
+        post_embed, photo_time = await getInstagramEmbed(username)
+        curr_time = time.time()
+        if (curr_time - photo_time) < 600:
+            await sendAllChannels(message_type="publish", content="@everyone", embed=post_embed)
 
 
 @tasks.loop(minutes=10)
