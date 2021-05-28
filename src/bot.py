@@ -88,6 +88,8 @@ async def sendAllChannels(message_type, content=None, embed=None, file=None):
     db_records = getCompleteDatabase()
     for row in db_records:
         guild_id, _, channel_type, channel_id = row[1:]
+        if channel_id == None:
+            continue
         guild_id = int(guild_id)
         channel_id = int(channel_id)
         if channel_type == message_type:
