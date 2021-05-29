@@ -153,14 +153,16 @@ async def subscriptionReminder():
     for guild in guild_info:
         if guild_info[guild]["publish"] == None:
             alert_embed = discord.Embed(
-                color=discord.Color.blue(), title="PESU Academy Bot - REMINDER")
-            alert_embed.add_field(
-                name="\u200b", value="Your server is **not** setup for alerts. Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`")
+                color=discord.Color.blue(), 
+                title="PESU Academy Bot - IMPORTANT REMINDER", 
+                description="Your server is **not** setup for alerts. Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`"
+                )
             guild_object = client.get_guild(guild)
-            for channels in guild_object.text_channels:
-                if channels.permissions_for(guild_object.me).send_messages:
-                    await channels.send(embed=alert_embed)
-                    break
+            if guild_object != None:
+                for channels in guild_object.text_channels:
+                    if channels.permissions_for(guild_object.me).send_messages:
+                        await channels.send(embed=alert_embed)
+                        break
 
 
 @tasks.loop(hours=4)
@@ -205,10 +207,7 @@ async def on_guild_join(guild):
     alert_embed = discord.Embed(
         color=discord.Color.blue(),
         title="PESU Academy Bot - IMPORTANT",
-    )
-    alert_embed.add_field(
-        name="\u200b",
-        value="Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`"
+        description="Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`"
     )
 
     for channels in guild.text_channels:
@@ -241,7 +240,12 @@ async def on_message(ctx):
     elif client.user.mentioned_in(ctx):
         if "@everyone" not in ctx.content and "@here" not in ctx.content and ctx.reference == None:
             greeting = random.choice(greetings)[:-1]
-            await ctx.channel.send(f"{ctx.author.mention} don't be a {greeting} by pinging the bot. Type `pes.help` to access commands.")
+            embed = discord.Embed(
+                color=discord.Color.blue(),
+                title="PESU Academy Bot",
+                description=f"{ctx.author.mention} don't be a {greeting} by pinging the bot. Type `pes.help` to access commands."
+            )
+            await ctx.channel.send(f"{ctx.author.mention}", embed=embed)
         else:
             await client.process_commands(ctx)
     else:
@@ -255,9 +259,18 @@ async def on_command_error(ctx, error):
     guild_logging_channels = getChannelFromServer(guild_id, "log")
     if guild_logging_channels:
         guild_logging_channels = [row[-1] for row in guild_logging_channels]
-        await sendSpecificChannels(guild_logging_channels, content=f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}")
-    content = f"Incorrect command. Please type `pes.help` to view all commands."
-    await ctx.send(content)
+        embed = discord.Embed(
+        color=discord.Color.blue(),
+        title="PESU Academy Bot - Command Error Log",
+        description=f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}"
+        )
+        await sendSpecificChannels(guild_logging_channels, embed=embed)
+    embed = discord.Embed(
+        color=discord.Color.blue(),
+        title="PESU Academy Bot - Command Error",
+        description="Incorrect command. Please type `pes.help` to view all commands."
+    )
+    await ctx.send(embed=embed)
 
 
 @client.event
@@ -310,14 +323,25 @@ async def reachoutcommand(ctx, *, message: str = None):
         if(message == None):
             await ctx.send("Type a message to send to the developers.")
         else:
-            await ctx.send("Your message has been sent to the developer team. We will get back to you with a reply shortly on this channel.")
-            channel = client.get_channel(CHANNEL_BOT_LOGS)
-            await channel.send(f'''**New Reachout**\n
-**Server Name**: `{ctx.guild.name}`
+
+            embed = discord.Embed(
+            color=discord.Color.blue(),
+            title="PESU Academy Bot - Reach Out to Developer Team",
+            description="Your message has been sent to the developer team. We will get back to you with a reply shortly on this channel."
+            )
+            await ctx.send(embed=embed)
+
+            embed = discord.Embed(
+            color=discord.Color.blue(),
+            title="PESU Academy Bot - Reach Out to Developer Team",
+            description=f'''**Server Name**: `{ctx.guild.name}`
 **Server ID**: `{ctx.guild.id}`
 **Channel ID**: `{ctx.channel.id}`\n
 **Message**: {message}'''
-                               )
+            )
+            channel = client.get_channel(CHANNEL_BOT_LOGS)
+            await channel.send(embed=embed)
+
     else:
         await ctx.send("You are not authorised to run this command. Only members with administrator permissions can run this command. Contact your server administrator or anyone with a role who has administrator privileges. You can always contact us on our GitHub page: https://github.com/aditeyabaral/pesu-academy-bot")
 
@@ -331,12 +355,27 @@ async def reachreplycommand(ctx, destination_channel_id: int = None, *, message:
             await ctx.send("Enter a valid message")
         else:
             try:
-                destination_channel = client.get_channel(
-                    destination_channel_id)
-                await destination_channel.send(f"**MESSAGE FROM THE BOT DEVELOPERS**\n\n{message}")
-                await ctx.send("Message sent")
+                destination_channel = client.get_channel(destination_channel_id)
+                embed = discord.Embed(
+                    color=discord.Color.blue(),
+                    title="PESU Academy Bot - Message from Developer Team",
+                    description=message
+                )
+                await destination_channel.send(embed=embed)
+
+                embed = discord.Embed(
+                    color=discord.Color.blue(),
+                    title="PESU Academy Bot - Message from Developer Team",
+                    description="Message has been delivered"
+                )
+                await ctx.send(embed=embed)
             except:
-                await ctx.send("Cannot fetch that channel.")
+                embed = discord.Embed(
+                    color=discord.Color.blue(),
+                    title="PESU Academy Bot - Message from Developer Team",
+                    description="Message failed to deliver to channel"
+                )
+                await ctx.send(embed=embed)
     else:
         await ctx.send("You do not have the permission to execute this command")
 
@@ -386,7 +425,12 @@ async def announcecommand(ctx, message_type=None, *, message: str = None):
         elif message_type == None:
             await ctx.send("Please enter a valid message type.")
         else:
-            await sendAllChannels(message_type=message_type, content=f"**NEW MESSAGE FROM THE BOT DEVELOPERS**\n\n{message}")
+            embed = discord.Embed(
+            color=discord.Color.blue(),
+            title="PESU Academy Bot - Message from Developer Team",
+            description=message
+            )
+            await sendAllChannels(message_type=message_type, embed=embed)
     else:
         await ctx.send("You are not authorised to run this command.")
 
@@ -487,7 +531,12 @@ async def prideofpesu(ctx):
 
 @client.command()
 async def ping(ctx):
-    await ctx.send(f"Pong! {round(client.latency * 1000, 2)} ms")
+    embed = discord.Embed(
+        color=discord.Color.blue(),
+        title="PESU Academy Bot - Ping Test",
+        description=f"Pong! {round(client.latency * 1000, 2)} ms"
+)
+    await ctx.send(embed=embed)
 
 
 @client.command(aliases=["h"])
