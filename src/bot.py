@@ -29,6 +29,8 @@ BOT_ID = int(os.environ["BOT_ID"])
 ARONYABAKSY_ID = int(os.environ["ARONYA_ID"])
 ADITEYABARAL_ID = int(os.environ["BARAL_ID"])
 BOT_DEVS = [ARONYABAKSY_ID, ADITEYABARAL_ID]
+CHANNEL_BOT_LOGS = 842466762985701406
+DEV_SERVER = 768874819474292746
 
 BITLY_TOKEN = os.environ["BITLY_TOKEN"]
 BITLY_GUID = os.environ["BITLY_GUID"]
@@ -248,7 +250,7 @@ async def contribute(ctx, *params):
         embed.add_field(
             name='\u200b', value=f"{rule}: {rules[rule]}", inline=False)
 
-    guild_object = client.get_guild(768874819474292746)
+    guild_object = client.get_guild(DEV_SERVER)
     aditeyabaral = guild_object.get_member(ADITEYABARAL_ID).mention
     abaksy = guild_object.get_member(ARONYABAKSY_ID).mention
     embed.add_field(
@@ -258,6 +260,44 @@ async def contribute(ctx, *params):
     embed.add_field(
         name="\u200b", value="You can send suggestions and feedback by raising an issue with [IMPROVEMENT] or [FEEDBACK] added to the title.")
     await ctx.send(embed=embed)
+
+
+@client.command(aliases=['reachout'])
+async def reachoutcommand(ctx, *, message: str = None):
+    if await checkUserIsAdminOrBotDev(ctx):
+        if(message == None):
+            await ctx.send("Type a message to send to the developers.")
+        else:
+            await ctx.send("Your message has been sent to the developer team. We will get back to you with a reply shortly on this channel.")
+            channel = client.get_channel(CHANNEL_BOT_LOGS)
+            await channel.send(f'''**New Reachout**\n
+**Server Name**: `{ctx.guild.name}`
+**Server ID**: `{ctx.guild.id}`
+**Channel ID**: `{ctx.channel.id}`\n
+**Message**: {message}'''
+                               )
+    else:
+        await ctx.send("You are not authorised to run this command. Only members with administrator permissions can run this command. Contact your server administrator or anyone with a role who has administrator privileges. You can always contact us on our GitHub page: https://github.com/aditeyabaral/pesu-academy-bot")
+
+
+@client.command(aliases=['reachreply'])
+async def reachreplycommand(ctx, destination_channel_id: int = None, *, message: str = None):
+    if await checkUserIsBotDev(ctx):
+        if(destination_channel_id == None):
+            await ctx.send("Enter a valid channel ID")
+        elif message == None:
+            await ctx.send("Enter a valid message")
+        else:
+            try:
+                destination_channel = client.get_channel(
+                    destination_channel_id)
+                await destination_channel.send("**MESSAGE FROM THE BOT DEVELOPERS**")
+                await destination_channel.send(message)
+                await ctx.send("Message sent")
+            except:
+                await ctx.send("Cannot fetch that channel.")
+    else:
+        await ctx.send("You do not have the permission to execute this command")
 
 
 @client.command(aliases=['guilds'])
@@ -287,7 +327,7 @@ async def dbinfo(ctx):
         data = "SERVER ID,SERVER NAME,CHANNEL TYPE,CHANNEL ID\n\n"
         for row in db_records:
             row_data = list(map(str, row[1:]))
-            data += "{},{},{}\n".format(*row_data)
+            data += "{},{},{},{}\n".format(*row_data)
         with open('guilds.csv', 'w') as fp:
             fp.write(data)
         await ctx.send(file=discord.File('guilds.csv'))
@@ -303,7 +343,7 @@ async def announcecommand(ctx, *, message: str = None):
         if message == None:
             await ctx.send("Please enter a valid message.")
         else:
-            await sendAllChannels(message_type="publish", content=f"**NEW MESSAGE FROM THE BOT DEVS**\n\n{message}")
+            await sendAllChannels(message_type="publish", content=f"**NEW MESSAGE FROM THE BOT DEVELOPERS**\n\n{message}")
     else:
         await ctx.send("You are not authorised to run this command.")
 
@@ -428,12 +468,14 @@ async def help(ctx):
         '`pes.dict`': 'Search for the meaning of word using `pes.dict [word]`'
     }
     embed = discord.Embed(title=f"Help",
-                              color=discord.Color.blue())
+                          color=discord.Color.blue())
     index = 1
     for cmd in content:
-        embed.add_field(name=f"**{index}**", value='\t{} : {}'.format(cmd, content[cmd]), inline = False)
-        index+=1
-    await ctx.send(embed = embed)
+        embed.add_field(
+            name=f"**{index}**", value='\t{} : {}'.format(cmd, content[cmd]), inline=False)
+        index += 1
+    await ctx.send(embed=embed)
+
 
 @client.command(aliases=["hi"])
 async def hello(ctx):
@@ -474,7 +516,7 @@ async def search(ctx, query):
 **Department**: {department}
 **Branch**: {branch}
 **Campus**: {campus}'''
-            )
+                            )
         await ctx.send(embed=embed)
     driver.quit()
 
@@ -498,7 +540,7 @@ async def pesdb(ctx, *, query):
 **Campus**: {campus}
 **Phone**: {phone}
 **E-Mail**: {email}'''
-            )
+                            )
         await ctx.send(embed=embed)
         if truncated and ctx is not None:
             await ctx.send(f"For more records, please visit {base_url}")
