@@ -122,6 +122,31 @@ async def sendAllChannels(message_type, content=None, embed=None, file=None):
             await sendChannel(channel_id, content=content, embed=embed, file=file)
 
 
+async def subscriptionReminder():
+    print("Reminding non-subscribed servers...")
+    db_records = getCompleteDatabase()
+    guild_info = dict()
+    for row in db_records:
+        guild_id, _, channel_type, channel_id = row[1:]
+        if guild_id not in guild_info:
+            guild_info[guild_id] = {
+                "publish": None,
+                "log": None
+            }
+        guild_info[guild_id][channel_type] = channel_id
+
+    for guild in guild_info:
+        if guild_info[guild]["publish"] == None:
+            alert_embed = discord.Embed(
+                color=discord.Color.blue(), title="PESU Academy Bot - REMINDER")
+            alert_embed.add_field(
+                name="\u200b", value="Your server is **not** setup for alerts. Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`")
+            for channels in guild.text_channels:
+                if channels.permissions_for(guild.me).send_messages:
+                    await channels.send(embed=alert_embed)
+                    break
+
+
 @tasks.loop(hours=4)
 async def changeStatus():
     '''
@@ -143,6 +168,7 @@ async def on_ready():
     embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
                           description="Use `pes.` to access commands", color=discord.Color.blue())
     await sendAllChannels(message_type="log", embed=embed)
+    await subscriptionReminder()
 
 
 @client.event
@@ -891,6 +917,7 @@ async def checkNewDay():
         TODAY_ANNOUNCEMENTS_MADE = list()
         ALL_ANNOUNCEMENTS_MADE = list()
         await cleanUp()
+        await subscriptionReminder()
 
 
 checkNewDay.start()
