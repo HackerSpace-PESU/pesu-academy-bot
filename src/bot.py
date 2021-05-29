@@ -240,8 +240,8 @@ async def on_message(ctx):
         pass
     elif client.user.mentioned_in(ctx):
         if "@everyone" not in ctx.content and "@here" not in ctx.content and ctx.reference == None:
-            greeting = random.choice(greetings[:-1])
-            await ctx.channel.send(f"{ctx.author.mention} don't ping the bot da {greeting}")
+            greeting = random.choice(greetings)[:-1]
+            await ctx.channel.send(f"{ctx.author.mention} don't be a {greeting} by pinging the bot. Type `pes.help` to access commands.")
         else:
             await client.process_commands(ctx)
     else:
@@ -379,12 +379,14 @@ async def dbinfo(ctx):
 
 
 @client.command(aliases=['announce'])
-async def announcecommand(ctx, *, message: str = None):
+async def announcecommand(ctx, message_type=None, *, message: str = None):
     if await checkUserIsBotDev(ctx):
         if message == None:
             await ctx.send("Please enter a valid message.")
+        elif message_type == None:
+            await ctx.send("Please enter a valid message type.")
         else:
-            await sendAllChannels(message_type="publish", content=f"**NEW MESSAGE FROM THE BOT DEVELOPERS**\n\n{message}")
+            await sendAllChannels(message_type=message_type, content=f"**NEW MESSAGE FROM THE BOT DEVELOPERS**\n\n{message}")
     else:
         await ctx.send("You are not authorised to run this command.")
 
