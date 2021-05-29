@@ -83,6 +83,20 @@ async def checkUserIsAdmin(ctx):
     return ctx.message.author.guild_permissions.administrator
 
 
+async def checkUserEchoReplyPermissions(ctx, channel_id):
+    if await checkUserIsBotDev(ctx):
+        return True
+    else:
+        guild_id = int(ctx.guild.id)
+        guild_object = client.get_guild(guild_id)
+        guild_channels = guild_object.text_channels
+        guild_channels_id = [gc.id for gc in guild_channels]
+        if await checkUserIsAdmin(ctx) and channel_id in guild_channels_id:
+            return True
+        else:
+            return False
+
+
 async def checkUserHasManageServerPermission(ctx):
     '''
     Checks if the message author has the Manage Server permission.
@@ -128,6 +142,7 @@ async def subscriptionReminder():
     guild_info = dict()
     for row in db_records:
         guild_id, _, channel_type, channel_id = row[1:]
+        guild_id = int(guild_id)
         if guild_id not in guild_info:
             guild_info[guild_id] = {
                 "publish": None,
@@ -141,8 +156,9 @@ async def subscriptionReminder():
                 color=discord.Color.blue(), title="PESU Academy Bot - REMINDER")
             alert_embed.add_field(
                 name="\u200b", value="Your server is **not** setup for alerts. Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`")
-            for channels in guild.text_channels:
-                if channels.permissions_for(guild.me).send_messages:
+            guild_object = client.get_guild(guild)
+            for channels in guild_object.text_channels:
+                if channels.permissions_for(guild_object.me).send_messages:
                     await channels.send(embed=alert_embed)
                     break
 
@@ -317,8 +333,7 @@ async def reachreplycommand(ctx, destination_channel_id: int = None, *, message:
             try:
                 destination_channel = client.get_channel(
                     destination_channel_id)
-                await destination_channel.send("**MESSAGE FROM THE BOT DEVELOPERS**")
-                await destination_channel.send(message)
+                await destination_channel.send(f"**MESSAGE FROM THE BOT DEVELOPERS**\n\n{message}")
                 await ctx.send("Message sent")
             except:
                 await ctx.send("Cannot fetch that channel.")
@@ -423,12 +438,18 @@ async def logging(ctx, channel: discord.TextChannel = None):
 @client.command()
 async def echo(ctx, *, query=None):
     await client.wait_until_ready()
-    if await checkUserIsAdminOrBotDev(ctx):
-        channel = query.split()[0]
-        pattern = re.compile(r"^<#\d+>")
+    channel = query.split()[0]
+    try:
+        channel_id = int(channel)
+        pattern = pattern = re.compile(r"^\d+")
+    except ValueError:
+        channel_id = int(channel[2:-1])
+        pattern = pattern = re.compile(r"^<#\d+>")
+
+    if await checkUserEchoReplyPermissions(ctx, channel_id):
         _, content = re.split(pattern, query)
         content = content.strip()
-        channel = client.get_channel(int(channel[2:-1]))
+        channel = client.get_channel(channel_id)
         await channel.send(content)
     else:
         await ctx.send(f"You are not authorised to run this command.")
@@ -437,13 +458,14 @@ async def echo(ctx, *, query=None):
 @client.command()
 async def reply(ctx, *, query=None):
     await client.wait_until_ready()
-    if await checkUserIsAdminOrBotDev(ctx):
-        parent_message_url = query.split()[0]
-        _, content = query.split(parent_message_url)
-        parent_message_url_components = parent_message_url.split('/')
-        server_id = int(parent_message_url_components[4])
-        channel_id = int(parent_message_url_components[5])
-        parent_message_id = int(parent_message_url_components[6])
+    parent_message_url = query.split()[0]
+    _, content = query.split(parent_message_url)
+    parent_message_url_components = parent_message_url.split('/')
+    server_id = int(parent_message_url_components[4])
+    channel_id = int(parent_message_url_components[5])
+    parent_message_id = int(parent_message_url_components[6])
+
+    if await checkUserEchoReplyPermissions(ctx, channel_id):
         server = client.get_guild(server_id)
         channel = server.get_channel(channel_id)
         parent_message = await channel.fetch_message(parent_message_id)
