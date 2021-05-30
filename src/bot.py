@@ -165,6 +165,18 @@ async def subscriptionReminder():
                         break
 
 
+async def syncDatabase():
+    print("Syncing databases...")
+    db_records = getCompleteDatabase()
+    db_id = [row[1] for row in db_records]
+    guilds_details = await client.fetch_guilds(limit=150).flatten()
+    guild_id = [str(g.id) for g in guilds_details]
+
+    for dbi in db_id:
+        if dbi not in guild_id:
+            removeGuild(dbi)
+
+
 @tasks.loop(hours=4)
 async def changeStatus():
     '''
@@ -179,14 +191,14 @@ async def on_ready():
     '''
     Initialising bot after boot
     '''
-    print("Bot is online")
     await client.change_presence(activity=discord.Game(next(status)))
-
     greeting = random.choice(greetings)
     embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
                           description="Use `pes.` to access commands", color=discord.Color.blue())
+    await syncDatabase()
     await sendAllChannels(message_type="log", embed=embed)
     await subscriptionReminder()
+    print("Bot is online")
 
 
 @client.event
@@ -990,6 +1002,7 @@ async def checkNewDay():
         TODAY_ANNOUNCEMENTS_MADE = list()
         ALL_ANNOUNCEMENTS_MADE = list()
         await cleanUp()
+        await syncDatabase()
         await subscriptionReminder()
 
 
