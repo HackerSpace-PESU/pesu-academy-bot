@@ -237,6 +237,11 @@ def removeChannel(channel_id):
     result = guilddb_connection.execute(query)
 
 
+def removeChannelWithType(channel_id, channel_type):
+    query = guilddb_table.delete().where(and_(guilddb_table.c.channel_id == channel_id, guilddb_table.c.channel_type == channel_type))
+    result = guilddb_connection.execute(query)
+
+
 def checkServerChannelAndTypeExists(guild_id, channel_id, channel_type):
     query = guilddb_table.select().where(and_(guilddb_table.c.guild_id == guild_id,
                                               guilddb_table.c.channel_id == channel_id, guilddb_table.c.channel_type == channel_type))

@@ -153,16 +153,17 @@ async def subscriptionReminder():
     for guild in guild_info:
         if guild_info[guild]["publish"] == None:
             alert_embed = discord.Embed(
-                color=discord.Color.blue(), 
-                title="PESU Academy Bot - IMPORTANT REMINDER", 
+                color=discord.Color.blue(),
+                title="PESU Academy Bot - IMPORTANT REMINDER",
                 description="Your server is **not** setup for alerts. Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`"
-                )
+            )
             guild_object = client.get_guild(guild)
             if guild_object != None:
                 for channels in guild_object.text_channels:
                     if channels.permissions_for(guild_object.me).send_messages:
                         await channels.send(embed=alert_embed)
                         break
+
 
 @tasks.loop(hours=4)
 async def syncDatabase():
@@ -272,9 +273,9 @@ async def on_command_error(ctx, error):
     if guild_logging_channels:
         guild_logging_channels = [row[-1] for row in guild_logging_channels]
         embed = discord.Embed(
-        color=discord.Color.blue(),
-        title="PESU Academy Bot - Command Error Log",
-        description=f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}"
+            color=discord.Color.blue(),
+            title="PESU Academy Bot - Command Error Log",
+            description=f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}"
         )
         await sendSpecificChannels(guild_logging_channels, embed=embed)
     embed = discord.Embed(
@@ -337,16 +338,16 @@ async def reachoutcommand(ctx, *, message: str = None):
         else:
 
             embed = discord.Embed(
-            color=discord.Color.blue(),
-            title="PESU Academy Bot - Reach Out to Developer Team",
-            description="Your message has been sent to the developer team. We will get back to you with a reply shortly on this channel."
+                color=discord.Color.blue(),
+                title="PESU Academy Bot - Reach Out to Developer Team",
+                description="Your message has been sent to the developer team. We will get back to you with a reply shortly on this channel."
             )
             await ctx.send(embed=embed)
 
             embed = discord.Embed(
-            color=discord.Color.blue(),
-            title="PESU Academy Bot - Reach Out to Developer Team",
-            description=f'''**Server Name**: `{ctx.guild.name}`
+                color=discord.Color.blue(),
+                title="PESU Academy Bot - Reach Out to Developer Team",
+                description=f'''**Server Name**: `{ctx.guild.name}`
 **Server ID**: `{ctx.guild.id}`
 **Channel ID**: `{ctx.channel.id}`\n
 **Message**: {message}'''
@@ -367,7 +368,8 @@ async def reachreplycommand(ctx, destination_channel_id: int = None, *, message:
             await ctx.send("Enter a valid message")
         else:
             try:
-                destination_channel = client.get_channel(destination_channel_id)
+                destination_channel = client.get_channel(
+                    destination_channel_id)
                 embed = discord.Embed(
                     color=discord.Color.blue(),
                     title="PESU Academy Bot - Message from Developer Team",
@@ -438,9 +440,9 @@ async def announcecommand(ctx, message_type=None, *, message: str = None):
             await ctx.send("Please enter a valid message type.")
         else:
             embed = discord.Embed(
-            color=discord.Color.blue(),
-            title="PESU Academy Bot - Message from Developer Team",
-            description=message
+                color=discord.Color.blue(),
+                title="PESU Academy Bot - Message from Developer Team",
+                description=message
             )
             await sendAllChannels(message_type=message_type, embed=embed)
     else:
@@ -470,6 +472,24 @@ async def alerts(ctx, channel: discord.TextChannel = None):
             await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
 
 
+@client.command()
+async def removealerts(ctx, channel: discord.TextChannel = None):
+    if channel == None:
+        await ctx.send("Please mention the channel you would like to unsubscribe from alerts.")
+    else:
+        if await checkUserHasManageServerPermission(ctx):
+            channel_id = str(channel.id)
+            guild_id = str(ctx.guild.id)
+            if not checkServerChannelAndTypeExists(guild_id, channel_id, "publish"):
+                await ctx.send(f"{channel.mention} is not subscribed to PESU Academy Bot alerts.")
+            else:
+                removeChannelWithType(channel_id, "publish")
+                await ctx.send(f"**Success!** You will no longer receive PESU Academy Bot alerts on {channel.mention}.")
+
+        else:
+            await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
+
+
 @client.command(aliases=["log"])
 async def logging(ctx, channel: discord.TextChannel = None):
     if channel == None:
@@ -489,6 +509,24 @@ async def logging(ctx, channel: discord.TextChannel = None):
                     await ctx.send(f"**Success!** You will now receive PESU Academy Bot logging on {channel.mention}. You can optionally also give the Bot permission to ping `@everyone` and `@here` roles to receive notifications.")
                 else:
                     await ctx.send("I don't have enough permissions in that channel. Enable `Send Messages`, `Embed Links`, and `Read History` permissions for me.")
+        else:
+            await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
+
+
+@client.command()
+async def removelog(ctx, channel: discord.TextChannel = None):
+    if channel == None:
+        await ctx.send("Please mention the channel you would like to unsubscribe from logging.")
+    else:
+        if await checkUserHasManageServerPermission(ctx):
+            channel_id = str(channel.id)
+            guild_id = str(ctx.guild.id)
+            if not checkServerChannelAndTypeExists(guild_id, channel_id, "log"):
+                await ctx.send(f"{channel.mention} is not subscribed to PESU Academy Bot logging.")
+            else:
+                removeChannelWithType(channel_id, "log")
+                await ctx.send(f"**Success!** You will no longer receive PESU Academy Bot logging on {channel.mention}.")
+
         else:
             await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
 
@@ -547,7 +585,7 @@ async def ping(ctx):
         color=discord.Color.blue(),
         title="PESU Academy Bot - Ping Test",
         description=f"Pong! {round(client.latency * 1000, 2)} ms"
-)
+    )
     await ctx.send(embed=embed)
 
 
