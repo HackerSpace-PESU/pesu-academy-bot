@@ -196,7 +196,6 @@ async def on_ready():
     greeting = random.choice(greetings)
     embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
                           description="Use `pes.` to access commands", color=discord.Color.blue())
-    # await syncDatabase()
     await sendAllChannels(message_type="log", embed=embed)
     await subscriptionReminder()
     print("Bot is online")
@@ -1040,7 +1039,6 @@ async def checkNewDay():
         TODAY_ANNOUNCEMENTS_MADE = list()
         ALL_ANNOUNCEMENTS_MADE = list()
         await cleanUp()
-        # await syncDatabase()
         await subscriptionReminder()
 
 

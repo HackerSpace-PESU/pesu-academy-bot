@@ -35,8 +35,6 @@ DEV_SERVER = 768874819474292746
 BITLY_TOKEN = os.environ["BITLY_TOKEN"]
 BITLY_GUID = os.environ["BITLY_GUID"]
 
-# GOOGLE_CHROME_BIN = os.environ["GOOGLE_CHROME_BIN"]
-# CHROMEDRIVER_PATH = os.environ["CHROMEDRIVER_PATH"]
 PESU_SRN = os.environ["PESU_SRN"]
 PESU_PWD = os.environ["PESU_PWD"]
 
@@ -45,7 +43,6 @@ REDDIT_PERSONAL_USE_TOKEN = os.environ["REDDIT_PERSONAL_USE_TOKEN"]
 REDDIT_USER_AGENT = os.environ["REDDIT_USER_AGENT"]
 
 chrome_options = webdriver.ChromeOptions()
-# chrome_options.binary_location = GOOGLE_CHROME_BIN
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
@@ -196,7 +193,6 @@ async def on_ready():
     greeting = random.choice(greetings)
     embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
                           description="Use `pes.` to access commands", color=discord.Color.blue())
-    # await syncDatabase()
     await sendAllChannels(message_type="log", embed=embed)
     await subscriptionReminder()
     print("Bot is online")
@@ -1037,7 +1033,6 @@ async def checkNewDay():
         TODAY_ANNOUNCEMENTS_MADE = list()
         ALL_ANNOUNCEMENTS_MADE = list()
         await cleanUp()
-        # await syncDatabase()
         await subscriptionReminder()
 
 
