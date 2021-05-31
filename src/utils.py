@@ -16,7 +16,7 @@ from instagram import *
 
 async def cleanUp():
     files = [fname for fname in os.listdir() if Path(fname).suffix in [
-        ".pdf", ".png", ".jpg", ".jpeg"]
+        ".pdf", ".png", ".jpg", ".jpeg", ".doc", ".docx"]
     ]
     for fname in files:
         try:

@@ -6,6 +6,7 @@ test/
 test*.py
 chromedriver
 *.pdf
+*.pem
 requirements-backup.txt
 setHerokuConfig.py
 todo.md
