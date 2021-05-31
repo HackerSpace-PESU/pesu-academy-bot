@@ -267,11 +267,11 @@ async def getDocumentSimilarity(filenames, model_type="doc2vec", phrase=True):
         return result
 
 
-async def getRedditPosts(REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n=5):
+async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n=5):
     reddit = asyncpraw.Reddit(client_id=REDDIT_PERSONAL_USE_TOKEN,
                               client_secret=REDDIT_SECRET_TOKEN, user_agent=REDDIT_USER_AGENT)
 
-    new_posts = await reddit.subreddit('PESU', fetch=True)
+    new_posts = await reddit.subreddit(subreddit, fetch=True)
     data = list()
 
     async for post in new_posts.new(limit=n):

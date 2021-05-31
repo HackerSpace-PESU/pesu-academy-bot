@@ -861,8 +861,8 @@ async def getRedditEmbed(post):
 
 
 @client.command(aliases=["r"])
-async def reddit(ctx, n=5):
-    reddit_posts = await getRedditPosts(REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n)
+async def reddit(ctx, subreddit="PESU", n=5):
+    reddit_posts = await getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n)
     for p in reddit_posts:
         embed = await getRedditEmbed(p)
         await ctx.send(embed=embed)
@@ -974,9 +974,9 @@ async def checkInstagramPost():
 
 
 @tasks.loop(minutes=10)
-async def checkRedditPost():
+async def checkRedditPost(subreddit="PESU"):
     await client.wait_until_ready()
-    reddit_posts = await getRedditPosts(REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
+    reddit_posts = await getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
     latest_reddit_post = reddit_posts[0]
     post_time = latest_reddit_post["create_time"]
     current_time = datetime.now()
