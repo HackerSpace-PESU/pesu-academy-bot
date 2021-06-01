@@ -961,7 +961,6 @@ async def pesunews(ctx, *, query=None):
 async def checkInstagramPost():
     await client.wait_until_ready()
     for username in utils.instagram_usernames:
-        print("ready!")
         print(f"Fetching Instagram posts from {username}...")
         post_embed, photo_time = await getInstagramEmbed(username)
         curr_time = time.time()
