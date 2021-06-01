@@ -56,6 +56,23 @@ instagram_usernames = [
     "pesuniversity",
     "peshackerspace",
     "peshackerspace.ecc"
+    "pes.opensource"
+    "pes.spacejam"
+    "equinox.pes"
+    "pes_ecell"
+    "pesmunsociety"
+    "pesdebsoc"
+    "dsgnr_pesuecc"
+    "munsoc.pesecc"
+    "ieee.ras.pesu"
+    "equinox.pesecc"
+    "zeroday.pesuecc"
+    "pixelloid_pes"
+    "ingeniushackathon"
+    "_techwarts"
+    "dscpesu.ec"
+    "apostrophe.pesuecc"
+    "acmpesuecc"
 ]
 TODAY_ANNOUNCEMENTS_MADE = list()
 ALL_ANNOUNCEMENTS_MADE = list()
