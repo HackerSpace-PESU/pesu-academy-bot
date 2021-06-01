@@ -962,10 +962,13 @@ async def checkInstagramPost():
     await client.wait_until_ready()
     for username in instagram_usernames:
         print(f"Fetching Instagram posts from {username}...")
-        post_embed, photo_time = await getInstagramEmbed(username)
-        curr_time = time.time()
-        if (curr_time - photo_time) < 600:
-            await sendAllChannels(message_type="publish", content="@everyone", embed=post_embed)
+        try:
+            post_embed, photo_time = await getInstagramEmbed(username)
+            curr_time = time.time()
+            if (curr_time - photo_time) < 600:
+                await sendAllChannels(message_type="publish", content="@everyone", embed=post_embed)
+        except:
+            print(f"Error while fetching posts from {username}")
 
 
 @tasks.loop(minutes=10)
