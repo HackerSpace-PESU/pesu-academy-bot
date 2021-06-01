@@ -49,11 +49,6 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument('--ignore-ssl-errors=yes')
 chrome_options.add_argument('--ignore-certificate-errors')
 
-instagram_usernames = [
-    "pesuniversity",
-    "peshackerspace",
-    "peshackerspace.ecc"
-]
 TODAY_ANNOUNCEMENTS_MADE = list()
 ALL_ANNOUNCEMENTS_MADE = list()
 greetings = ["PESsants", "PESts"]
@@ -960,7 +955,7 @@ async def pesunews(ctx, *, query=None):
 @tasks.loop(minutes=10)
 async def checkInstagramPost():
     await client.wait_until_ready()
-    for username in instagram_usernames:
+    for username in utils.instagram_usernames:
         print(f"Fetching Instagram posts from {username}...")
         post_embed, photo_time = await getInstagramEmbed(username)
         curr_time = time.time()

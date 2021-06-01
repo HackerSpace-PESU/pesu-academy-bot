@@ -298,3 +298,27 @@ async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOK
         data.append(post_data)
 
     return data
+
+instagram_usernames=['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc',
+                     'acmw.pesu', 'aditeyabaral', 'aikya_pesu', 'anihm136', 
+                     'apostrophe.pesuecc', 'ayra_the.helping.hand_pesu', 
+                     'blueprint_pesuecc', 'c.o.d.s_community', 'c.o.d.s_pesu_ecc', 
+                     'c.o.d.s_pesu_rr', 'cie.pesu', 'clubs_pesuecc', 'codechef_pesuecc', 
+                     'csr.pesu', 'dhruv__shetty', 'dscpesu.ec', 'dscpesu.rr', 'dsgnr_pesu', 
+                     'dsgnr_pesuecc', 'entrepreneurshipclub.pes', 'equinox.pes', 'equinox.pesecc', 
+                     'grimmreaders_pesu', 'hayaracing', 'humans_of_pes', 'humans_of_pesu', 
+                     'ieee.ras.pesu', 'ieee.ras.pesuecc', 'ieee_pes_sscs_photonics', 'ieeepesit', 
+                     'ingeniushackathon', 'kludge_pesu', 'lawjarpanagani', 'linguista.club', 
+                     'maayapesu', 'mangobites.pesu', 'munsoc.pesecc', 'newolfsociety', 
+                     'ninaada.pesu', 'parallax_techwarts', 'pes.epsilon', 'pes.lab', 'pes.opensource', 
+                     'pes.qforest', 'pes.spacejam', 'pes_ecell', 'pes_grads', 'pesdebsoc', 
+                     'pesfreshers', 'peshackerspace', 'peshackerspace.ecc', 'pesmunsociety', 
+                     'pesonium', 'pesu.gdc', 'pesu.hashtagcrew', 'pesu.io', 'pesu.tas', 
+                     'pesu_covid_support', 'pesu_nirantara', 'pesuniversity', 'pixelloid_pes', 
+                     'pixels.pesu', 'quotientquizclub', 'rc_pesu3190', 'saarang_official', 
+                     'samarpana.india', 'shakennotstirred.pes', 'swarantraka.pes', 'team.encore', 
+                     'team_aeolus', 'teamsanskrithi', 'techplussocialgoodpesu', 'tedxpesu', 
+                     'tedxpesuecc', 'tensor.pesu', 'the_changemakers_society', 'the_clefhangers', 
+                     'thealcodingclub', 'thebisibelebois', 'themusicclubpesu', 'thenautankiteam', 
+                     'thor_pesu', 'throughthelens.pesu', 'trance_pes', 'under25pes', 'under25pesuecc', 
+                     'vegaracingelectric', 'writeangle.pesu', 'zeroday.pesuecc']
