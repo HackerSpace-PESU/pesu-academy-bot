@@ -867,7 +867,7 @@ async def getInstagramEmbed(username):
     html = getInstagramHTML(username)
     photo_time = getLastPhotoDate(html)
     post_embed = discord.Embed(
-        title=f'New Instagram Post', url=getPostLink(html), color=0x8a3ab9)
+        title=f'New Instagram Post from {username}', url=getPostLink(html), color=0x8a3ab9)
     if(checkVideo(html)):
         post_embed.set_image(url=getVideoURL(html))
     else:
