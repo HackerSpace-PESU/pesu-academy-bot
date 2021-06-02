@@ -952,7 +952,7 @@ async def pesunews(ctx, *, query=None):
         await ctx.send("No announcements available. Retry with another option or try again later.")
 
 
-@tasks.loop(minutes=10)
+@tasks.loop(minutes=15)
 async def checkInstagramPost():
     await client.wait_until_ready()
     for username in instagram_usernames:
@@ -960,13 +960,13 @@ async def checkInstagramPost():
         try:
             post_embed, photo_time = await getInstagramEmbed(username)
             curr_time = time.time()
-            if (curr_time - photo_time) < 600:
+            if (curr_time - photo_time) < 900:
                 await sendAllChannels(message_type="publish", content="@everyone", embed=post_embed)
         except:
             print(f"Error while fetching posts from {username}")
 
 
-@tasks.loop(minutes=10)
+@tasks.loop(minutes=15)
 async def checkRedditPost(subreddit="PESU"):
     await client.wait_until_ready()
     reddit_posts = await getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
@@ -974,7 +974,7 @@ async def checkRedditPost(subreddit="PESU"):
     post_time = latest_reddit_post["create_time"]
     current_time = datetime.now()
     time_difference = current_time - post_time
-    if time_difference.seconds < 600 and time_difference.days == 0:
+    if time_difference.seconds < 900 and time_difference.days == 0:
         post_embed = await getRedditEmbed(latest_reddit_post)
         await sendAllChannels(message_type="publish", content="@everyone", embed=post_embed)
 
