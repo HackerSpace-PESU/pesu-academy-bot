@@ -167,19 +167,13 @@ async def subscriptionReminder():
 async def syncDatabase():
     print("Syncing databases...")
     db_records = getCompleteDatabase()
-    db_id = [row[1] for row in db_records]
     guilds_details = await client.fetch_guilds(limit=150).flatten()
     guild_id = [str(g.id) for g in guilds_details]
 
     for row in db_records:
         db_guild_id = row[1]
-        db_channel_type = row[3]
-        db_channel_id = row[4]
         if db_guild_id not in guild_id:
             removeGuild(db_guild_id)
-        # channel = client.get_channel(int(db_channel_id))
-        # if channel == None or not channel.permissions_for(BOT_ID).send_messages:
-        #     removeChannel(db_channel_id)
 
 
 @tasks.loop(hours=4)
@@ -300,7 +294,6 @@ async def dbsync(ctx):
     if await checkUserIsBotDev(ctx):
         print("Syncing databases...")
         db_records = getCompleteDatabase()
-        db_id = [row[1] for row in db_records]
         guilds_details = await client.fetch_guilds(limit=150).flatten()
         guild_id = [str(g.id) for g in guilds_details]
 
@@ -310,9 +303,23 @@ async def dbsync(ctx):
             db_channel_id = row[4]
             if db_guild_id not in guild_id:
                 removeGuild(db_guild_id)
+            if db_channel_id == None:
+                continue
             channel = client.get_channel(int(db_channel_id))
-            if channel == None or not channel.permissions_for(BOT_ID).send_messages:
+            client_member = ctx.guild.get_member(BOT_ID)
+            client_permissions = client_member.permissions_in(channel)
+            if channel == None:
+                print("Removing channel...")
                 removeChannel(db_channel_id)
+            else:
+                if db_channel_type == "publish":
+                    if not (client_permissions.send_messages and client_permissions.embed_links and client_permissions.attach_files and client_permissions.read_message_history):
+                        print("Removing channel...")
+                        removeChannelWithType(db_channel_id, "publish")
+                else:
+                    if not (client_permissions.send_messages and client_permissions.embed_links and client_permissions.read_message_history):
+                        print("Removing channel...")
+                        removeChannelWithType(db_channel_id, "log")
 
         await ctx.send("Database sync completed.")
     else:
