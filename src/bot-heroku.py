@@ -149,10 +149,10 @@ async def subscriptionReminder():
         guild_info[guild_id][channel_type] = channel_id
 
     alert_embed = discord.Embed(
-                color=discord.Color.blue(),
-                title="PESU Academy Bot - IMPORTANT REMINDER",
-                description="Your server is **not** setup for alerts. Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`"
-            )
+        color=discord.Color.blue(),
+        title="PESU Academy Bot - IMPORTANT REMINDER",
+        description="Your server is **not** setup for alerts. Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`"
+    )
 
     # In database and on server but not subscribed to alerts
     for guild in guild_info:
@@ -1023,7 +1023,7 @@ async def checkInstagramPost():
             post_embed, photo_time = await getInstagramEmbed(username)
             curr_time = time.time()
             if (curr_time - photo_time) < 900:
-                await sendAllChannels(message_type="publish", content="@everyone", embed=post_embed)
+                await sendAllChannels(message_type="publish", embed=post_embed)
         except:
             print(f"Error while fetching posts from {username}")
 
@@ -1038,7 +1038,7 @@ async def checkRedditPost():
     time_difference = current_time - post_time
     if time_difference.seconds < 900 and time_difference.days == 0:
         post_embed = await getRedditEmbed(latest_reddit_post)
-        await sendAllChannels(message_type="publish", content="@everyone", embed=post_embed)
+        await sendAllChannels(message_type="publish", embed=post_embed)
 
 
 @tasks.loop(minutes=5)
