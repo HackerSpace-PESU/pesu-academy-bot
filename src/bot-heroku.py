@@ -287,8 +287,19 @@ async def on_guild_channel_delete(channel):
 
 
 @client.command()
-async def dbsync():
-    await syncDatabase()
+async def dbsync(ctx):
+    if await checkUserIsBotDev(ctx):
+        print("Syncing databases...")
+        db_records = getCompleteDatabase()
+        db_id = [row[1] for row in db_records]
+        guilds_details = await client.fetch_guilds(limit=150).flatten()
+        guild_id = [str(g.id) for g in guilds_details]
+        for dbi in db_id:
+            if dbi not in guild_id:
+                removeGuild(dbi)
+        await ctx.send("Database sync completed.")
+    else:
+        await ctx.send("You are not authorised to run this command.")
 
 
 @client.command()
