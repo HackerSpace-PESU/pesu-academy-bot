@@ -98,17 +98,20 @@ async def checkUserHasManageServerPermission(ctx):
 
 async def sendChannel(channel_id, content=None, embed=None, file=None):
     channel_id = int(channel_id)
-    channel = client.get_channel(channel_id)
-    if file != None:
-        await channel.send(file=file)
-    if embed == None and content != None:
-        await channel.send(content)
-    elif embed != None and content == None:
-        await channel.send(embed=embed)
-    elif embed != None and content != None:
-        await channel.send(content, embed=embed)
-    else:
-        pass
+    try:
+        channel = client.get_channel(channel_id)
+        if file != None:
+            await channel.send(file=file)
+        if embed == None and content != None:
+            await channel.send(content)
+        elif embed != None and content == None:
+            await channel.send(embed=embed)
+        elif embed != None and content != None:
+            await channel.send(content, embed=embed)
+        else:
+            pass
+    except:
+        print(f"Error sending message to channel {channel_id}")
 
 
 async def sendSpecificChannels(channels, content=None, embed=None, file=None):
@@ -165,9 +168,15 @@ async def syncDatabase():
     guilds_details = await client.fetch_guilds(limit=150).flatten()
     guild_id = [str(g.id) for g in guilds_details]
 
-    for dbi in db_id:
-        if dbi not in guild_id:
-            removeGuild(dbi)
+    for row in db_records:
+        db_guild_id = row[1]
+        db_channel_type = row[3]
+        db_channel_id = row[4]
+        if db_guild_id not in guild_id:
+            removeGuild(db_guild_id)
+        # channel = client.get_channel(int(db_channel_id))
+        # if channel == None or not channel.permissions_for(BOT_ID).send_messages:
+        #     removeChannel(db_channel_id)
 
 
 @tasks.loop(hours=4)
@@ -291,9 +300,17 @@ async def dbsync(ctx):
         db_id = [row[1] for row in db_records]
         guilds_details = await client.fetch_guilds(limit=150).flatten()
         guild_id = [str(g.id) for g in guilds_details]
-        for dbi in db_id:
-            if dbi not in guild_id:
-                removeGuild(dbi)
+
+        for row in db_records:
+            db_guild_id = row[1]
+            db_channel_type = row[3]
+            db_channel_id = row[4]
+            if db_guild_id not in guild_id:
+                removeGuild(db_guild_id)
+            channel = client.get_channel(int(db_channel_id))
+            if channel == None or not channel.permissions_for(BOT_ID).send_messages:
+                removeChannel(db_channel_id)
+
         await ctx.send("Database sync completed.")
     else:
         await ctx.send("You are not authorised to run this command.")
