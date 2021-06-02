@@ -145,14 +145,28 @@ async def subscriptionReminder():
             }
         guild_info[guild_id][channel_type] = channel_id
 
-    for guild in guild_info:
-        if guild_info[guild]["publish"] == None:
-            alert_embed = discord.Embed(
+    alert_embed = discord.Embed(
                 color=discord.Color.blue(),
                 title="PESU Academy Bot - IMPORTANT REMINDER",
                 description="Your server is **not** setup for alerts. Members with the `Manage Server` permissions are requested to run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`"
             )
+
+    # In database and on server but not subscribed to alerts
+    for guild in guild_info:
+        if guild_info[guild]["publish"] == None:
             guild_object = client.get_guild(guild)
+            if guild_object != None:
+                for channels in guild_object.text_channels:
+                    if channels.permissions_for(guild_object.me).send_messages:
+                        await channels.send(embed=alert_embed)
+                        break
+
+    # On server but not in database [happens when hard sync happens and channel gets deleted - HENCE DO NOT DO THIS]
+    guilds_details = await client.fetch_guilds(limit=150).flatten()
+    guild_id = [g.id for g in guilds_details]
+    for gid in guild_id:
+        if gid not in guild_info:
+            guild_object = client.get_guild(gid)
             if guild_object != None:
                 for channels in guild_object.text_channels:
                     if channels.permissions_for(guild_object.me).send_messages:
