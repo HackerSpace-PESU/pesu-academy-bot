@@ -858,9 +858,12 @@ async def getRedditEmbed(post):
 @client.command(aliases=["r"])
 async def reddit(ctx, subreddit="PESU", n=5):
     reddit_posts = await getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n)
-    for p in reddit_posts:
-        embed = await getRedditEmbed(p)
-        await ctx.send(embed=embed)
+    if reddit_posts:
+        for p in reddit_posts:
+            embed = await getRedditEmbed(p)
+            await ctx.send(embed=embed)
+    else:
+        await ctx.send("No posts found. Please ensure that the subreddit exists and it is not NSFW.")
 
 
 async def getInstagramEmbed(username):
@@ -972,9 +975,9 @@ async def checkInstagramPost():
 
 
 @tasks.loop(minutes=15)
-async def checkRedditPost(subreddit="PESU"):
+async def checkRedditPost():
     await client.wait_until_ready()
-    reddit_posts = await getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
+    reddit_posts = await getRedditPosts("PESU", REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
     latest_reddit_post = reddit_posts[0]
     post_time = latest_reddit_post["create_time"]
     current_time = datetime.now()

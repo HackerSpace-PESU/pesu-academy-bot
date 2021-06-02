@@ -299,6 +299,8 @@ async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOK
     data = list()
 
     async for post in new_posts.new(limit=n):
+        if post.over_18:
+            continue
         post_data = dict()
         post_data["title"] = post.title
         post_data["content"] = post.selftext
@@ -320,5 +322,6 @@ async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOK
                     post_data["images"].append(i["resolutions"][-1]["url"])
 
         data.append(post_data)
-
+    
+    await reddit.close()
     return data
