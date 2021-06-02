@@ -284,6 +284,11 @@ async def on_guild_channel_delete(channel):
 
 
 @client.command()
+async def dbsync():
+    await syncDatabase()
+
+
+@client.command()
 async def invite(ctx):
     embed = discord.Embed(title="Invite PESU Academy Bot to your Discord Server", url="http://bit.ly/pesu-academy-bot",
                           description="Use the following link: http://bit.ly/pesu-academy-bot", color=discord.Color.blue())
