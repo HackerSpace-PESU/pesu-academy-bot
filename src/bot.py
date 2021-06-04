@@ -52,6 +52,25 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument('--ignore-ssl-errors=yes')
 chrome_options.add_argument('--ignore-certificate-errors')
 
+COMPILER_CLIENT_ID_1 = os.environ["COMPILER_CLIENT_ID_1"]
+COMPILER_CLIENT_SECRET_1 = os.environ["COMPILER_CLIENT_SECRET_1"]
+COMPILER_CLIENT_ID_2 = os.environ["COMPILER_CLIENT_ID_2"]
+COMPILER_CLIENT_SECRET_2 = os.environ["COMPILER_CLIENT_SECRET_2"]
+COMPILER_CLIENT_ID_3 = os.environ["COMPILER_CLIENT_ID_3"]
+COMPILER_CLIENT_SECRET_3 = os.environ["COMPILER_CLIENT_SECRET_3"]
+COMPILER_CLIENT_ID_4 = os.environ["COMPILER_CLIENT_ID_4"]
+COMPILER_CLIENT_SECRET_4 = os.environ["COMPILER_CLIENT_SECRET_4"]
+COMPILER_CLIENT_ID_5 = os.environ["COMPILER_CLIENT_ID_5"]
+COMPILER_CLIENT_SECRET_5 = os.environ["COMPILER_CLIENT_SECRET_5"]
+
+compiler_keys = {
+    (COMPILER_CLIENT_ID_1, COMPILER_CLIENT_SECRET_1): 0,
+    (COMPILER_CLIENT_ID_2, COMPILER_CLIENT_SECRET_2): 0,
+    (COMPILER_CLIENT_ID_3, COMPILER_CLIENT_SECRET_3): 0,
+    (COMPILER_CLIENT_ID_4, COMPILER_CLIENT_SECRET_4): 0,
+    (COMPILER_CLIENT_ID_5, COMPILER_CLIENT_SECRET_5): 0,
+}
+
 TODAY_ANNOUNCEMENTS_MADE = list()
 ALL_ANNOUNCEMENTS_MADE = list()
 greetings = ["PESsants", "PESts"]
@@ -205,6 +224,10 @@ async def on_ready():
     Initialising bot after boot
     '''
     await client.change_presence(activity=discord.Game(next(status)))
+
+    for client_id, client_secret in compiler_keys.keys():
+        compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
+
     greeting = random.choice(greetings)
     embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
                           description="Use `pes.` to access commands", color=discord.Color.blue())
@@ -804,70 +827,26 @@ async def longrip(ctx, long_url):
     driver.quit()
 
 
-def handler(signum, frame):
-    raise Exception("Time limit exceeded")
-
-
-signal.signal(signal.SIGALRM, handler)
-
-
-@contextlib.contextmanager
-def stdoutIO(stdout=None):
-    old = sys.stdout
-    if stdout is None:
-        stdout = StringIO()
-    sys.stdout = stdout
-    yield stdout
-    sys.stdout = old
-
-
-@client.command(aliases=["exec"])
-async def execute(ctx, *, code):
-    code = '\n'.join(code.split('\n')[1:-1])
-    check_malicious_code_flag = await checkMaliciousCode(code)
-    if not check_malicious_code_flag:
-        with stdoutIO() as sio:
-            signal.alarm(5)
-            try:
-                exec(code)
-                try:
-                    await ctx.reply(sio.getvalue(), mention_author=False)
-                except:
-                    await ctx.reply("No output generated.", mention_author=False)
-            except Exception as e:
-                await ctx.reply(f"**{e}**: Execution halted.", mention_author=True)
-            signal.alarm(0)
-    else:
-        await ctx.reply(f"Usage of `os` and `subprocess` is not allowed.", mention_author=True)
-        guild_id = str(ctx.guild.id)
-        author = ctx.message.author
-        guild_logging_channels = getChannelFromServer(guild_id, "log")
-        if guild_logging_channels:
-            guild_logging_channels = [row[-1]
-                                      for row in guild_logging_channels]
-            await sendSpecificChannels(guild_logging_channels, content=f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
-
-
-@client.command(aliases=["eval"])
-async def evaluate(ctx, *, code):
-    check_malicious_code_flag = await checkMaliciousCode(code)
-    if not check_malicious_code_flag:
-        signal.alarm(5)
-        try:
-            x = eval(code)
-            await ctx.reply(x, mention_author=False)
-        except Exception as e:
-            await ctx.reply(f"**{e}**: Execution halted.", mention_author=True)
-        signal.alarm(0)
-    else:
-        await ctx.reply(f"Usage of `os` and `subprocess` is not allowed.", mention_author=True)
-        guild_id = str(ctx.guild.id)
-        author = ctx.message.author
-        guild_logging_channels = getChannelFromServer(guild_id, "log")
-        if guild_logging_channels:
-            guild_logging_channels = [row[-1]
-                                      for row in guild_logging_channels]
-            await sendSpecificChannels(guild_logging_channels, content=f"{author.mention} tried executing this bad script on {ctx.message.channel.mention}:\n```Python\n{code}```")
+@client.command()
+async def code(ctx, language, *, content):
+    lines = content.split("\n")[1:]
+    last_blockquote = lines.index("```", -1)
+    script = '\n'.join(lines[: last_blockquote]).strip()
+    inputs = '\n'.join(lines[last_blockquote + 3:]).strip()
+    if not inputs:
+        inputs = None
+    client_id, client_secret = max(
+        compiler_keys, key=lambda x: compiler_keys[x])
+    try:
+        result = await executeCode(client_id, client_secret, script, language, inputs)
+        await ctx.reply(f"{result.output.strip()}\nScript took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", mention_author=False)
+    except Exception as error:
+        await ctx.reply(f'''**Error occured**:\n\n{error}\n\nThe correct syntax to use `code` is
+pes.code <language>
+```
+< your code >
+```
+<inputs>''')
 
 
 @client.command(aliases=["sim"])
@@ -1062,7 +1041,7 @@ async def checkPESUAnnouncement():
         if a not in ALL_ANNOUNCEMENTS_MADE:
             ALL_ANNOUNCEMENTS_MADE.append(a)
             new_announcement_count += 1
-    
+
     print(f"NEW announcements found: {new_announcement_count}")
 
     ALL_ANNOUNCEMENTS_MADE.sort(key=lambda x: x["date"], reverse=True)

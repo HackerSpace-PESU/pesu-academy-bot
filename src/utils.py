@@ -3,6 +3,7 @@ import json
 import asyncio
 import asyncpraw
 import requests
+import pydoodle
 from datetime import datetime
 from bs4 import BeautifulSoup
 from gensim.models.doc2vec import TaggedDocument
@@ -93,13 +94,15 @@ async def searchPESUAcademy(driver, query):
     return result
 
 
-async def checkMaliciousCode(source_code):
-    bad_codes = ["from os", "from subprocess", "from sys",
-                 "import os", "import subprocess", "import sys"]
-    for code_segment in bad_codes:
-        if code_segment in source_code:
-            return True
-    return False
+async def executeCode(COMPILER_CLIENT_ID, COMPILER_CLIENT_SECRET, script, language, inputs=None):
+    executor = pydoodle.Compiler(clientId=COMPILER_CLIENT_ID, clientSecret=COMPILER_CLIENT_SECRET)
+    output = executor.execute(script=script, language=language, stdIn=inputs)
+    return output
+
+
+async def updateCodeAPICallLimits(COMPILER_CLIENT_ID, COMPILER_CLIENT_SECRET):
+    executor = pydoodle.Compiler(clientId=COMPILER_CLIENT_ID, clientSecret=COMPILER_CLIENT_SECRET)
+    return 200 - executor.usage()
 
 
 async def getPESUDBResults(query):
