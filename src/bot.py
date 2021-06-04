@@ -164,7 +164,7 @@ async def subscriptionReminder():
                         await channels.send(embed=alert_embed)
                         break
 
-    # On server but not in database [happens when hard sync happens and channel gets deleted - HENCE DO NOT DO THIS]
+    # On server but not in database [happens when hard sync happens and channel gets deleted - HENCE DO NOT PERFORM HARD SYNC]
     guilds_details = await client.fetch_guilds(limit=150).flatten()
     guild_id = [g.id for g in guilds_details]
     for gid in guild_id:
@@ -304,9 +304,17 @@ async def on_guild_channel_delete(channel):
 
 
 @client.command()
-async def dbsync(ctx):
+async def remind(ctx):
     if await checkUserIsBotDev(ctx):
-        print("Syncing databases...")
+        await subscriptionReminder()
+        await ctx.send("Subscription reminders have been delivered.")
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
+async def dbsync(ctx, sync_method="soft"):
+    if await checkUserIsBotDev(ctx):
         db_records = getCompleteDatabase()
         guilds_details = await client.fetch_guilds(limit=150).flatten()
         guild_id = [str(g.id) for g in guilds_details]
@@ -317,23 +325,22 @@ async def dbsync(ctx):
             db_channel_id = row[4]
             if db_guild_id not in guild_id:
                 removeGuild(db_guild_id)
-            if db_channel_id == None:
-                continue
-            channel = client.get_channel(int(db_channel_id))
-            client_member = ctx.guild.get_member(BOT_ID)
-            client_permissions = client_member.permissions_in(channel)
-            if channel == None:
-                print("Removing channel...")
-                removeChannel(db_channel_id)
-            else:
-                if db_channel_type == "publish":
-                    if not (client_permissions.send_messages and client_permissions.embed_links and client_permissions.attach_files and client_permissions.read_message_history):
-                        print("Removing channel...")
-                        removeChannelWithType(db_channel_id, "publish")
+
+            if sync_method == "hard":
+                if db_channel_id == None:
+                    continue
+                channel = client.get_channel(int(db_channel_id))
+                client_member = ctx.guild.get_member(BOT_ID)
+                client_permissions = client_member.permissions_in(channel)
+                if channel == None:
+                    removeChannel(db_channel_id)
                 else:
-                    if not (client_permissions.send_messages and client_permissions.embed_links and client_permissions.read_message_history):
-                        print("Removing channel...")
-                        removeChannelWithType(db_channel_id, "log")
+                    if db_channel_type == "publish":
+                        if not (client_permissions.send_messages and client_permissions.embed_links and client_permissions.attach_files and client_permissions.read_message_history):
+                            removeChannelWithType(db_channel_id, "publish")
+                    else:
+                        if not (client_permissions.send_messages and client_permissions.embed_links and client_permissions.read_message_history):
+                            removeChannelWithType(db_channel_id, "log")
 
         await ctx.send("Database sync completed.")
     else:
@@ -798,7 +805,6 @@ async def longrip(ctx, long_url):
 
 
 def handler(signum, frame):
-    print("Code took too long - terminating script")
     raise Exception("Time limit exceeded")
 
 
@@ -974,9 +980,6 @@ async def pesunews(ctx, *, query=None):
     global TODAY_ANNOUNCEMENTS_MADE
     global ALL_ANNOUNCEMENTS_MADE
 
-    print(f"Announcements TODAY: {len(TODAY_ANNOUNCEMENTS_MADE)}")
-    print(f"Announcements ALL: {len(ALL_ANNOUNCEMENTS_MADE)}")
-
     announcements = ALL_ANNOUNCEMENTS_MADE
     N = len(ALL_ANNOUNCEMENTS_MADE)
     if query != None:
@@ -1014,31 +1017,33 @@ async def pesunews(ctx, *, query=None):
         await ctx.send("No announcements available. Retry with another option or try again later.")
 
 
-@tasks.loop(minutes=15)
+@tasks.loop(minutes=30)
 async def checkInstagramPost():
     await client.wait_until_ready()
+    print("Fetching Instagram posts...")
     for username in instagram_usernames:
-        print(f"Fetching Instagram posts from {username}...")
         try:
             post_embed, photo_time = await getInstagramEmbed(username)
             curr_time = time.time()
-            if (curr_time - photo_time) < 900:
+            if (curr_time - photo_time) < 1800:
                 await sendAllChannels(message_type="publish", embed=post_embed)
         except:
-            print(f"Error while fetching posts from {username}")
+            print(f"Error while fetching Instagram post from {username}")
 
 
-@tasks.loop(minutes=15)
+@tasks.loop(minutes=30)
 async def checkRedditPost():
     await client.wait_until_ready()
+    print("Fetching Reddit posts...")
     reddit_posts = await getRedditPosts("PESU", REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
-    latest_reddit_post = reddit_posts[0]
-    post_time = latest_reddit_post["create_time"]
-    current_time = datetime.now()
-    time_difference = current_time - post_time
-    if time_difference.seconds < 900 and time_difference.days == 0:
-        post_embed = await getRedditEmbed(latest_reddit_post)
-        await sendAllChannels(message_type="publish", embed=post_embed)
+    if reddit_posts:
+        latest_reddit_post = reddit_posts[0]
+        post_time = latest_reddit_post["create_time"]
+        current_time = datetime.now()
+        time_difference = current_time - post_time
+        if time_difference.seconds < 1800 and time_difference.days == 0:
+            post_embed = await getRedditEmbed(latest_reddit_post)
+            await sendAllChannels(message_type="publish", embed=post_embed)
 
 
 @tasks.loop(minutes=5)
@@ -1051,14 +1056,16 @@ async def checkPESUAnnouncement():
     driver = webdriver.Chrome(
         executable_path=CHROMEDRIVER_PATH, options=chrome_options)
     all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
-    print(f"Fetched announcements: {len(all_announcements)}")
 
+    new_announcement_count = 0
     for a in all_announcements:
         if a not in ALL_ANNOUNCEMENTS_MADE:
             ALL_ANNOUNCEMENTS_MADE.append(a)
-    print(f"All announcements found: {len(ALL_ANNOUNCEMENTS_MADE)}")
-    ALL_ANNOUNCEMENTS_MADE.sort(key=lambda x: x["date"], reverse=True)
+            new_announcement_count += 1
+    
+    print(f"NEW announcements found: {new_announcement_count}")
 
+    ALL_ANNOUNCEMENTS_MADE.sort(key=lambda x: x["date"], reverse=True)
     current_date = datetime.now().date()
     for announcement in all_announcements:
         if announcement["date"] == current_date:
@@ -1081,6 +1088,9 @@ async def checkPESUAnnouncement():
                         await sendAllChannels(message_type="publish", file=attachment_file)
                 TODAY_ANNOUNCEMENTS_MADE.append(announcement)
     driver.quit()
+
+    # print(f"Announcements TODAY: {len(TODAY_ANNOUNCEMENTS_MADE)}")
+    # print(f"Announcements ALL: {len(ALL_ANNOUNCEMENTS_MADE)}")
 
 
 @tasks.loop(minutes=10)
