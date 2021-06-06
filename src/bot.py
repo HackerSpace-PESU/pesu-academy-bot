@@ -205,15 +205,6 @@ async def syncDatabase():
             removeGuild(db_guild_id)
 
 
-@tasks.loop(hours=4)
-async def changeStatus():
-    '''
-    Changes the status of the PESU Academy bot every 4 hours.
-    '''
-    await client.wait_until_ready()
-    await client.change_presence(activity=discord.Game(next(status)))
-
-
 @client.event
 async def on_ready():
     '''
@@ -1024,7 +1015,7 @@ async def pesunews(ctx, *, query=None):
         await ctx.send("No announcements available. Retry with another option or try again later.")
 
 
-@tasks.loop(minutes=30)
+@tasks.loop(minutes=28)
 async def checkInstagramPost():
     await client.wait_until_ready()
     print("Fetching Instagram posts...")
@@ -1032,13 +1023,13 @@ async def checkInstagramPost():
         try:
             post_embed, photo_time = await getInstagramEmbed(username)
             curr_time = time.time()
-            if (curr_time - photo_time) < 1800:
+            if (curr_time - photo_time) < 1680:
                 await sendAllChannels(message_type="publish", embed=post_embed)
         except:
             print(f"Error while fetching Instagram post from {username}")
 
 
-@tasks.loop(minutes=30)
+@tasks.loop(minutes=32)
 async def checkRedditPost():
     await client.wait_until_ready()
     print("Fetching Reddit posts...")
@@ -1048,7 +1039,7 @@ async def checkRedditPost():
         post_time = latest_reddit_post["create_time"]
         current_time = datetime.now()
         time_difference = current_time - post_time
-        if time_difference.seconds < 1800 and time_difference.days == 0:
+        if time_difference.seconds < 1920 and time_difference.days == 0:
             post_embed = await getRedditEmbed(latest_reddit_post)
             await sendAllChannels(message_type="publish", embed=post_embed)
 
@@ -1112,6 +1103,15 @@ async def checkNewDay():
         ALL_ANNOUNCEMENTS_MADE = list()
         await cleanUp()
         await subscriptionReminder()
+
+
+@tasks.loop(hours=4)
+async def changeStatus():
+    '''
+    Changes the status of the PESU Academy bot every 4 hours.
+    '''
+    await client.wait_until_ready()
+    await client.change_presence(activity=discord.Game(next(status)))
 
 
 # syncDatabase.start()
