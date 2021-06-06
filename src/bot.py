@@ -683,12 +683,14 @@ async def help(ctx):
         '`pes.reddit`': 'Fetch the latest posts from r/PESU using `pes.reddit [NUMBER OF POSTS]`',
         '`pes.longrip`': 'Create a shortened long.rip link using `pes.longrip [URL]`',
         '`pes.goto`': 'Create customized redirection links using `pes.goto [LONG URL] [SHORT URL]`',
-        '`pes.exec`': """Use this to execute Python scripts. Attach your script within blockquotes on the next line. 
+        '`pes.code`': """Use this to execute Python scripts. Attach your script within blockquotes on the next line. 
         **Example**: 
-        pes.exec
-        ```Python
+        pes.code python3
+        ```
         import math
-        print(math.pi)```""",
+        print(math.pi)
+        ```
+        <inputs>""",
         '`pes.eval`': 'Evaluate a single Python expression using `pes.eval [EXPRESSION]`',
         '`pes.sim`': 'Find similarity between uploaded files using Doc2Vec. Upload files into a channel and use `pes.sim [FILENAMES]`. ',
         '`pes.spongebob` or `pes.sb`': 'Create a SpongeBob mocking meme. `pes.sb [top text] & [bottom-text]` or `pes.sb [bottom-text]`',
@@ -829,24 +831,25 @@ async def longrip(ctx, long_url):
 
 @client.command()
 async def code(ctx, language, *, content):
-    lines = content.split("\n")[1:]
-    last_blockquote = lines.index("```", -1)
-    script = '\n'.join(lines[: last_blockquote]).strip()
-    inputs = '\n'.join(lines[last_blockquote + 3:]).strip()
+    script, inputs = list(map(str.strip, content.split("```")[1:]))
     if not inputs:
         inputs = None
-    client_id, client_secret = max(
-        compiler_keys, key=lambda x: compiler_keys[x])
-    try:
-        result = await executeCode(client_id, client_secret, script, language, inputs)
-        await ctx.reply(f"{result.output.strip()}\nScript took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", mention_author=False)
-    except Exception as error:
-        await ctx.reply(f'''**Error occured**:\n\n{error}\n\nThe correct syntax to use `code` is
-pes.code <language>
+    if "@everyone" not in script and "@here" not in script and "@everyone" not in inputs and "@here" not in inputs:
+        client_id, client_secret = max(
+            compiler_keys, key=lambda x: compiler_keys[x])
+        try:
+            result = await executeCode(client_id, client_secret, script, language, inputs)
+            await ctx.reply(f"{result.output.strip()}\nScript took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", mention_author=False)
+        except Exception as error:
+            await ctx.reply(f'''**Error occured**:\n\n{error}\n\nThe correct syntax to use `code` is
+.code <language>
 ```
 < your code >
 ```
 <inputs>''')
+    else:
+        greeting = random.choice(greetings)[:-1]
+        await ctx.reply(f"Aye {greeting}, you may be smart but I am smarter. No pinging `@everyone` or `@here` with the bot.")
 
 
 @client.command(aliases=["sim"])

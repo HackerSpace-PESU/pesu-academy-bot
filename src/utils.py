@@ -95,13 +95,15 @@ async def searchPESUAcademy(driver, query):
 
 
 async def executeCode(COMPILER_CLIENT_ID, COMPILER_CLIENT_SECRET, script, language, inputs=None):
-    executor = pydoodle.Compiler(clientId=COMPILER_CLIENT_ID, clientSecret=COMPILER_CLIENT_SECRET)
+    executor = pydoodle.Compiler(
+        clientId=COMPILER_CLIENT_ID, clientSecret=COMPILER_CLIENT_SECRET)
     output = executor.execute(script=script, language=language, stdIn=inputs)
     return output
 
 
 async def updateCodeAPICallLimits(COMPILER_CLIENT_ID, COMPILER_CLIENT_SECRET):
-    executor = pydoodle.Compiler(clientId=COMPILER_CLIENT_ID, clientSecret=COMPILER_CLIENT_SECRET)
+    executor = pydoodle.Compiler(
+        clientId=COMPILER_CLIENT_ID, clientSecret=COMPILER_CLIENT_SECRET)
     return 200 - executor.usage()
 
 
@@ -325,6 +327,6 @@ async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOK
                     post_data["images"].append(i["resolutions"][-1]["url"])
 
         data.append(post_data)
-    
+
     await reddit.close()
     return data
