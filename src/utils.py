@@ -94,6 +94,13 @@ async def searchPESUAcademy(driver, query):
     return result
 
 
+def checkSpamCode(script, inputs):
+    if isinstance(inputs, str):
+        return "@everyone" in script or "@here" in script or "@everyone" in inputs or "@here" in inputs
+    else:
+        return "@everyone" in script or "@here" in script
+
+
 async def executeCode(COMPILER_CLIENT_ID, COMPILER_CLIENT_SECRET, script, language, inputs=None):
     executor = pydoodle.Compiler(
         clientId=COMPILER_CLIENT_ID, clientSecret=COMPILER_CLIENT_SECRET)

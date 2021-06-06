@@ -831,10 +831,11 @@ async def longrip(ctx, long_url):
 
 @client.command()
 async def code(ctx, language, *, content):
-    script, inputs = list(map(str.strip, content.split("```")[1:]))
+    content = content.split("```")[1:]
+    script, inputs = list(map(str.strip, content))
     if not inputs:
         inputs = None
-    if "@everyone" not in script and "@here" not in script and "@everyone" not in inputs and "@here" not in inputs:
+    if not checkSpamCode(script, inputs):
         client_id, client_secret = max(
             compiler_keys, key=lambda x: compiler_keys[x])
         try:
