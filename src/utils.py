@@ -94,11 +94,11 @@ async def searchPESUAcademy(driver, query):
     return result
 
 
-def checkSpamCode(script, inputs):
+def checkSpamCode(script, inputs=None):
     if isinstance(inputs, str):
-        return "@everyone" in script or "@here" in script or "@everyone" in inputs or "@here" in inputs
+        return "@everyone" in script or "@here" in script or "@everyone" in inputs or "@here" in inputs or '@&' in script or '@&' in inputs
     else:
-        return "@everyone" in script or "@here" in script
+        return "@everyone" in script or "@here" in script or '@&' in script
 
 
 async def executeCode(COMPILER_CLIENT_ID, COMPILER_CLIENT_SECRET, script, language, inputs=None):

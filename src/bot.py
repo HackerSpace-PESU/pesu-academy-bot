@@ -1,14 +1,10 @@
 import re
 import os
-import sys
 import time
 import random
 import base64
 import asyncio
-import signal
 import discord
-import contextlib
-from io import StringIO
 from itertools import cycle
 from datetime import datetime
 from dotenv import load_dotenv
@@ -830,27 +826,54 @@ async def longrip(ctx, long_url):
 
 
 @client.command()
-async def code(ctx, language, *, content):
-    content = content.split("```")[1:]
-    script, inputs = list(map(str.strip, content))
-    if not inputs:
-        inputs = None
-    if not checkSpamCode(script, inputs):
-        client_id, client_secret = max(
-            compiler_keys, key=lambda x: compiler_keys[x])
-        try:
-            result = await executeCode(client_id, client_secret, script, language, inputs)
-            await ctx.reply(f"{result.output.strip()}\nScript took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", mention_author=False)
-        except Exception as error:
-            await ctx.reply(f'''**Error occured**:\n\n{error}\n\nThe correct syntax to use `code` is
+async def code(ctx, language, *, content=None):
+    if language == "help":
+        languages = ['ada', 'bash', 'bc', 'brainfuck', 'c', 'c-99', 'clisp', 'clojure', 'cobol', 'coffeescript',
+                     'cpp', 'cpp17', 'csharp', 'd', 'dart', 'elixir', 'erlang', 'factor', 'falcon', 'fantom',
+                     'forth', 'fortran', 'freebasic', 'fsharp', 'gccasm', 'go', 'groovy', 'hack', 'haskell',
+                     'icon', 'intercal', 'java', 'jlang', 'kotlin', 'lolcode', 'lua', 'mozart', 'nasm', 'nemerle',
+                     'nim', 'nodejs', 'objc', 'ocaml', 'octave', 'pascal', 'perl', 'php', 'picolisp', 'pike',
+                     'prolog', 'python2', 'python3', 'r', 'racket', 'rhino', 'ruby', 'rust', 'scala', 'scheme',
+                     'smalltalk', 'spidermonkey', 'sql', 'swift', 'tcl', 'unlambda', 'vbn', 'verilog',
+                     'whitespace', 'yabasic']
+        content = f'''`.code` uses the JDoodle code execution API which supports code compilation and execution for all major programming languages.
+
+Supported languages: `{languages}`
+
+To execute a script, use the following syntax for the command:
+
 .code <language>
 ```
-< your code >
+Enter code here, do not add syntax highlighting
 ```
-<inputs>''')
+<inputs for script>
+'''
+        await ctx.reply(content, mention_author=False)
     else:
-        greeting = random.choice(greetings)[:-1]
-        await ctx.reply(f"Aye {greeting}, you may be smart but I am smarter. No pinging `@everyone` or `@here` with the bot.")
+        if content == None:
+            await ctx.reply("Please enter a valid script. Use `.code help` to learn how to use the service.", mention_author=False)
+        else:
+            content = content.split("```")[1:]
+            script, inputs = list(map(str.strip, content))
+            if not inputs:
+                inputs = None
+            if not checkSpamCode(script, inputs):
+                client_id, client_secret = max(
+                    compiler_keys, key=lambda x: compiler_keys[x])
+                try:
+                    result = await executeCode(client_id, client_secret, script, language, inputs)
+                    if not checkSpamCode(result.output.strip()):
+                        await ctx.reply(f"{result.output.strip()}\nScript took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", mention_author=False)
+                    else:
+                        greeting = random.choice(greetings)[:-1]
+                        await ctx.reply(f"Aye {greeting}, you may be smart but I am smarter. No pinging `@everyone` or `@here` with the bot.")
+
+                except Exception as error:
+                    await ctx.reply(f"**Error occured**: {error}\n\nUse `.code help` to learn how to use the service.")
+
+            else:
+                greeting = random.choice(greetings)[:-1]
+                await ctx.reply(f"Aye {greeting}, you may be smart but I am smarter. No pinging `@everyone` or `@here` with the bot.")
 
 
 @client.command(aliases=["sim"])
