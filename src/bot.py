@@ -192,7 +192,7 @@ async def subscriptionReminder():
                         break
 
 
-@tasks.loop(hours=4)
+# @tasks.loop(hours=4)
 async def syncDatabase():
     print("Syncing databases...")
     db_records = getCompleteDatabase()
@@ -220,6 +220,7 @@ async def on_ready():
     Initialising bot after boot
     '''
     await client.change_presence(activity=discord.Game(next(status)))
+    await syncDatabase()
 
     for client_id, client_secret in compiler_keys.keys():
         compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
@@ -1113,7 +1114,7 @@ async def checkNewDay():
         await subscriptionReminder()
 
 
-syncDatabase.start()
+# syncDatabase.start()
 checkNewDay.start()
 checkPESUAnnouncement.start()
 checkInstagramPost.start()
