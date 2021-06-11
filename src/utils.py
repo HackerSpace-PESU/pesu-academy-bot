@@ -4,14 +4,12 @@ import asyncio
 import asyncpraw
 import requests
 import pydoodle
+from pathlib import Path
 from datetime import datetime
 from bs4 import BeautifulSoup
-from gensim.models.doc2vec import TaggedDocument
-from nltk.tokenize import word_tokenize
 from selenium.webdriver.common.by import By
 from db import *
 from pydictionary import *
-from doc2sim import *
 from instagram import *
 
 instagram_usernames = ['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc',
@@ -264,43 +262,6 @@ async def getPESUAnnouncements(chrome, username, password):
         data.append(temp)
 
     return data
-
-
-async def getDocumentSimilarity(filenames, model_type="doc2vec", phrase=True):
-    if model_type == "doc2vec":
-        documents = list(map(getText, filenames))
-        if phrase:
-            documents = list(map(phraseTransform, documents))
-        documents = [" ".join(d) for d in documents]
-        document_words = list(map(word_tokenize, documents))
-
-        train_text = [
-            TaggedDocument(
-                words=w,
-                tags=[str(i)]
-            ) for i, w in enumerate(document_words)
-        ]
-
-        test_text = document_words
-        total_files = len(filenames)
-        result = list()
-        similarity_matrix = np.identity(total_files, dtype=float)
-
-        for i in range(total_files):
-            for j in range(total_files):
-                if i != j and similarity_matrix[i, j] == 0:
-                    model = createDoc2VecModel(
-                        [train_text[i]] + [train_text[j]])
-                    vecs = list(map(model.infer_vector, [
-                                test_text[i]] + [test_text[j]]))
-                    similarity_matrix[i, j] = cosineSimilarity(
-                        vecs[0], vecs[1])
-                    similarity_matrix[j, i] = similarity_matrix[i, j]
-                    result.append(
-                        (filenames[i], filenames[j], similarity_matrix[i, j]))
-                    del model
-
-        return result
 
 
 async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n=5):

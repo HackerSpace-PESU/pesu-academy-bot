@@ -1,9 +1,8 @@
 import re
 import os
 from sqlalchemy import create_engine, MetaData, Table, and_
-from sqlalchemy.engine import result
 from sqlalchemy.orm import sessionmaker
-from dbmodels import Student, Guild
+from dbmodels import Student
 from dotenv import load_dotenv
 
 load_dotenv()

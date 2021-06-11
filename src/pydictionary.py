@@ -3,6 +3,7 @@ from spellchecker import SpellChecker
 
 dictionary = SpellChecker()
 
+
 def checkWordExistsInDictionary(word):
     if wordnet.synsets(word):
         return True, word

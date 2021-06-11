@@ -25,8 +25,11 @@ BOT_ID = int(os.environ["BOT_ID"])
 ARONYABAKSY_ID = int(os.environ["ARONYA_ID"])
 ADITEYABARAL_ID = int(os.environ["BARAL_ID"])
 BOT_DEVS = [ARONYABAKSY_ID, ADITEYABARAL_ID]
-CHANNEL_BOT_LOGS = 842466762985701406
-DEV_SERVER = 768874819474292746
+
+CHANNEL_BOT_LOGS_1 = 842466762985701406
+CHANNEL_BOT_LOGS_2 = 848634702944010252
+DEV_SERVER_1 = 768874819474292746
+DEV_SERVER_2 = 848632052059471912
 
 BITLY_TOKEN = os.environ["BITLY_TOKEN"]
 BITLY_GUID = os.environ["BITLY_GUID"]
@@ -192,7 +195,6 @@ async def subscriptionReminder():
                         break
 
 
-# @tasks.loop(hours=4)
 async def syncDatabase():
     print("Syncing databases...")
     db_records = getCompleteDatabase()
@@ -210,6 +212,7 @@ async def on_ready():
     '''
     Initialising bot after boot
     '''
+    print("Bot is online")
     await client.change_presence(activity=discord.Game(next(status)))
     await syncDatabase()
 
@@ -221,7 +224,12 @@ async def on_ready():
                           description="Use `pes.` to access commands", color=discord.Color.blue())
     await sendAllChannels(message_type="log", embed=embed)
     await subscriptionReminder()
-    print("Bot is online")
+
+    checkNewDay.start()
+    checkPESUAnnouncement.start()
+    checkInstagramPost.start()
+    checkRedditPost.start()
+    changeStatus.start()
 
 
 @client.event
@@ -384,7 +392,7 @@ async def contribute(ctx, *params):
         embed.add_field(
             name='\u200b', value=f"{rule}: {rules[rule]}", inline=False)
 
-    guild_object = client.get_guild(DEV_SERVER)
+    guild_object = client.get_guild(DEV_SERVER_1)
     aditeyabaral = guild_object.get_member(ADITEYABARAL_ID).mention
     abaksy = guild_object.get_member(ARONYABAKSY_ID).mention
     embed.add_field(
@@ -418,7 +426,7 @@ async def reachoutcommand(ctx, *, message: str = None):
 **Channel ID**: `{ctx.channel.id}`\n
 **Message**: {message}'''
             )
-            channel = client.get_channel(CHANNEL_BOT_LOGS)
+            channel = client.get_channel(CHANNEL_BOT_LOGS_2)
             await channel.send(embed=embed)
 
     else:
@@ -679,8 +687,6 @@ async def help(ctx):
         print(math.pi)
         ```
         <inputs>""",
-        '`pes.eval`': 'Evaluate a single Python expression using `pes.eval [EXPRESSION]`',
-        '`pes.sim`': 'Find similarity between uploaded files using Doc2Vec. Upload files into a channel and use `pes.sim [FILENAMES]`. ',
         '`pes.spongebob` or `pes.sb`': 'Create a SpongeBob mocking meme. `pes.sb [top text] & [bottom-text]` or `pes.sb [bottom-text]`',
         '`pes.dict`': 'Search for the meaning of word using `pes.dict [word]`'
     }
@@ -868,37 +874,9 @@ Enter code here, do not add syntax highlighting
                 await ctx.reply(f"Aye {greeting}, you may be smart but I am smarter. No pinging `@everyone` or `@here` with the bot.")
 
 
-@client.command(aliases=["sim"])
-async def similarity(ctx, *, filenames):
-    filenames = filenames.split()
-    all_attachments = list()
-    async for message in ctx.history(limit=50):
-        if message.attachments:
-            async for attachment in message.attachments:
-                with open(attachment.filename, "wb") as f:
-                    await attachment.save(f)
-                all_attachments.append(attachment.filename)
-
-    flag = True
-    async for fname in filenames:
-        if fname not in all_attachments:
-            flag = False
-            await ctx.send(f"{fname} not found. Please reupload file and try again.")
-            break
-
-    if flag:
-        result = await getDocumentSimilarity(filenames)
-        result = [
-            f"{doc1} -- {doc2}: **{round(sim*100, 2)}%**" for doc1, doc2, sim in result]
-        string = "\n\n".join(result)
-        embed = discord.Embed(
-            title="Document Similarity Results", color=discord.Color.blue(), description=string)
-        await ctx.send(embed=embed)
-
-
 async def getRedditEmbed(post):
     embed = discord.Embed(title="New Reddit Post",
-                          url=post["url"], color=0xff5700)
+                          url=post["url"], color=discord.Color.blue())
     if post["content"]:
         if len(post["content"]) > 1024:
             embed.add_field(
@@ -928,7 +906,7 @@ async def getInstagramEmbed(username):
     html = getInstagramHTML(username)
     photo_time = getLastPhotoDate(html)
     post_embed = discord.Embed(
-        title=f'New Instagram Post from {username}', url=getPostLink(html), color=0x8a3ab9)
+        title=f'New Instagram Post from {username}', url=getPostLink(html), color=discord.Color.blue())
     if(checkVideo(html)):
         post_embed.set_image(url=getVideoURL(html))
     else:
@@ -1015,7 +993,7 @@ async def pesunews(ctx, *, query=None):
         await ctx.send("No announcements available. Retry with another option or try again later.")
 
 
-@tasks.loop(minutes=28)
+@tasks.loop(minutes=26)
 async def checkInstagramPost():
     await client.wait_until_ready()
     print("Fetching Instagram posts...")
@@ -1023,13 +1001,13 @@ async def checkInstagramPost():
         try:
             post_embed, photo_time = await getInstagramEmbed(username)
             curr_time = time.time()
-            if (curr_time - photo_time) < 1680:
+            if (curr_time - photo_time) < 1560:
                 await sendAllChannels(message_type="publish", embed=post_embed)
         except:
             print(f"Error while fetching Instagram post from {username}")
 
 
-@tasks.loop(minutes=32)
+@tasks.loop(minutes=34)
 async def checkRedditPost():
     await client.wait_until_ready()
     print("Fetching Reddit posts...")
@@ -1039,7 +1017,7 @@ async def checkRedditPost():
         post_time = latest_reddit_post["create_time"]
         current_time = datetime.now()
         time_difference = current_time - post_time
-        if time_difference.seconds < 1920 and time_difference.days == 0:
+        if time_difference.seconds < 2040 and time_difference.days == 0:
             post_embed = await getRedditEmbed(latest_reddit_post)
             await sendAllChannels(message_type="publish", embed=post_embed)
 
@@ -1105,7 +1083,7 @@ async def checkNewDay():
         await subscriptionReminder()
 
 
-@tasks.loop(hours=4)
+@tasks.loop(hours=5)
 async def changeStatus():
     '''
     Changes the status of the PESU Academy bot every 4 hours.
@@ -1114,10 +1092,9 @@ async def changeStatus():
     await client.change_presence(activity=discord.Game(next(status)))
 
 
-# syncDatabase.start()
-checkNewDay.start()
-checkPESUAnnouncement.start()
-checkInstagramPost.start()
-checkRedditPost.start()
-changeStatus.start()
+# checkNewDay.start()
+# checkPESUAnnouncement.start()
+# checkInstagramPost.start()
+# checkRedditPost.start()
+# changeStatus.start()
 client.run(BOT_TOKEN)
