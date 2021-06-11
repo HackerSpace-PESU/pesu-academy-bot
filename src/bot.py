@@ -18,6 +18,7 @@ client = commands.Bot(command_prefix='pes.',
                       help_command=None, intents=discord.Intents.all())
 status = cycle(["with the PRIDE of PESU", "with lives",
                "with your future", "with PESsants", "with PESts"])
+greetings = ["PESsants", "PESts"]
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 BOT_ID = int(os.environ["BOT_ID"])
@@ -72,7 +73,9 @@ compiler_keys = {
 
 TODAY_ANNOUNCEMENTS_MADE = list()
 ALL_ANNOUNCEMENTS_MADE = list()
-greetings = ["PESsants", "PESts"]
+TASK_FLAG_INSTAGRAM = True
+TASK_FLAG_REDDIT = True
+TASK_FLAG_PESU = True
 
 
 async def checkUserIsAdminOrBotDev(ctx):
@@ -226,10 +229,14 @@ async def on_ready():
     await subscriptionReminder()
 
     checkNewDay.start()
-    checkPESUAnnouncement.start()
-    checkInstagramPost.start()
-    checkRedditPost.start()
     changeStatus.start()
+
+    if TASK_FLAG_PESU:
+        checkPESUAnnouncement.start()
+    if TASK_FLAG_INSTAGRAM:
+        checkInstagramPost.start()
+    if TASK_FLAG_REDDIT:
+        checkRedditPost.start()
 
 
 @client.event
@@ -993,33 +1000,79 @@ async def pesunews(ctx, *, query=None):
         await ctx.send("No announcements available. Retry with another option or try again later.")
 
 
+@client.command()
+async def taskmanager(ctx, handle=None, mode=None):
+    global TASK_FLAG_PESU
+    global TASK_FLAG_REDDIT
+    global TASK_FLAG_INSTAGRAM
+
+    if await checkUserIsBotDev(ctx):
+        allowed_handles = ["instagram", "reddit", "pesu"]
+        allowed_modes = ["on", "off"]
+        if handle == None or handle not in allowed_handles:
+            await ctx.send(f"Please enter a valid handle. Allowed handles are: {allowed_handles}")
+        elif mode == None or mode not in allowed_modes:
+            await ctx.send(f"Please enter a valid mode. Allowed modes are: {allowed_modes}")
+        else:
+            if mode == "on":
+                if handle == "instagram":
+                    TASK_FLAG_INSTAGRAM = True
+                if handle == "reddit":
+                    TASK_FLAG_REDDIT = True
+                if handle == "pesu":
+                    TASK_FLAG_PESU = True
+
+            if mode == "off":
+                if handle == "instagram":
+                    TASK_FLAG_INSTAGRAM = False
+                if handle == "reddit":
+                    TASK_FLAG_REDDIT = False
+                if handle == "pesu":
+                    TASK_FLAG_PESU = False
+
+            if mode == "pesu":
+                mode = "PESU Announcement"
+
+            embed = discord.Embed(
+                color=discord.Color.blue(),
+                title="PESU Academy Bot - Message from Developer Team",
+                description=f"The {handle.capitalize()} feature has been turned {mode}."
+            )
+            await sendAllChannels(message_type="publish", embed=embed)
+            await sendAllChannels(message_type="log", embed=embed)
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
 @tasks.loop(minutes=26)
 async def checkInstagramPost():
     await client.wait_until_ready()
-    print("Fetching Instagram posts...")
-    for username in instagram_usernames:
-        try:
-            post_embed, photo_time = await getInstagramEmbed(username)
-            curr_time = time.time()
-            if (curr_time - photo_time) < 1560:
-                await sendAllChannels(message_type="publish", embed=post_embed)
-        except:
-            print(f"Error while fetching Instagram post from {username}")
+    if TASK_FLAG_INSTAGRAM:
+        print("Fetching Instagram posts...")
+        for username in instagram_usernames:
+            try:
+                post_embed, photo_time = await getInstagramEmbed(username)
+                curr_time = time.time()
+                if (curr_time - photo_time) < 1560:
+                    await sendAllChannels(message_type="publish", embed=post_embed)
+            except:
+                print(f"Error while fetching Instagram post from {username}")
 
 
 @tasks.loop(minutes=34)
 async def checkRedditPost():
     await client.wait_until_ready()
-    print("Fetching Reddit posts...")
-    reddit_posts = await getRedditPosts("PESU", REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
-    if reddit_posts:
-        latest_reddit_post = reddit_posts[0]
-        post_time = latest_reddit_post["create_time"]
-        current_time = datetime.now()
-        time_difference = current_time - post_time
-        if time_difference.seconds < 2040 and time_difference.days == 0:
-            post_embed = await getRedditEmbed(latest_reddit_post)
-            await sendAllChannels(message_type="publish", embed=post_embed)
+    if TASK_FLAG_REDDIT:
+        print("Fetching Reddit posts...")
+        reddit_posts = await getRedditPosts("PESU", REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
+        if reddit_posts:
+            latest_reddit_post = reddit_posts[0]
+            post_time = latest_reddit_post["create_time"]
+            current_time = datetime.now()
+            time_difference = current_time - post_time
+            if time_difference.seconds < 2040 and time_difference.days == 0:
+                post_embed = await getRedditEmbed(latest_reddit_post)
+                await sendAllChannels(message_type="publish", embed=post_embed)
 
 
 @tasks.loop(minutes=5)
@@ -1028,45 +1081,46 @@ async def checkPESUAnnouncement():
     global ALL_ANNOUNCEMENTS_MADE
     await client.wait_until_ready()
 
-    print("Fetching announcements...")
-    driver = webdriver.Chrome(
-        executable_path=CHROMEDRIVER_PATH, options=chrome_options)
-    all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
+    if TASK_FLAG_PESU:
+        print("Fetching announcements...")
+        driver = webdriver.Chrome(
+            executable_path=CHROMEDRIVER_PATH, options=chrome_options)
+        all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
 
-    new_announcement_count = 0
-    for a in all_announcements:
-        if a not in ALL_ANNOUNCEMENTS_MADE:
-            ALL_ANNOUNCEMENTS_MADE.append(a)
-            new_announcement_count += 1
+        new_announcement_count = 0
+        for a in all_announcements:
+            if a not in ALL_ANNOUNCEMENTS_MADE:
+                ALL_ANNOUNCEMENTS_MADE.append(a)
+                new_announcement_count += 1
 
-    print(f"NEW announcements found: {new_announcement_count}")
+        print(f"NEW announcements found: {new_announcement_count}")
 
-    ALL_ANNOUNCEMENTS_MADE.sort(key=lambda x: x["date"], reverse=True)
-    current_date = datetime.now().date()
-    for announcement in all_announcements:
-        if announcement["date"] == current_date:
-            if announcement not in TODAY_ANNOUNCEMENTS_MADE:
-                embed = await getAnnouncementEmbed(announcement)
-                if announcement["img"] != None:
-                    img_base64 = announcement["img"].strip()[22:]
-                    imgdata = base64.b64decode(img_base64)
-                    filename = "announcement-img.png"
-                    with open(filename, 'wb') as f:
-                        f.write(imgdata)
-                    with open(filename, 'rb') as f:
-                        img_file = discord.File(f)
-                        await sendAllChannels(message_type="publish", file=img_file)
+        ALL_ANNOUNCEMENTS_MADE.sort(key=lambda x: x["date"], reverse=True)
+        current_date = datetime.now().date()
+        for announcement in all_announcements:
+            if announcement["date"] == current_date:
+                if announcement not in TODAY_ANNOUNCEMENTS_MADE:
+                    embed = await getAnnouncementEmbed(announcement)
+                    if announcement["img"] != None:
+                        img_base64 = announcement["img"].strip()[22:]
+                        imgdata = base64.b64decode(img_base64)
+                        filename = "announcement-img.png"
+                        with open(filename, 'wb') as f:
+                            f.write(imgdata)
+                        with open(filename, 'rb') as f:
+                            img_file = discord.File(f)
+                            await sendAllChannels(message_type="publish", file=img_file)
 
-                await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
-                if announcement["attachments"]:
-                    for fname in announcement["attachments"]:
-                        attachment_file = discord.File(fname)
-                        await sendAllChannels(message_type="publish", file=attachment_file)
-                TODAY_ANNOUNCEMENTS_MADE.append(announcement)
-    driver.quit()
+                    await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
+                    if announcement["attachments"]:
+                        for fname in announcement["attachments"]:
+                            attachment_file = discord.File(fname)
+                            await sendAllChannels(message_type="publish", file=attachment_file)
+                    TODAY_ANNOUNCEMENTS_MADE.append(announcement)
+        driver.quit()
 
-    # print(f"Announcements TODAY: {len(TODAY_ANNOUNCEMENTS_MADE)}")
-    # print(f"Announcements ALL: {len(ALL_ANNOUNCEMENTS_MADE)}")
+        # print(f"Announcements TODAY: {len(TODAY_ANNOUNCEMENTS_MADE)}")
+        # print(f"Announcements ALL: {len(ALL_ANNOUNCEMENTS_MADE)}")
 
 
 @tasks.loop(minutes=10)
@@ -1092,9 +1146,4 @@ async def changeStatus():
     await client.change_presence(activity=discord.Game(next(status)))
 
 
-# checkNewDay.start()
-# checkPESUAnnouncement.start()
-# checkInstagramPost.start()
-# checkRedditPost.start()
-# changeStatus.start()
 client.run(BOT_TOKEN)
