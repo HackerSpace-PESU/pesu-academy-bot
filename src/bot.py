@@ -1030,6 +1030,8 @@ async def taskmanager(ctx, handle=None, mode=None):
                 title="PESU Academy Bot - Message from Developer Team",
                 description=f"The {handle.capitalize()} feature has been turned **{mode.upper()}**"
             )
+
+            await ctx.send(f"The {handle.capitalize()} feature has been turned **{mode.upper()}**")
             await sendAllChannels(message_type="publish", embed=embed)
             await sendAllChannels(message_type="log", embed=embed)
     else:
