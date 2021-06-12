@@ -1014,21 +1014,13 @@ async def taskmanager(ctx, handle=None, mode=None):
         elif mode == None or mode not in allowed_modes:
             await ctx.send(f"Please enter a valid mode. Allowed modes are: {allowed_modes}")
         else:
-            if mode == "on":
-                if handle == "instagram":
-                    TASK_FLAG_INSTAGRAM = True
-                if handle == "reddit":
-                    TASK_FLAG_REDDIT = True
-                if handle == "pesu":
-                    TASK_FLAG_PESU = True
-
-            if mode == "off":
-                if handle == "instagram":
-                    TASK_FLAG_INSTAGRAM = False
-                if handle == "reddit":
-                    TASK_FLAG_REDDIT = False
-                if handle == "pesu":
-                    TASK_FLAG_PESU = False
+            value_mapping = {"on": True, "off": False}
+            if handle == "instagram":
+                TASK_FLAG_INSTAGRAM = value_mapping[mode]
+            if handle == "reddit":
+                TASK_FLAG_REDDIT = value_mapping[mode]
+            if handle == "pesu":
+                TASK_FLAG_PESU = value_mapping[mode]
 
             if mode == "pesu":
                 mode = "PESU Announcement"
@@ -1036,10 +1028,30 @@ async def taskmanager(ctx, handle=None, mode=None):
             embed = discord.Embed(
                 color=discord.Color.blue(),
                 title="PESU Academy Bot - Message from Developer Team",
-                description=f"The {handle.capitalize()} feature has been turned {mode}."
+                description=f"The {handle.capitalize()} feature has been turned **{mode.upper()}**"
             )
             await sendAllChannels(message_type="publish", embed=embed)
             await sendAllChannels(message_type="log", embed=embed)
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
+async def taskstatus(ctx):
+    global TASK_FLAG_PESU
+    global TASK_FLAG_REDDIT
+    global TASK_FLAG_INSTAGRAM
+
+    if await checkUserIsBotDev(ctx):
+        value_mapping = {True: "ON", False: "OFF"}
+        embed = discord.Embed(
+            color=discord.Color.blue(),
+            title="PESU Academy Bot - Task Status",
+            description=f'''PESU Announcement Checks: **{value_mapping[TASK_FLAG_PESU]}**
+Instagram Checks: **{value_mapping[TASK_FLAG_INSTAGRAM]}**
+Reddit Checks: **{value_mapping[TASK_FLAG_REDDIT]}**'''
+        )
+        await ctx.send(embed=embed)
     else:
         await ctx.send("You are not authorised to run this command.")
 
