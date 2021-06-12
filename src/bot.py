@@ -230,13 +230,9 @@ async def on_ready():
 
     checkNewDay.start()
     changeStatus.start()
-
-    if TASK_FLAG_PESU:
-        checkPESUAnnouncement.start()
-    if TASK_FLAG_INSTAGRAM:
-        checkInstagramPost.start()
-    if TASK_FLAG_REDDIT:
-        checkRedditPost.start()
+    checkPESUAnnouncement.start()
+    checkInstagramPost.start()
+    checkRedditPost.start()
 
 
 @client.event
