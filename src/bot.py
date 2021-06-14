@@ -1095,9 +1095,9 @@ async def checkPESUAnnouncement():
         print("Fetching announcements...")
         driver = webdriver.Chrome(
             executable_path=CHROMEDRIVER_PATH, options=chrome_options)
-        all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
+        all_announcements = getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
         # all_announcements = getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
-        time.sleep(5)   # sleep so all attachments are downloaded
+        time.sleep(1)   # sleep so all attachments are downloaded
 
         new_announcement_count = 0
         for a in all_announcements:
