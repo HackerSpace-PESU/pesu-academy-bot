@@ -1097,7 +1097,8 @@ async def checkPESUAnnouncement():
             executable_path=CHROMEDRIVER_PATH, options=chrome_options)
         all_announcements = getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
         # all_announcements = getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
-        time.sleep(1)   # sleep so all attachments are downloaded
+        time.sleep(5)   # sleep so all attachments are downloaded
+        print(all_announcements)
 
         new_announcement_count = 0
         for a in all_announcements:
@@ -1114,6 +1115,7 @@ async def checkPESUAnnouncement():
                 if announcement not in TODAY_ANNOUNCEMENTS_MADE:
                     embed = await getAnnouncementEmbed(announcement)
                     if announcement["img"] != None:
+                        print("Image available, sending...")
                         img_base64 = announcement["img"].strip()[22:]
                         imgdata = base64.b64decode(img_base64)
                         filename = "announcement-img.png"
@@ -1125,6 +1127,7 @@ async def checkPESUAnnouncement():
 
                     await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
                     if announcement["attachments"]:
+                        print("Attachment available, sending...")
                         for fname in announcement["attachments"]:
                             attachment_file = discord.File(fname)
                             await sendAllChannels(message_type="publish", file=attachment_file)
