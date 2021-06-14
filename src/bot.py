@@ -1096,6 +1096,8 @@ async def checkPESUAnnouncement():
         driver = webdriver.Chrome(
             executable_path=CHROMEDRIVER_PATH, options=chrome_options)
         all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
+        # all_announcements = getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
+        time.sleep(5)   # sleep so all attachments are downloaded
 
         new_announcement_count = 0
         for a in all_announcements:
@@ -1128,9 +1130,6 @@ async def checkPESUAnnouncement():
                             await sendAllChannels(message_type="publish", file=attachment_file)
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
         driver.quit()
-
-        # print(f"Announcements TODAY: {len(TODAY_ANNOUNCEMENTS_MADE)}")
-        # print(f"Announcements ALL: {len(ALL_ANNOUNCEMENTS_MADE)}")
 
 
 @tasks.loop(minutes=10)
