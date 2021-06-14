@@ -1123,13 +1123,14 @@ async def checkPESUAnnouncement():
                             f.write(imgdata)
                         with open(filename, 'rb') as f:
                             img_file = discord.File(f)
-                            await sendAllChannels(message_type="publish", file=img_file)
+                        await sendAllChannels(message_type="publish", file=img_file)
 
                     await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
                     if announcement["attachments"]:
                         print("Attachment available, sending...")
                         for fname in announcement["attachments"]:
-                            attachment_file = discord.File(fname)
+                            with open(fname, "rb") as f:
+                                attachment_file = discord.File(f)
                             await sendAllChannels(message_type="publish", file=attachment_file)
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
         driver.quit()
