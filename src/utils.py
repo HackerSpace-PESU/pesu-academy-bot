@@ -193,31 +193,26 @@ async def generateSpongebobMeme(query):
         outfile.write(response.content)
 
 
-def getPESUAnnouncements(chrome, username, password):
+async def getPESUAnnouncements(chrome, username, password):
     chrome.get("https://pesuacademy.com/Academy")
-    # await asyncio.sleep(2)
-    time.sleep(2)
+    await asyncio.sleep(2)
 
     username_box = chrome.find_element_by_xpath(r'//*[@id="j_scriptusername"]')
     password_box = chrome.find_element_by_xpath(r'//*[@name="j_password"]')
 
     username_box.send_keys(username)
-    # await asyncio.sleep(0.3)
-    time.sleep(0.3)
+    await asyncio.sleep(0.3)
     password_box.send_keys(password)
-    # await asyncio.sleep(0.3)
-    time.sleep(0.3)
+    await asyncio.sleep(0.3)
 
     sign_in_button = chrome.find_element_by_xpath(
         r'//*[@id="postloginform#/Academy/j_spring_security_check"]')
     sign_in_button.click()
-    # await asyncio.sleep(1)
-    time.sleep(1)
+    await asyncio.sleep(1)
 
     menu_options = chrome.find_elements_by_xpath(r'//*[@class="menu-name"]')
     menu_options[8].click()
-    # await asyncio.sleep(1)
-    time.sleep(1)
+    await asyncio.sleep(1)
 
     announcement_boxes = chrome.find_elements_by_xpath(
         r'//*[@class="elem-info-wrapper"]')
@@ -250,7 +245,7 @@ def getPESUAnnouncements(chrome, username, password):
                 all_attachments.extend(attachment_names)
                 for a in attachments:
                     a.click()
-                    time.sleep(0.2)
+                    await asyncio.sleep(1)
 
         img_base64 = None
         img_box = a_box.find_elements_by_xpath(
