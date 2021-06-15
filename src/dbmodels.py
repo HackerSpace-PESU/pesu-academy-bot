@@ -45,3 +45,13 @@ class Guild(Base):
         self.guild_name = guild_name
         self.channel_id = channel_id
         self.channel_type = channel_type
+
+
+class Status(Base):
+    __tablename__ = "status"
+    variable = Column(String(30), primary_key=True)
+    value = Column(String(10), nullable=False)
+
+    def __init__(self, variable, value) -> None:
+        self.variable = variable
+        self.value = value

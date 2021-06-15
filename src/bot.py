@@ -73,9 +73,11 @@ compiler_keys = {
 
 TODAY_ANNOUNCEMENTS_MADE = list()
 ALL_ANNOUNCEMENTS_MADE = list()
-TASK_FLAG_INSTAGRAM = False
+
+TASK_FLAG_PESU = False
 TASK_FLAG_REDDIT = False
-TASK_FLAG_PESU = True
+TASK_FLAG_INSTAGRAM = False
+TASK_FLAG_MAP = {"on": True, "off": False}
 
 
 async def checkUserIsAdminOrBotDev(ctx):
@@ -144,7 +146,7 @@ async def sendSpecificChannels(channels, content=None, embed=None, file=None):
 
 
 async def sendAllChannels(message_type, content=None, embed=None, file=None):
-    db_records = getCompleteDatabase()
+    db_records = getCompleteGuildDatabase()
     for row in db_records:
         guild_id, _, channel_type, channel_id = row[1:]
         if channel_id == None:
@@ -157,7 +159,7 @@ async def sendAllChannels(message_type, content=None, embed=None, file=None):
 
 async def subscriptionReminder():
     print("Reminding non-subscribed servers...")
-    db_records = getCompleteDatabase()
+    db_records = getCompleteGuildDatabase()
     guild_info = dict()
     for row in db_records:
         guild_id, _, channel_type, channel_id = row[1:]
@@ -198,9 +200,9 @@ async def subscriptionReminder():
                         break
 
 
-async def syncDatabase():
+async def syncGuildDatabase():
     print("Syncing databases...")
-    db_records = getCompleteDatabase()
+    db_records = getCompleteGuildDatabase()
     guilds_details = await client.fetch_guilds(limit=150).flatten()
     guild_id = [str(g.id) for g in guilds_details]
 
@@ -210,14 +212,28 @@ async def syncDatabase():
             removeGuild(db_guild_id)
 
 
+async def syncTaskStatusDatabase():
+    print("Syncing task status...")
+
+    global TASK_FLAG_PESU
+    global TASK_FLAG_REDDIT
+    global TASK_FLAG_INSTAGRAM
+
+    TASK_FLAG_PESU = TASK_FLAG_MAP[getVariableValue("pesu")]
+    TASK_FLAG_REDDIT = TASK_FLAG_MAP[getVariableValue("reddit")]
+    TASK_FLAG_INSTAGRAM = TASK_FLAG_MAP[getVariableValue("instagram")]
+
+
 @client.event
 async def on_ready():
     '''
     Initialising bot after boot
     '''
     print("Bot is online")
+
     await client.change_presence(activity=discord.Game(next(status)))
-    await syncDatabase()
+    await syncGuildDatabase()
+    await syncTaskStatusDatabase()
 
     for client_id, client_secret in compiler_keys.keys():
         compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
@@ -335,9 +351,18 @@ async def remind(ctx):
 
 
 @client.command()
-async def dbsync(ctx, sync_method="soft"):
+async def syncstatus(ctx):
     if await checkUserIsBotDev(ctx):
-        db_records = getCompleteDatabase()
+        await syncTaskStatusDatabase()
+        await ctx.send("Task Status sync completed.")
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
+async def syncdb(ctx, sync_method="soft"):
+    if await checkUserIsBotDev(ctx):
+        db_records = getCompleteGuildDatabase()
         guilds_details = await client.fetch_guilds(limit=150).flatten()
         guild_id = [str(g.id) for g in guilds_details]
 
@@ -494,7 +519,7 @@ async def guildscommand(ctx):
 @client.command()
 async def dbinfo(ctx):
     if await checkUserIsBotDev(ctx):
-        db_records = getCompleteDatabase()
+        db_records = getCompleteGuildDatabase()
         data = "SERVER ID,SERVER NAME,CHANNEL TYPE,CHANNEL ID\n\n"
         for row in db_records:
             row_data = list(map(str, row[1:]))
@@ -998,10 +1023,6 @@ async def pesunews(ctx, *, query=None):
 
 @client.command()
 async def taskmanager(ctx, handle=None, mode=None):
-    global TASK_FLAG_PESU
-    global TASK_FLAG_REDDIT
-    global TASK_FLAG_INSTAGRAM
-
     if await checkUserIsBotDev(ctx):
         allowed_handles = ["instagram", "reddit", "pesu"]
         allowed_modes = ["on", "off"]
@@ -1010,24 +1031,22 @@ async def taskmanager(ctx, handle=None, mode=None):
         elif mode == None or mode not in allowed_modes:
             await ctx.send(f"Please enter a valid mode. Allowed modes are: {allowed_modes}")
         else:
-            value_mapping = {"on": True, "off": False}
-            if handle == "instagram":
-                TASK_FLAG_INSTAGRAM = value_mapping[mode]
-            if handle == "reddit":
-                TASK_FLAG_REDDIT = value_mapping[mode]
-            if handle == "pesu":
-                TASK_FLAG_PESU = value_mapping[mode]
+            updateVariableValue(handle, mode)
+            await syncTaskStatusDatabase()
 
-            if mode == "pesu":
-                mode = "PESU Announcement"
+            mode = mode.upper()
+            if handle == "pesu":
+                handle = "PESU Announcement"
+            else:
+                handle = handle.capitalize()
 
             embed = discord.Embed(
                 color=discord.Color.blue(),
                 title="PESU Academy Bot - Message from Developer Team",
-                description=f"The {handle.capitalize()} feature has been turned **{mode.upper()}**"
+                description=f"The {handle} feature has been turned **{mode}**"
             )
 
-            await ctx.send(f"The {handle.capitalize()} feature has been turned **{mode.upper()}**")
+            await ctx.send(f"The {handle} feature has been turned **{mode}**")
             await sendAllChannels(message_type="publish", embed=embed)
             await sendAllChannels(message_type="log", embed=embed)
     else:
@@ -1036,18 +1055,17 @@ async def taskmanager(ctx, handle=None, mode=None):
 
 @client.command()
 async def taskstatus(ctx):
-    global TASK_FLAG_PESU
-    global TASK_FLAG_REDDIT
-    global TASK_FLAG_INSTAGRAM
-
     if await checkUserIsBotDev(ctx):
-        value_mapping = {True: "ON", False: "OFF"}
+        await syncTaskStatusDatabase()
+        pesu_status_value = getVariableValue("pesu").upper()
+        reddit_status_value = getVariableValue("reddit").upper()
+        instagram_status_value = getVariableValue("instagram").upper()
         embed = discord.Embed(
             color=discord.Color.blue(),
             title="PESU Academy Bot - Task Status",
-            description=f'''PESU Announcement Checks: **{value_mapping[TASK_FLAG_PESU]}**
-Instagram Checks: **{value_mapping[TASK_FLAG_INSTAGRAM]}**
-Reddit Checks: **{value_mapping[TASK_FLAG_REDDIT]}**'''
+            description=f'''PESU Announcement Checks: **{pesu_status_value}**
+Instagram Checks: **{instagram_status_value}**
+Reddit Checks: **{reddit_status_value}**'''
         )
         await ctx.send(embed=embed)
     else:

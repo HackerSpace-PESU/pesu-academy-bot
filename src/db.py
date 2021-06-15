@@ -20,6 +20,8 @@ guilddb_Session = sessionmaker(bind=guilddb_engine)
 guilddb_session = guilddb_Session()
 guilddb_table = Table("guild", guilddb_metadata,
                       autoload=True, autoload_with=guilddb_engine)
+statusdb_table = Table("status", guilddb_metadata,
+                       autoload=True, autoload_with=guilddb_engine)
 
 
 def processFilter(filter_type, filter):
@@ -225,7 +227,7 @@ def addChannel(guild_id, guild_name, channel_id, channel_type):
     result = guilddb_connection.execute(query).fetchall()
     if result:
         query = guilddb_table.update().where(and_(guilddb_table.c.guild_id == guild_id, guilddb_table.c.channel_id ==
-                                                None, guilddb_table.c.channel_type == None)).values(channel_id=channel_id, channel_type=channel_type)
+                                                  None, guilddb_table.c.channel_type == None)).values(channel_id=channel_id, channel_type=channel_type)
         result = guilddb_connection.execute(query)
     else:
         addGuild(guild_id, guild_name, channel_id, channel_type)
@@ -237,7 +239,8 @@ def removeChannel(channel_id):
 
 
 def removeChannelWithType(channel_id, channel_type):
-    query = guilddb_table.delete().where(and_(guilddb_table.c.channel_id == channel_id, guilddb_table.c.channel_type == channel_type))
+    query = guilddb_table.delete().where(and_(guilddb_table.c.channel_id ==
+                                              channel_id, guilddb_table.c.channel_type == channel_type))
     result = guilddb_connection.execute(query)
 
 
@@ -248,13 +251,42 @@ def checkServerChannelAndTypeExists(guild_id, channel_id, channel_type):
     return bool(result)
 
 
-def getCompleteDatabase():
+def getCompleteGuildDatabase():
     query = guilddb_table.select()
     result = guilddb_connection.execute(query).fetchall()
     return result
 
 
 def getChannelFromServer(guild_id, channel_type):
-    query = guilddb_table.select().where(and_(guilddb_table.c.guild_id == guild_id,guilddb_table.c.channel_type == channel_type))
+    query = guilddb_table.select().where(and_(guilddb_table.c.guild_id == guild_id,
+                                              guilddb_table.c.channel_type == channel_type))
     result = guilddb_connection.execute(query).fetchall()
     return result
+
+
+def getCompleteStatusDatabase():
+    query = statusdb_table.select()
+    result = guilddb_connection.execute(query).fetchall()
+    return result
+
+
+def addVariable(variable, value):
+    query = statusdb_table.insert().values(variable=variable, value=value)
+    result = guilddb_connection.execute(query)
+
+
+def deleteVariable(variable):
+    query = statusdb_table.delete().where(statusdb_table.c.variable == variable)
+    result = guilddb_connection.execute(query)
+
+
+def getVariableValue(variable):
+    query = statusdb_table.select().where(statusdb_table.c.variable == variable)
+    result = guilddb_connection.execute(query).fetchall()
+    return result[0][-1]
+
+
+def updateVariableValue(variable, value):
+    query = statusdb_table.update().where(
+        statusdb_table.c.variable == variable).values(value=value)
+    result = guilddb_connection.execute(query)
