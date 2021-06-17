@@ -245,7 +245,7 @@ async def getPESUAnnouncements(chrome, username, password):
                 all_attachments.extend(attachment_names)
                 for a in attachments:
                     a.click()
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(0.5)
 
         img_base64 = None
         img_box = a_box.find_elements_by_xpath(

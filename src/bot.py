@@ -1110,11 +1110,11 @@ async def checkPESUAnnouncement():
     await client.wait_until_ready()
 
     if TASK_FLAG_PESU:
-        print("Fetching announcements...")
+        # print("Fetching announcements...")
         driver = webdriver.Chrome(
             executable_path=CHROMEDRIVER_PATH, options=chrome_options)
         all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
-        time.sleep(15)   # sleep so all attachments are downloaded
+        time.sleep(5)
 
         new_announcement_count = 0
         for a in all_announcements:
@@ -1122,7 +1122,7 @@ async def checkPESUAnnouncement():
                 ALL_ANNOUNCEMENTS_MADE.append(a)
                 new_announcement_count += 1
 
-        print(f"NEW announcements found: {new_announcement_count}")
+        # print(f"NEW announcements found: {new_announcement_count}")
 
         ALL_ANNOUNCEMENTS_MADE.sort(key=lambda x: x["date"], reverse=True)
         current_date = datetime.now().date()
@@ -1137,16 +1137,18 @@ async def checkPESUAnnouncement():
                         filename = "announcement-img.png"
                         with open(filename, 'wb') as f:
                             f.write(imgdata)
+                        # time.sleep(1)
                         with open(filename, 'rb') as f:
                             img_file = discord.File(f)
-                        await sendAllChannels(message_type="publish", file=img_file)
+                            time.sleep(2)
+                            await sendAllChannels(message_type="publish", file=img_file)
 
                     await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
                     if announcement["attachments"]:
                         print("Attachment available, sending...")
                         for fname in announcement["attachments"]:
-                            with open(fname, "rb") as f:
-                                attachment_file = discord.File(f)
+                            attachment_file = discord.File(fname)
+                            time.sleep(2)
                             await sendAllChannels(message_type="publish", file=attachment_file)
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
         driver.quit()
