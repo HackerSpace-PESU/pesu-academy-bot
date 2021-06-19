@@ -931,6 +931,10 @@ async def faculty(ctx, *, query):
     queries = query.split()
     result = getFacultyResults(queries)
     if result:
+        truncated = False
+        num_results = len(result)
+        if num_results > 15:
+            truncated = True
         embed = await getFacultyResultEmbed(result)
     else:
         embed = discord.Embed(
@@ -939,6 +943,8 @@ async def faculty(ctx, *, query):
             color=discord.Color.blue()
         )
     await ctx.send(embed=embed)
+    if truncated:
+        await ctx.send("To view more results, visit https://github.com/aditeyabaral/pesu-academy-bot/blob/main/data/faculty.csv")
 
 
 async def getRedditEmbed(post):
