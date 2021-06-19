@@ -1153,7 +1153,7 @@ async def checkPESUAnnouncement():
         driver = webdriver.Chrome(
             executable_path=CHROMEDRIVER_PATH, options=chrome_options)
         all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         new_announcement_count = 0
         for a in all_announcements:
@@ -1177,14 +1177,14 @@ async def checkPESUAnnouncement():
                             f.write(imgdata)
                         with open(filename, 'rb') as f:
                             img_file = discord.File(f)
-                            time.sleep(2)
+                            await asyncio.sleep(2)
                             await sendAllChannels(message_type="publish", file=img_file)
 
                     await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
                     if announcement["attachments"]:
                         for fname in announcement["attachments"]:
                             attachment_file = discord.File(fname)
-                            time.sleep(2)
+                            await asyncio.sleep(2)
                             await sendAllChannels(message_type="publish", file=attachment_file)
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
         driver.quit()

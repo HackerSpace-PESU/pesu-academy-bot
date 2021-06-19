@@ -1,11 +1,20 @@
+import requests
 import pandas as pd
+from io import StringIO
 
-df = pd.read_csv("data/faculty.csv")
-# df = df[~df["COURSE"].isna()]
-
+df = None
 unique_department = set()
 unique_campus = set()
 unique_course = set()
+
+
+def readDataFrame():
+    global df
+    df_link = "https://raw.githubusercontent.com/aditeyabaral/pesu-academy-bot/main/data/faculty.csv"
+    response = requests.get(df_link)
+    df_content = StringIO(response.content.decode())
+    df = pd.read_csv(df_content, sep=',')
+    # df = df[~df["COURSE"].isna()]
 
 
 def initialiseFacultyFilters():
@@ -161,4 +170,5 @@ def getFacultyResults(queries):
     return result
 
 
+readDataFrame()
 initialiseFacultyFilters()
