@@ -902,6 +902,45 @@ Enter code here, do not add syntax highlighting
                 await ctx.reply(f"Aye {greeting}, you may be smart but I am smarter. No pinging `@everyone` or `@here` with the bot.")
 
 
+async def getFacultyResultEmbed(result):
+    embed = discord.Embed(
+        title="Faculty Lookup",
+        color=discord.Color.blue()
+    )
+    for row in result:
+        name = row["NAME"]
+        email = row["EMAIL"]
+        department = row["DEPARTMENT"]
+        campus = row["CAMPUS"]
+        courses = row["COURSE"].replace(',', ', ')
+        content = f'''**Name**: {name}
+**Email**: {email}
+**Department**: {department}
+**Campus**: {campus} Campus
+**Courses**: {courses}'''
+        embed.add_field(
+            name="\u200b",
+            value=content,
+            inline=True
+        )
+    return embed
+
+
+@client.command()
+async def faculty(ctx, *, query):
+    queries = query.split()
+    result = getFacultyResults(queries)
+    if result:
+        embed = await getFacultyResultEmbed(result)
+    else:
+        embed = discord.Embed(
+            title="Faculty Lookup",
+            description="No results found",
+            color=discord.Color.blue()
+        )
+    await ctx.send(embed=embed)
+
+
 async def getRedditEmbed(post):
     embed = discord.Embed(title="New Reddit Post",
                           url=post["url"], color=discord.Color.blue())
@@ -1110,7 +1149,7 @@ async def checkPESUAnnouncement():
     await client.wait_until_ready()
 
     if TASK_FLAG_PESU:
-        # print("Fetching announcements...")
+        print("Fetching announcements...")
         driver = webdriver.Chrome(
             executable_path=CHROMEDRIVER_PATH, options=chrome_options)
         all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
@@ -1122,7 +1161,7 @@ async def checkPESUAnnouncement():
                 ALL_ANNOUNCEMENTS_MADE.append(a)
                 new_announcement_count += 1
 
-        # print(f"NEW announcements found: {new_announcement_count}")
+        print(f"NEW announcements found: {new_announcement_count}")
 
         ALL_ANNOUNCEMENTS_MADE.sort(key=lambda x: x["date"], reverse=True)
         current_date = datetime.now().date()
@@ -1131,13 +1170,11 @@ async def checkPESUAnnouncement():
                 if announcement not in TODAY_ANNOUNCEMENTS_MADE:
                     embed = await getAnnouncementEmbed(announcement)
                     if announcement["img"] != None:
-                        print("Image available, sending...")
                         img_base64 = announcement["img"].strip()[22:]
                         imgdata = base64.b64decode(img_base64)
                         filename = "announcement-img.png"
                         with open(filename, 'wb') as f:
                             f.write(imgdata)
-                        # time.sleep(1)
                         with open(filename, 'rb') as f:
                             img_file = discord.File(f)
                             time.sleep(2)
@@ -1145,7 +1182,6 @@ async def checkPESUAnnouncement():
 
                     await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
                     if announcement["attachments"]:
-                        print("Attachment available, sending...")
                         for fname in announcement["attachments"]:
                             attachment_file = discord.File(fname)
                             time.sleep(2)

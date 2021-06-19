@@ -10,6 +10,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from db import *
+from faculty import *
 from pydictionary import *
 from instagram import *
 
