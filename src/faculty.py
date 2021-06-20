@@ -170,5 +170,5 @@ def getFacultyResults(queries):
     return result
 
 
-readDataFrame()
-initialiseFacultyFilters()
+# readDataFrame()
+# initialiseFacultyFilters()

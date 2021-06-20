@@ -224,6 +224,12 @@ async def syncTaskStatusDatabase():
     TASK_FLAG_INSTAGRAM = TASK_FLAG_MAP[getVariableValue("instagram")]
 
 
+async def syncFacultyInformation():
+    print("Syncing faculty info...")
+    readDataFrame()
+    initialiseFacultyFilters()
+
+
 @client.event
 async def on_ready():
     '''
@@ -234,6 +240,7 @@ async def on_ready():
     await client.change_presence(activity=discord.Game(next(status)))
     await syncGuildDatabase()
     await syncTaskStatusDatabase()
+    await syncFacultyInformation()
 
     for client_id, client_secret in compiler_keys.keys():
         compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
@@ -945,6 +952,15 @@ async def faculty(ctx, *, query):
     await ctx.send(embed=embed)
     if truncated:
         await ctx.send("To view more results, visit https://github.com/aditeyabaral/pesu-academy-bot/blob/main/data/faculty.csv")
+
+
+@client.command()
+async def facultyupdate(ctx):
+    if await checkUserIsBotDev(ctx):
+        await syncFacultyInformation()
+        await ctx.send("Faculty information has been synced")
+    else:
+        await ctx.send(f"You are not authorised to run this command.")
 
 
 async def getRedditEmbed(post):
