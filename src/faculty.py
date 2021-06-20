@@ -168,7 +168,3 @@ def getFacultyResults(queries):
     else:
         result = getFacultyResultsByFilters(query_data)
     return result
-
-
-# readDataFrame()
-# initialiseFacultyFilters()

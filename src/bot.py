@@ -937,11 +937,12 @@ async def getFacultyResultEmbed(result):
 async def faculty(ctx, *, query):
     queries = query.split()
     result = getFacultyResults(queries)
-    if result:
-        truncated = False
+    truncated = False
+    if result:    
         num_results = len(result)
         if num_results > 15:
             truncated = True
+            result = result[:15]
         embed = await getFacultyResultEmbed(result)
     else:
         embed = discord.Embed(
@@ -955,7 +956,7 @@ async def faculty(ctx, *, query):
 
 
 @client.command()
-async def facultyupdate(ctx):
+async def syncfaculty(ctx):
     if await checkUserIsBotDev(ctx):
         await syncFacultyInformation()
         await ctx.send("Faculty information has been synced")
