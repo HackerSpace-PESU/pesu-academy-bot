@@ -919,7 +919,9 @@ async def getFacultyResultEmbed(result):
         email = row["EMAIL"]
         department = row["DEPARTMENT"]
         campus = row["CAMPUS"]
-        courses = row["COURSE"].replace(',', ', ')
+        courses = ""
+        if row["COURSE"] != None:
+            courses = row["COURSE"].replace(',', ', ')
         content = f'''**Name**: {name}
 **Email**: {email}
 **Department**: {department}

@@ -2,19 +2,19 @@ import requests
 import pandas as pd
 from io import StringIO
 
-df = None
+faculty_df = None
 unique_department = set()
 unique_campus = set()
 unique_course = set()
 
 
 def readDataFrame():
-    global df
-    df_link = "https://raw.githubusercontent.com/aditeyabaral/pesu-academy-bot/main/data/faculty.csv"
-    response = requests.get(df_link)
-    df_content = StringIO(response.content.decode())
-    df = pd.read_csv(df_content, sep=',')
-    # df = df[~df["COURSE"].isna()]
+    global faculty_df
+    faculty_df_link = "https://raw.githubusercontent.com/aditeyabaral/pesu-academy-bot/main/data/faculty.csv"
+    response = requests.get(faculty_df_link)
+    faculty_df_content = StringIO(response.content.decode())
+    faculty_df = pd.read_csv(faculty_df_content, sep=',')
+    # faculty_df = faculty_df[~faculty_df["COURSE"].isna()]
 
 
 def initialiseFacultyFilters():
@@ -22,7 +22,7 @@ def initialiseFacultyFilters():
     global unique_campus
     global unique_course
 
-    for row in df.iterrows():
+    for row in faculty_df.iterrows():
         row = dict(row[1])
         department = row["DEPARTMENT"].lower()
         campus = row["CAMPUS"].lower()
@@ -53,7 +53,7 @@ def getFacultyResultsByNameOrCampusOrDepartment(search_query, query_type):
     result = list()
     if query_type in ["NAME", "CAMPUS", "DEPARTMENT"]:
         search_query = search_query.lower()
-        for row in df.iterrows():
+        for row in faculty_df.iterrows():
             row = dict(row[1])
             search_query_field_value = row[query_type].lower()
             if search_query in search_query_field_value:
@@ -64,7 +64,7 @@ def getFacultyResultsByNameOrCampusOrDepartment(search_query, query_type):
 def getFacultyResultsByCourse(search_course):
     result = list()
     search_course = search_course.lower()
-    for row in df.iterrows():
+    for row in faculty_df.iterrows():
         row = dict(row[1])
         if isinstance(row["COURSE"], float):
             continue
@@ -79,7 +79,7 @@ def getFacultyResultsByTwoFilters(search_query_1, search_query_2, query_type_1, 
     if query_type_1 in ["COURSE", "CAMPUS", "DEPARTMENT"] and query_type_2 in ["COURSE", "CAMPUS", "DEPARTMENT"]:
         search_query_1 = search_query_1.lower()
         search_query_2 = search_query_2.lower()
-        for row in df.iterrows():
+        for row in faculty_df.iterrows():
             row = dict(row[1])
             search_query_field_value_1 = row[query_type_1].lower()
             search_query_field_value_2 = row[query_type_2].lower()
@@ -105,7 +105,7 @@ def getFacultyResultsByThreeFilters(search_query_1, search_query_2, search_query
         search_query_1 = search_query_1.lower()
         search_query_2 = search_query_2.lower()
         search_query_3 = search_query_3.lower()
-        for row in df.iterrows():
+        for row in faculty_df.iterrows():
             row = dict(row[1])
             search_query_field_value_1 = row[query_type_1].lower()
             search_query_field_value_2 = row[query_type_2].lower()
@@ -130,7 +130,7 @@ def getFacultyResultsByThreeFilters(search_query_1, search_query_2, search_query
 
 def getFacultyResultsByFilters(query_data):
     result = list()
-    for row in df.iterrows():
+    for row in faculty_df.iterrows():
         flag = True
         row = dict(row[1])
         for filter in query_data:
