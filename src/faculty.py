@@ -14,7 +14,7 @@ def readDataFrame():
     response = requests.get(df_link)
     df_content = StringIO(response.content.decode())
     df = pd.read_csv(df_content, sep=',')
-    # df = df[~df["COURSE"].isna()]
+    df = df[~df["COURSE"].isna()]
 
 
 def initialiseFacultyFilters():
@@ -26,10 +26,11 @@ def initialiseFacultyFilters():
         row = dict(row[1])
         department = row["DEPARTMENT"].lower()
         campus = row["CAMPUS"].lower()
-        course = set([c.lower().strip() for c in row["COURSE"].split(',')])
+        if not isinstance(row["COURSE"], float):
+            course = set([c.lower().strip() for c in row["COURSE"].split(',')])
+            unique_course.update(course)
         unique_department.add(department)
         unique_campus.add(campus)
-        unique_course.update(course)
 
 
 def getFacultyFilterType(queries):
@@ -84,6 +85,8 @@ def getFacultyResultsByTwoFilters(search_query_1, search_query_2, query_type_1, 
             search_query_field_value_2 = row[query_type_2].lower()
 
             if query_type_1 == "COURSE" or query_type_2 == "COURSE":
+                if isinstance(row["COURSE"], float):
+                    continue
                 courses = [c.lower().strip() for c in row["COURSE"].split(',')]
                 if query_type_1 == "COURSE":
                     search_query_field_value_1 = courses
@@ -109,6 +112,8 @@ def getFacultyResultsByThreeFilters(search_query_1, search_query_2, search_query
             search_query_field_value_3 = row[query_type_3].lower()
 
             if query_type_1 == "COURSE" or query_type_2 == "COURSE" or query_type_3 == "COURSE":
+                if isinstance(row["COURSE"], float):
+                    continue
                 courses = [c.lower().strip() for c in row["COURSE"].split(',')]
                 if query_type_1 == "COURSE":
                     search_query_field_value_1 = courses
@@ -128,7 +133,6 @@ def getFacultyResultsByFilters(query_data):
     for row in df.iterrows():
         flag = True
         row = dict(row[1])
-        courses = [c.lower().strip() for c in row["COURSE"].split(',')]
         for filter in query_data:
             query, query_type = list(filter.items())[0]
             query_search_field_value = row[query_type].lower()
@@ -136,6 +140,9 @@ def getFacultyResultsByFilters(query_data):
                 result.append(row)
                 return result
             if query_type == "COURSE":
+                if isinstance(row["COURSE"], float):
+                    continue
+                courses = [c.lower().strip() for c in row["COURSE"].split(',')]
                 query_search_field_value = courses
             if query not in query_search_field_value:
                 flag = False

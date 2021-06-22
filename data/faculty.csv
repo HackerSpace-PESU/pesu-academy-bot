@@ -1,5 +1,67 @@
 NAME,EMAIL,DEPARTMENT,CAMPUS,COURSE
-shylaja,email@email.com,CSE,RR,"DS,DAA"
-mamatha,email@email.com,CSE,RR,"IDS,DBMS,DA,NLP"
-channa,email@email.com,CSE,RR,"DS,DAA"
-gowri,email@email.com,CSE,RR,DA
+Dr. Shylaja S.S.,shylaja.sharath@pes.edu,CSE,RR,"DS,DAA"
+Prof. Nitin V Pujari,nitin.pujari@pes.edu,CSE,RR,OS
+Dr. Jayashree R.,jayashree@pes.edu,CSE,RR,"DDCO,HCI"
+Dr. Mamatha H.R.,mamathahr@pes.edu,CSE,RR,"IDS,SDS,DBMS,DA,NLP"
+Dr. Uma D.,umaprabha@pes.edu,CSE,RR
+Dr. S. Natarajan,natarajan@pes.edu,CSE,RR
+Dr. Ramamurthy Srinath,ramamoorthysrinath@gmail.com,CSE,RR
+Dr. K.V. Subramaniam,subramaniamkv@pes.edu,CSE,RR,"CC,BD"
+Prof. H.B. Prasad,prasadhb@pes.edu,CSE,RR
+Dr. T.S.B.Sudarshan,sudarshan@pes.edu,CSE,RR
+Dr. Reetinder Sidhu,reetindersidhu@pes.edu,CSE,RR,"DDCO,MPCA,CC,TOC,AFLL"
+Dr. Surabhi Narayan,surabhinarayan@pes.edu,CSE,RR
+Dr. Gowri Srinivasan,gsrinivasa@pes.edu,CSE,EC,"DA"
+Mr. A Vinay,a.vinay@pes.edu,CSE,RR
+Mr. V.R. Badri Prasad,badriprasad@pes.edu,CSE,RR
+Mr. Dinesh Singh,dineshs@pes.edu,CSE,RR,"DS,DAA"
+Mr. H.L. Phalachandra,phalachandra@pes.edu,CSE,RR
+Mr. Raghu B A,raghubarao@pes.edu,CSE,RR
+Ms. S Nagasundari,nagasundaris@pes.edu,CSE,RR,CC
+Mr. K S Srinivas,srinivasks@pes.edu,CSE,RR,"MI,TDL,CC,ERP"
+Dr. Nagegowda K S,nagegowda@pes.edu,CSE,RR
+Mr. Suresh Jamadagni,sureshjamadagni@pes.edu,CSE,RR,"DBMS,DA,DBT"
+Ms. Preet Kanwal,preetkanwal@pes.edu,CSE,RR,"TOC,AFLL,CD"
+Dr. Sivaraman E,sivaramane@pes.edu,CSE,RR,"CN,CNS"
+Dr. Santhosh Kumar Vasudevan,santvasu@gmail.com,CSE,RR
+Mr. Mahesh H.B.,hbmahesh@pes.edu,CSE,RR
+Ms. Jyothi R,jyothir@pes.edu,CSE,RR,"DDCO,DBMS,LA,OOADSE"
+Mr. Kiran P,kiranp@pes.edu,CSE,RR,CD
+Ms. Priya Badrinath,priyab@pes.edu,CSE,RR
+Mr. C O Prakash,coprakasha@pes.edu,CSE,RR,SNA
+Ms. P Rama Devi,pramadevi@pes.edu,CSE,RR,LA
+Ms. Prafullata Kiran Auradkar,prafullatak@pes.edu,CSE,RR,"OS,CC,BD"
+Ms. Chandravva Hebbi,Chandravvahebbi@pes.edu,CSE,RR,"DDCO,MPCA,DIP"
+Mr. Vinay Joshi,vinayj@pes.edu,CSE,RR,OOADSE
+Ms. Chitra G M,chitragm@pes.edu,CSE,RR,MPCA
+Ms. Sangeeta V I,sangeetav@pes.edu,CSE,RR,"TOC,AFLL,CD"
+Ms. Roopa Ravish,rooparavish@pes.edu,CSE,RR
+Ms. Ashwini M Joshi,ashwinimjoshi@pes.edu,CSE,RR,"CN,NLP"
+Ms. Savitri Sheshappanavar,savitris@pes.edu,CSE,RR,DML
+Ms. Divya S J,divyasj@pes.edu,CSE,RR
+Ms. Samatha R Swamy,samathaswamy@pes.edu,CSE,RR,"DDCO,MPCA"
+Ms. Kavitha K.N,kavithakn@pes.edu,CSE,RR
+Ms. Aruna S,arunas@pes.edu,CSE,RR
+Ms. Preethi P,Preethip@pes.edu,CSE,RR
+Ms. Supriya M C,supriya@pes.edu,CSE,RR,MPCA
+Ms. Kusuma K V,kusumakv@pes.edu,CSE,RR
+Mr. Venkatesh Prasad,venkateshprasad@pes.edu,CSE,RR,"OS,CC"
+Ms. Silviya Nancy J,silviyanancy@pes.edu,CSE,RR
+Ms. Sunitha R,sunithar@pes.edu,CSE,RR
+Ms. Mahitha G,mahithag@pes.edu,CSE,RR,OOADSE
+Ms. Suganthi S,suganthis@pes.edu,CSE,RR
+Mr. Nithin H A,nithinha@pes.edu,CSE,RR
+Ms. E.Sushma,sushmae@pes.edu,CSE,RR
+Mr. Charanraj B R,charanrajbr@pes.edu,CSE,RR
+Ms. Supreetha S,supreethas@pes.edu,CSE,RR
+Ms. Rachana B S,rachanabs@pes.edu,CSE,RR
+Ms. Revathi G P,revathigp@pes.edu,CSE,RR
+Ms. Pushpa G,pushpag@pes.edu,CSE,RR
+Ms. Spurthi N Anjan,spurthianjan@pes.edu,CSE,RR,"CN,WT,CC"
+Ms. Veena Suresh,veenasuresh@pes.edu,CSE,RR
+Ms. Usha Devi B G,ushadevibg@pes.edu,CSE,RR
+Ms. Rajashree S,rajashrees@pes.edu,CSE,RR
+Ms. Vineetha B,vineethab@pes.edu,CSE,RR
+Ms. Jamuna,jamuna@pes.edu,CSE,RR
+Mr. N S Kumar,kumaradhara@gmail.com,CSE,RR
+Mr. Bhaskarjyothi Das,bhaskarjyoti01@gmail.com,CSE,RR
