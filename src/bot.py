@@ -920,7 +920,7 @@ async def getFacultyResultEmbed(result):
         department = row["DEPARTMENT"]
         campus = row["CAMPUS"]
         courses = ""
-        if row["COURSE"] != None:
+        if not isinstance(row["COURSE"], float):
             courses = row["COURSE"].replace(',', ', ')
         content = f'''**Name**: {name}
 **Email**: {email}
