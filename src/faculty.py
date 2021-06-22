@@ -81,6 +81,8 @@ def getFacultyResultsByTwoFilters(search_query_1, search_query_2, query_type_1, 
         search_query_2 = search_query_2.lower()
         for row in faculty_df.iterrows():
             row = dict(row[1])
+            if isinstance(row[query_type_1], float) or isinstance(row[query_type_2], float):
+                continue
             search_query_field_value_1 = row[query_type_1].lower()
             search_query_field_value_2 = row[query_type_2].lower()
 
