@@ -142,7 +142,21 @@ async def sendChannel(channel_id, content=None, embed=None, file=None):
 
 async def sendSpecificChannels(channels, content=None, embed=None, file=None):
     for channel_id in channels:
-        await sendChannel(channel_id, content=content, embed=embed, file=file)
+        channel_id = int(channel_id)
+        try:
+            channel = client.get_channel(channel_id)
+            if file != None:
+                await channel.send(file=file)
+            if embed == None and content != None:
+                await channel.send(content)
+            elif embed != None and content == None:
+                await channel.send(embed=embed)
+            elif embed != None and content != None:
+                await channel.send(content, embed=embed)
+            else:
+                pass
+        except:
+            print(f"Error sending message to channel {channel_id}")
 
 
 async def sendAllChannels(message_type, content=None, embed=None, file=None):
@@ -154,7 +168,21 @@ async def sendAllChannels(message_type, content=None, embed=None, file=None):
         guild_id = int(guild_id)
         channel_id = int(channel_id)
         if channel_type == message_type:
-            await sendChannel(channel_id, content=content, embed=embed, file=file)
+            channel_id = int(channel_id)
+            try:
+                channel = client.get_channel(channel_id)
+                if file != None:
+                    await channel.send(file=file)
+                if embed == None and content != None:
+                    await channel.send(content)
+                elif embed != None and content == None:
+                    await channel.send(embed=embed)
+                elif embed != None and content != None:
+                    await channel.send(content, embed=embed)
+                else:
+                    pass
+            except:
+                print(f"Error sending message to channel {channel_id}")
 
 
 async def subscriptionReminder():
