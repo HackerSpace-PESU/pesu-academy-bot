@@ -1167,7 +1167,7 @@ async def checkRedditPost():
                 await sendAllChannels(message_type="publish", embed=post_embed)
 
 
-@tasks.loop(minutes=5)
+@tasks.loop(minutes=10)
 async def checkPESUAnnouncement():
     global TODAY_ANNOUNCEMENTS_MADE
     global ALL_ANNOUNCEMENTS_MADE
@@ -1202,20 +1202,20 @@ async def checkPESUAnnouncement():
                             f.write(imgdata)
                         with open(filename, 'rb') as f:
                             img_file = discord.File(f)
-                            await asyncio.sleep(2)
+                            # await asyncio.sleep(2)
                             await sendAllChannels(message_type="publish", file=img_file)
 
                     await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
                     if announcement["attachments"]:
                         for fname in announcement["attachments"]:
                             attachment_file = discord.File(fname)
-                            await asyncio.sleep(2)
+                            # await asyncio.sleep(2)
                             await sendAllChannels(message_type="publish", file=attachment_file)
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
         driver.quit()
 
 
-@tasks.loop(minutes=10)
+@tasks.loop(minutes=20)
 async def checkNewDay():
     global TODAY_ANNOUNCEMENTS_MADE
     global ALL_ANNOUNCEMENTS_MADE
