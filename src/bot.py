@@ -1079,8 +1079,11 @@ async def pesunews(ctx, *, query=None):
             await ctx.send(embed=embed)
             if announcement["attachments"]:
                 for fname in announcement["attachments"]:
-                    attachment_file = discord.File(fname)
-                    await ctx.send(file=attachment_file)
+                    if fname in os.listdir():
+                        attachment_file = discord.File(fname)
+                        await ctx.send(file=attachment_file)
+                    else:
+                        print(f"Could not find attachment: {fname}")
     else:
         await ctx.send("No announcements available. Retry with another option or try again later.")
 
@@ -1208,9 +1211,12 @@ async def checkPESUAnnouncement():
                     await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
                     if announcement["attachments"]:
                         for fname in announcement["attachments"]:
-                            attachment_file = discord.File(fname)
-                            # await asyncio.sleep(2)
-                            await sendAllChannels(message_type="publish", file=attachment_file)
+                            if fname in os.listdir():
+                                attachment_file = discord.File(fname)
+                                # await asyncio.sleep(2)
+                                await sendAllChannels(message_type="publish", file=attachment_file)
+                            else:
+                                print(f"Could not find attachment: {fname}")
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
         driver.quit()
 
