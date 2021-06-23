@@ -251,11 +251,11 @@ async def on_ready():
     await sendAllChannels(message_type="log", embed=embed)
     await subscriptionReminder()
 
-    checkNewDay.start()
+    #checkNewDay.start()
     changeStatus.start()
     checkPESUAnnouncement.start()
-    checkInstagramPost.start()
-    checkRedditPost.start()
+    #checkInstagramPost.start()
+    #checkRedditPost.start()
 
 
 @client.event
@@ -1082,7 +1082,6 @@ async def pesunews(ctx, *, query=None):
                     if fname in os.listdir():
                         attachment_files.append(discord.File(fname))
                     else:
-                        # print(f"Could not find attachment: {fname}")
                         embed.add_field(
                             name=f"\u200b", value=fname, inline=False)
                         if fname.startswith("http"):
@@ -1212,17 +1211,13 @@ async def checkPESUAnnouncement():
                             f.write(imgdata)
                         with open(filename, 'rb') as f:
                             img_file = discord.File(f)
-                            # await asyncio.sleep(2)
                             await sendAllChannels(message_type="publish", file=img_file)
 
-                    # await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
                     attachment_files = list()
                     if announcement["attachments"]:
                         for fname in announcement["attachments"]:
                             if fname in os.listdir():
                                 attachment_files.append(discord.File(fname))
-                                # await asyncio.sleep(2)
-                                # await sendAllChannels(message_type="publish", file=attachment_file)
                             else:
                                 print(f"Could not find attachment: {fname}")
                                 embed.add_field(
@@ -1230,6 +1225,7 @@ async def checkPESUAnnouncement():
                                 if fname.startswith("http"):
                                     embed.url = fname
                     await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
+                    print(attachment_files)
                     for attachment_file in attachment_files:
                         await sendAllChannels(message_type="publish", file=attachment_file)
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
