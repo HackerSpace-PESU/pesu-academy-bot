@@ -940,7 +940,7 @@ async def faculty(ctx, *, query):
     queries = query.split()
     result = getFacultyResults(queries)
     truncated = False
-    if result:    
+    if result:
         num_results = len(result)
         if num_results > 15:
             truncated = True
@@ -1076,14 +1076,21 @@ async def pesunews(ctx, *, query=None):
                     img_file = discord.File(f)
                     await ctx.send(file=img_file)
 
-            await ctx.send(embed=embed)
+            attachment_files = list()
             if announcement["attachments"]:
                 for fname in announcement["attachments"]:
                     if fname in os.listdir():
-                        attachment_file = discord.File(fname)
-                        await ctx.send(file=attachment_file)
+                        attachment_files.append(discord.File(fname))
                     else:
-                        print(f"Could not find attachment: {fname}")
+                        # print(f"Could not find attachment: {fname}")
+                        embed.add_field(
+                            name=f"\u200b", value=fname, inline=False)
+                        if fname.startswith("http"):
+                            embed.url = fname
+            await ctx.send(embed=embed)
+            for attachment_file in attachment_files:
+                await ctx.send(file=attachment_file)
+
     else:
         await ctx.send("No announcements available. Retry with another option or try again later.")
 
@@ -1208,15 +1215,23 @@ async def checkPESUAnnouncement():
                             # await asyncio.sleep(2)
                             await sendAllChannels(message_type="publish", file=img_file)
 
-                    await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
+                    # await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
+                    attachment_files = list()
                     if announcement["attachments"]:
                         for fname in announcement["attachments"]:
                             if fname in os.listdir():
-                                attachment_file = discord.File(fname)
+                                attachment_files.append(discord.File(fname))
                                 # await asyncio.sleep(2)
-                                await sendAllChannels(message_type="publish", file=attachment_file)
+                                # await sendAllChannels(message_type="publish", file=attachment_file)
                             else:
                                 print(f"Could not find attachment: {fname}")
+                                embed.add_field(
+                                    name=f"\u200b", value=fname, inline=False)
+                                if fname.startswith("http"):
+                                    embed.url = fname
+                    await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
+                    for attachment_file in attachment_files:
+                        await sendAllChannels(message_type="publish", file=attachment_file)
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
         driver.quit()
 
