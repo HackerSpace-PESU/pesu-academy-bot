@@ -5,6 +5,7 @@ src/__pycache__/
 test/
 test*.py
 chromedriver
+chromedriver.exe
 *.pdf
 *.pem
 log.txt

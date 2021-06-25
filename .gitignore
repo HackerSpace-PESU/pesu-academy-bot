@@ -6,6 +6,7 @@ test/
 .env
 test*.py
 chromedriver
+chromedriver.exe
 *.pdf
 *.pem
 log.txt

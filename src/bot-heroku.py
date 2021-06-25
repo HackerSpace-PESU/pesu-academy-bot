@@ -45,6 +45,7 @@ REDDIT_PERSONAL_USE_TOKEN = os.environ["REDDIT_PERSONAL_USE_TOKEN"]
 REDDIT_USER_AGENT = os.environ["REDDIT_USER_AGENT"]
 
 chrome_options = webdriver.ChromeOptions()
+chrome_options.binary_location = GOOGLE_CHROME_BIN
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
@@ -73,33 +74,10 @@ compiler_keys = {
 TODAY_ANNOUNCEMENTS_MADE = list()
 ALL_ANNOUNCEMENTS_MADE = list()
 
-RUNTIME_ENVIRONMENT = None
 TASK_FLAG_PESU = False
 TASK_FLAG_REDDIT = False
 TASK_FLAG_INSTAGRAM = False
 TASK_FLAG_MAP = {"on": True, "off": False}
-
-
-async def setRuntimeEnvironment():
-    global RUNTIME_ENVIRONMENT
-    global chrome_options
-
-    runtime_env_heroku_flag = await checkRuntimeEnvironmentHeroku()
-    if runtime_env_heroku_flag:
-        RUNTIME_ENVIRONMENT = "HEROKU"
-        chrome_options.binary_location = GOOGLE_CHROME_BIN
-    else:
-        RUNTIME_ENVIRONMENT = "OTHER"
-    print(f"Setting runtime environment as: {RUNTIME_ENVIRONMENT}")
-
-
-async def getChromedriver():
-    if RUNTIME_ENVIRONMENT == "HEROKU":
-        driver = webdriver.Chrome(
-            executable_path=CHROMEDRIVER_PATH, options=chrome_options)
-    else:
-        driver = webdriver.Chrome(options=chrome_options)
-    return driver
 
 
 async def checkUserIsAdminOrBotDev(ctx):
@@ -263,7 +241,6 @@ async def on_ready():
     await syncGuildDatabase()
     await syncTaskStatusDatabase()
     await syncFacultyInformation()
-    await setRuntimeEnvironment()
 
     for client_id, client_secret in compiler_keys.keys():
         compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
@@ -780,7 +757,8 @@ async def clear(ctx, amount=1):
 
 @client.command(aliases=["searchsrn", "searchpes"])
 async def search(ctx, query):
-    driver = await getChromedriver()
+    driver = webdriver.Chrome(
+        executable_path=CHROMEDRIVER_PATH, options=chrome_options)
     result = await searchPESUAcademy(driver, query)
     if result == None:
         await ctx.send("No results found.")
@@ -873,7 +851,8 @@ async def redirector(ctx, long_url, short_url):
 
 @client.command(aliases=["lr"])
 async def longrip(ctx, long_url):
-    driver = await getChromedriver()
+    driver = webdriver.Chrome(
+        executable_path=CHROMEDRIVER_PATH, options=chrome_options)
     short_url = await shortenLinkLongRip(driver, long_url)
     await ctx.send(f"{long_url} is now shortened to {short_url}")
     driver.quit()
@@ -1205,7 +1184,8 @@ async def checkPESUAnnouncement():
 
     if TASK_FLAG_PESU:
         print("Fetching announcements...")
-        driver = await getChromedriver()
+        driver = webdriver.Chrome(
+            executable_path=CHROMEDRIVER_PATH, options=chrome_options)
         all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
         await asyncio.sleep(20)
 

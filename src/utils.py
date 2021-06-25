@@ -39,6 +39,13 @@ instagram_usernames = ['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc
                        'vegaracingelectric', 'writeangle.pesu', 'zeroday.pesuecc']
 
 
+async def checkRuntimeEnvironmentHeroku():
+    home_dir = os.path.expanduser("~")
+    if home_dir != "/app" or not home_dir.startswith("/app"):
+        return False
+    return True
+
+
 async def cleanUp():
     files = [fname for fname in os.listdir() if Path(fname).suffix in [
         ".pdf", ".png", ".jpg", ".jpeg", ".doc", ".docx"]
