@@ -3,6 +3,7 @@ import json
 import time
 import asyncio
 import asyncpraw
+from asyncprawcore.exceptions import RequestException
 import requests
 import pydoodle
 from pathlib import Path
@@ -278,33 +279,37 @@ async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOK
     reddit = asyncpraw.Reddit(client_id=REDDIT_PERSONAL_USE_TOKEN,
                               client_secret=REDDIT_SECRET_TOKEN, user_agent=REDDIT_USER_AGENT)
 
-    new_posts = await reddit.subreddit(subreddit, fetch=True)
     data = list()
+    try:
+        new_posts = await reddit.subreddit(subreddit, fetch=True)
+        async for post in new_posts.new(limit=n):
+            if post.over_18:
+                continue
+            post_data = dict()
+            post_data["title"] = post.title
+            post_data["content"] = post.selftext
+            post_data["url"] = f"https://reddit.com{post.permalink}"
+            post_data["create_time"] = datetime.fromtimestamp(post.created)
+            post_data["author"] = post.author.name
+            post_data["images"] = list()
 
-    async for post in new_posts.new(limit=n):
-        if post.over_18:
-            continue
-        post_data = dict()
-        post_data["title"] = post.title
-        post_data["content"] = post.selftext
-        post_data["url"] = f"https://reddit.com{post.permalink}"
-        post_data["create_time"] = datetime.fromtimestamp(post.created)
-        post_data["author"] = post.author.name
-        post_data["images"] = list()
+            if "media_metadata" in post.__dict__:
+                image_details = post.media_metadata
+                if image_details:
+                    for key in image_details:
+                        if image_details[key]['e'] == "Image":
+                            post_data["images"].append(
+                                image_details[key]['p'][-1]['u'])
+            elif "preview" in post.__dict__:
+                if post.preview["images"]:
+                    for i in post.preview["images"]:
+                        post_data["images"].append(i["resolutions"][-1]["url"])
 
-        if "media_metadata" in post.__dict__:
-            image_details = post.media_metadata
-            if image_details:
-                for key in image_details:
-                    if image_details[key]['e'] == "Image":
-                        post_data["images"].append(
-                            image_details[key]['p'][-1]['u'])
-        elif "preview" in post.__dict__:
-            if post.preview["images"]:
-                for i in post.preview["images"]:
-                    post_data["images"].append(i["resolutions"][-1]["url"])
+            data.append(post_data)
 
-        data.append(post_data)
-
-    await reddit.close()
+        await reddit.close()
+    except RequestException as error:
+        print(f"Request Exception while fetching from Reddit: {error}")
+    
     return data
+
