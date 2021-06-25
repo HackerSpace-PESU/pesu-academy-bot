@@ -1199,10 +1199,13 @@ async def checkPESUAnnouncement():
 
         ALL_ANNOUNCEMENTS_MADE.sort(key=lambda x: x["date"], reverse=True)
         current_date = datetime.now().date()
+        db_records = getCompleteGuildDatabase()
         for announcement in all_announcements:
             if announcement["date"] == current_date:
                 if announcement not in TODAY_ANNOUNCEMENTS_MADE:
                     embed = await getAnnouncementEmbed(announcement)
+
+                    img_file = None
                     if announcement["img"] != None:
                         img_base64 = announcement["img"].strip()[22:]
                         imgdata = base64.b64decode(img_base64)
@@ -1211,7 +1214,7 @@ async def checkPESUAnnouncement():
                             f.write(imgdata)
                         with open(filename, 'rb') as f:
                             img_file = discord.File(f)
-                            await sendAllChannels(message_type="publish", file=img_file)
+                            # await sendAllChannels(message_type="publish", file=img_file)
 
                     attachment_files = list()
                     if announcement["attachments"]:
@@ -1221,12 +1224,39 @@ async def checkPESUAnnouncement():
                             else:
                                 print(f"Could not find attachment: {fname}")
                                 embed.add_field(
-                                    name=f"\u200b", value=fname, inline=False)
+                                    name=f"\u200b",
+                                    value=fname,
+                                    inline=False
+                                )
                                 if fname.startswith("http"):
                                     embed.url = fname
-                    await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
-                    for attachment_file in attachment_files:
-                        await sendAllChannels(message_type="publish", file=attachment_file)
+
+                    # await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
+                    # for attachment_file in attachment_files:
+                    #     await sendAllChannels(message_type="publish", file=attachment_file)
+
+                    for row in db_records:
+                        guild_id, _, channel_type, channel_id = row[1:]
+                        if channel_id == None:
+                            continue
+                        guild_id = int(guild_id)
+                        channel_id = int(channel_id)
+                        if channel_type == "publish":
+                            try:
+                                channel = client.get_channel(channel_id)
+
+                                if img_file != None:
+                                    await channel.send(file=img_file)
+
+                                await channel.send("@everyone", embed=embed)
+
+                                for attachment_file in attachment_files:
+                                    await channel.send(file=attachment_file)
+
+                            except:
+                                print(
+                                    f"Error sending message to channel {channel_id}")
+
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
         driver.quit()
 
