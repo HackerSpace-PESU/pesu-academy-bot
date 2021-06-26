@@ -430,6 +430,7 @@ async def syncdb(ctx, sync_method="soft"):
 async def gitpull(ctx):
     if await checkUserIsBotDev(ctx):
         sys.stdout.flush()
+        await ctx.send("Pulling changes from repository..")
         p = subprocess.Popen(['git', 'pull'], stdout=subprocess.PIPE)
         for line in iter(p.stdout.readline, ''):
             if not line:
@@ -444,6 +445,7 @@ async def gitpull(ctx):
 async def restart(ctx):
     if await checkUserIsBotDev(ctx):
         await gitpull(ctx)
+        await ctx.send("Restarting bot...")
         p = subprocess.Popen(['nohup', 'python3', 'src/bot.py'])
         sys.exit(0)
     else:
