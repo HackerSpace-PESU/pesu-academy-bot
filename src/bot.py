@@ -446,6 +446,9 @@ async def restart(ctx):
     if await checkUserIsBotDev(ctx):
         await gitpull(ctx)
         await ctx.send("Restarting bot...")
+        p = subprocess.Popen(["rm", "*.pdf"])
+        p = subprocess.Popen(["rm", "*.png"])
+        p = subprocess.Popen(["rm", "*.out"])
         p = subprocess.Popen(['nohup', 'python3', 'src/bot.py'])
         sys.exit(0)
     else:
