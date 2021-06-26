@@ -428,7 +428,7 @@ async def syncdb(ctx, sync_method="soft"):
 
 @client.command()
 async def gitpull(ctx):
-    if await checkUserIsBotDev(ctx):
+    if RUNTIME_ENVIRONMENT == "OTHER" and await checkUserIsBotDev(ctx):
         sys.stdout.flush()
         await ctx.send("Pulling changes from repository..")
         p = subprocess.Popen(['git', 'pull'], stdout=subprocess.PIPE)
@@ -443,7 +443,7 @@ async def gitpull(ctx):
 
 @client.command()
 async def restart(ctx):
-    if await checkUserIsBotDev(ctx):
+    if RUNTIME_ENVIRONMENT == "OTHER" and await checkUserIsBotDev(ctx):
         await gitpull(ctx)
         await ctx.send("Restarting bot...")
         p = subprocess.Popen(["rm", "*.pdf"])
@@ -457,7 +457,7 @@ async def restart(ctx):
 
 @client.command()
 async def shutdown(ctx):
-    if await checkUserIsBotDev(ctx):
+    if RUNTIME_ENVIRONMENT == "OTHER" and await checkUserIsBotDev(ctx):
         sys.exit(0)
     else:
         await ctx.send("You are not authorised to run this command.")
