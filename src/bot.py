@@ -1,10 +1,12 @@
 import re
 import os
+import sys
 import time
 import random
 import base64
 import asyncio
 import discord
+import subprocess
 from itertools import cycle
 from datetime import datetime
 from dotenv import load_dotenv
@@ -420,6 +422,38 @@ async def syncdb(ctx, sync_method="soft"):
                             removeChannelWithType(db_channel_id, "log")
 
         await ctx.send("Database sync completed.")
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
+async def gitpull(ctx):
+    if await checkUserIsBotDev(ctx):
+        sys.stdout.flush()
+        p = subprocess.Popen(['git', 'pull'], stdout=subprocess.PIPE)
+        for line in iter(p.stdout.readline, ''):
+            if not line:
+                break
+            await ctx.send(str(line.rstrip(), 'utf-8', 'ignore'))
+        sys.stdout.flush()
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
+async def restart(ctx):
+    if await checkUserIsBotDev(ctx):
+        await gitpull(ctx)
+        p = subprocess.Popen(['nohup', 'python3', 'src/bot.py'])
+        sys.exit(0)
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
+async def shutdown(ctx):
+    if await checkUserIsBotDev(ctx):
+        sys.exit(0)
     else:
         await ctx.send("You are not authorised to run this command.")
 
