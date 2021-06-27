@@ -1278,8 +1278,6 @@ async def checkPESUAnnouncement():
                         with open(img_filename, 'wb') as f:
                             f.write(img_data)
 
-                            # await sendAllChannels(message_type="publish", file=img_file)
-
                     attachment_files = list()
                     if announcement["attachments"]:
                         for fname in announcement["attachments"]:
@@ -1296,10 +1294,6 @@ async def checkPESUAnnouncement():
                                 if fname.startswith("http"):
                                     embed.url = fname
 
-                    # await sendAllChannels(message_type="publish", content="@everyone", embed=embed)
-                    # for attachment_file in attachment_files:
-                    #     await sendAllChannels(message_type="publish", file=attachment_file)
-
                     for row in db_records:
                         guild_id, _, channel_type, channel_id = row[1:]
                         if channel_id == None:
@@ -1314,8 +1308,7 @@ async def checkPESUAnnouncement():
                                     with open(img_filename, "rb") as f:
                                         await channel.send(file=discord.File(img_filename))
 
-                                # ping everyone here
-                                await channel.send(embed=embed)
+                                await channel.send("@everyone", embed=embed)
 
                                 for attachment_file in attachment_files:
                                     with open(attachment_file, "rb") as f:
