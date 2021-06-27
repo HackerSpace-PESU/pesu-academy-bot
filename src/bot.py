@@ -1270,7 +1270,8 @@ async def checkPESUAnnouncement():
                     if announcement["img"] != None:
                         img_base64 = announcement["img"].strip()[22:]
                         imgdata = base64.b64decode(img_base64)
-                        filename = "announcement-img.png"
+                        announcement_title = announcement["header"]
+                        filename = f"announcement-img-{announcement_title}.png"
                         with open(filename, 'wb') as f:
                             f.write(imgdata)
                         with open(filename, 'rb') as f:
