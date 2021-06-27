@@ -1309,7 +1309,7 @@ async def checkPESUAnnouncement():
                         guild_id = int(guild_id)
                         channel_id = int(channel_id)
                         if channel_type == "publish":
-                            try:
+                            #try:
                                 channel = client.get_channel(channel_id)
 
                                 if img_file != None:
@@ -1322,9 +1322,9 @@ async def checkPESUAnnouncement():
                                     print(f"Sending attachment file: {attachment_file}")
                                     await channel.send(file=attachment_file)
 
-                            except:
-                                print(
-                                    f"Error sending message to channel {channel_id}")
+                            #except:
+                            #    print(
+                            #        f"Error sending message to channel {channel_id}")
 
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
         driver.quit()
