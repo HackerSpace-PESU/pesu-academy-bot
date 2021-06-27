@@ -310,6 +310,5 @@ async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOK
         await reddit.close()
     except RequestException as error:
         print(f"Request Exception while fetching from Reddit: {error}")
-    
-    return data
 
+    return data

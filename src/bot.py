@@ -160,8 +160,8 @@ async def sendChannel(channel_id, content=None, embed=None, file=None):
             await channel.send(content, embed=embed)
         else:
             pass
-    except:
-        print(f"Error sending message to channel {channel_id}")
+    except Exception as error:
+        print(f"Error sending message to channel {channel_id}: {error}")
 
 
 async def sendSpecificChannels(channels, content=None, embed=None, file=None):
@@ -1218,8 +1218,9 @@ async def checkInstagramPost():
                 curr_time = time.time()
                 if (curr_time - photo_time) < 1560:
                     await sendAllChannels(message_type="publish", embed=post_embed)
-            except:
-                print(f"Error while fetching Instagram post from {username}")
+            except Exception as error:
+                print(
+                    f"Error while fetching Instagram post from {username}: {error}")
 
 
 @tasks.loop(minutes=34)
@@ -1248,9 +1249,7 @@ async def checkPESUAnnouncement():
         print("Fetching announcements...")
         driver = await getChromedriver()
         all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
-        print([(f, os.path.getsize(f)) for f in os.listdir()])
         await asyncio.sleep(20)
-        print([(f, os.path.getsize(f)) for f in os.listdir()])
 
         new_announcement_count = 0
         for a in all_announcements:
@@ -1276,15 +1275,13 @@ async def checkPESUAnnouncement():
                         img_filename = f"announcement-img-{announcement_title}.png"
                         with open(img_filename, 'wb') as f:
                             f.write(img_data)
-                        
+
                             # await sendAllChannels(message_type="publish", file=img_file)
 
                     attachment_files = list()
                     if announcement["attachments"]:
-                        print(announcement["attachments"])
                         for fname in announcement["attachments"]:
                             fname = Path(fname).name
-                            print(fname)
                             if fname in os.listdir():
                                 attachment_files.append(fname)
                             else:
@@ -1308,25 +1305,23 @@ async def checkPESUAnnouncement():
                         guild_id = int(guild_id)
                         channel_id = int(channel_id)
                         if channel_type == "publish":
-                            #try:
+                            try:
                                 channel = client.get_channel(channel_id)
 
                                 if img_filename != None:
                                     with open(img_filename, "rb") as f:
-                                        print(f"Sending image file: {img_filename}")
                                         await channel.send(file=discord.File(img_filename))
 
-                                await channel.send(embed=embed) # ping everyone here
+                                # ping everyone here
+                                await channel.send(embed=embed)
 
-                                print(attachment_files)
                                 for attachment_file in attachment_files:
                                     with open(attachment_file, "rb") as f:
-                                        print(f"Sending attachment file: {attachment_file}")
                                         await channel.send(file=discord.File(attachment_file))
 
-                            #except:
-                            #    print(
-                            #        f"Error sending message to channel {channel_id}")
+                            except Exception as error:
+                                print(
+                                    f"Error sending message to channel {channel_id}: {error}")
 
                     TODAY_ANNOUNCEMENTS_MADE.append(announcement)
         driver.quit()
