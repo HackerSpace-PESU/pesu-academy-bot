@@ -1129,7 +1129,8 @@ async def pesunews(ctx, *, query=None):
             if announcement["img"] != None:
                 img_base64 = announcement["img"].strip()[22:]
                 imgdata = base64.b64decode(img_base64)
-                filename = "announcement-img.png"
+                announcement_title = announcement["header"]
+                filename = f"announcement-img-{announcement_title}.png"
                 with open(filename, 'wb') as f:
                     f.write(imgdata)
                 with open(filename, 'rb') as f:
@@ -1139,6 +1140,7 @@ async def pesunews(ctx, *, query=None):
             attachment_files = list()
             if announcement["attachments"]:
                 for fname in announcement["attachments"]:
+                    fname = Path(fname).name
                     if fname in os.listdir():
                         attachment_files.append(discord.File(fname))
                     else:
@@ -1315,7 +1317,9 @@ async def checkPESUAnnouncement():
 
                                 await channel.send(embed=embed) # ping everyone here
 
+                                print(attachment_files)
                                 for attachment_file in attachment_files:
+                                    print(f"Sending attachment file: {attachment_file}")
                                     await channel.send(file=attachment_file)
 
                             except:
