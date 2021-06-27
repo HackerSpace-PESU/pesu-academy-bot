@@ -1246,7 +1246,9 @@ async def checkPESUAnnouncement():
         print("Fetching announcements...")
         driver = await getChromedriver()
         all_announcements = await getPESUAnnouncements(driver, PESU_SRN, PESU_PWD)
+        print(os.listdir())
         await asyncio.sleep(20)
+        print(os.listdir())
 
         new_announcement_count = 0
         for a in all_announcements:
