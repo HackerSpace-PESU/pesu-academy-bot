@@ -1268,16 +1268,15 @@ async def checkPESUAnnouncement():
                 if announcement not in TODAY_ANNOUNCEMENTS_MADE:
                     embed = await getAnnouncementEmbed(announcement)
 
-                    img_file = None
+                    img_filename = None
                     if announcement["img"] != None:
                         img_base64 = announcement["img"].strip()[22:]
-                        imgdata = base64.b64decode(img_base64)
+                        img_data = base64.b64decode(img_base64)
                         announcement_title = announcement["header"]
-                        filename = f"announcement-img-{announcement_title}.png"
-                        with open(filename, 'wb') as f:
-                            f.write(imgdata)
-                        with open(filename, 'rb') as f:
-                            img_file = discord.File(f)
+                        img_filename = f"announcement-img-{announcement_title}.png"
+                        with open(img_filename, 'wb') as f:
+                            f.write(img_data)
+                        
                             # await sendAllChannels(message_type="publish", file=img_file)
 
                     attachment_files = list()
@@ -1312,8 +1311,10 @@ async def checkPESUAnnouncement():
                             #try:
                                 channel = client.get_channel(channel_id)
 
-                                if img_file != None:
-                                    await channel.send(file=img_file)
+                                if img_filename != None:
+                                    with open(img_filename, "rb") as f:
+                                        print(f"Sending image file: {img_filename}")
+                                        await channel.send(file=discord.File(img_filename))
 
                                 await channel.send(embed=embed) # ping everyone here
 
