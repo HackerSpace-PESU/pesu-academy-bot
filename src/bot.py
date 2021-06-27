@@ -1282,6 +1282,7 @@ async def checkPESUAnnouncement():
                     if announcement["attachments"]:
                         print(announcement["attachments"])
                         for fname in announcement["attachments"]:
+                            fname = Path(fname).name
                             print(fname)
                             if fname in os.listdir():
                                 attachment_files.append(discord.File(fname))
