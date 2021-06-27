@@ -1277,7 +1277,9 @@ async def checkPESUAnnouncement():
 
                     attachment_files = list()
                     if announcement["attachments"]:
+                        print(announcement["attachments"])
                         for fname in announcement["attachments"]:
+                            print(fname)
                             if fname in os.listdir():
                                 attachment_files.append(discord.File(fname))
                             else:
@@ -1307,7 +1309,7 @@ async def checkPESUAnnouncement():
                                 if img_file != None:
                                     await channel.send(file=img_file)
 
-                                await channel.send("@everyone", embed=embed)
+                                await channel.send(embed=embed) # ping everyone here
 
                                 for attachment_file in attachment_files:
                                     await channel.send(file=attachment_file)
