@@ -1130,27 +1130,29 @@ async def pesunews(ctx, *, query=None):
                 img_base64 = announcement["img"].strip()[22:]
                 imgdata = base64.b64decode(img_base64)
                 announcement_title = announcement["header"]
-                filename = f"announcement-img-{announcement_title}.png"
-                with open(filename, 'wb') as f:
+                img_filename = f"announcement-img-{announcement_title}.png"
+                with open(img_filename, 'wb') as f:
                     f.write(imgdata)
-                with open(filename, 'rb') as f:
-                    img_file = discord.File(f)
-                    await ctx.send(file=img_file)
+                with open(img_filename, 'rb') as f:
+                    await ctx.send(file=discord.File(img_filename))
 
             attachment_files = list()
             if announcement["attachments"]:
                 for fname in announcement["attachments"]:
                     fname = Path(fname).name
                     if fname in os.listdir():
-                        attachment_files.append(discord.File(fname))
+                        attachment_files.append(fname)
                     else:
                         embed.add_field(
                             name=f"\u200b", value=fname, inline=False)
                         if fname.startswith("http"):
                             embed.url = fname
+
             await ctx.send(embed=embed)
+
             for attachment_file in attachment_files:
-                await ctx.send(file=attachment_file)
+                with open(attachment_file, "rb") as f:
+                    await ctx.send(file=discord.File(attachment_file))
 
     else:
         await ctx.send("No announcements available. Retry with another option or try again later.")
