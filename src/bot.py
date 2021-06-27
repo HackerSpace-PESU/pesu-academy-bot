@@ -1287,7 +1287,7 @@ async def checkPESUAnnouncement():
                             fname = Path(fname).name
                             print(fname)
                             if fname in os.listdir():
-                                attachment_files.append(discord.File(fname))
+                                attachment_files.append(fname)
                             else:
                                 print(f"Could not find attachment: {fname}")
                                 embed.add_field(
@@ -1319,8 +1319,9 @@ async def checkPESUAnnouncement():
 
                                 print(attachment_files)
                                 for attachment_file in attachment_files:
-                                    print(f"Sending attachment file: {attachment_file}")
-                                    await channel.send(file=attachment_file)
+                                    with open(attachment_file, "rb") as f:
+                                        print(f"Sending attachment file: {attachment_file}")
+                                        await channel.send(file=discord.File(attachment_file))
 
                             #except:
                             #    print(
