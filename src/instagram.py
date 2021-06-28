@@ -1,8 +1,15 @@
+import os
 import time
+from dotenv import load_dotenv
 import requests
 from instaloader import Instaloader, Profile
 
+load_dotenv()
+INSTAGRAM_USERNAME = os.environ["INSTAGRAM_USERNAME"]
+INSTAGRAM_PASSWORD = os.environ["INSTAGRAM_PASSWORD"]
+
 instagram_loader = Instaloader()
+instagram_loader.login(INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD)
 
 '''
 def getLastPhotoDate(html):
