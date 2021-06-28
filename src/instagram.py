@@ -1,3 +1,4 @@
+import time
 import requests
 from instaloader import Instaloader, Profile
 
@@ -68,6 +69,7 @@ async def getLatestInstagramPost(instagram_usernames):
             result.append(post_content)
         except Exception as error:
             print(f"Error fetching posts from {username}: {error}")
+        time.sleep(0.5)
     return result
 
 
