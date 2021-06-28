@@ -9,7 +9,11 @@ INSTAGRAM_USERNAME = os.environ["INSTAGRAM_USERNAME"]
 INSTAGRAM_PASSWORD = os.environ["INSTAGRAM_PASSWORD"]
 
 instagram_loader = Instaloader()
-instagram_loader.login(INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD)
+
+try:
+    instagram_loader.login(INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD)
+except Exception as error:
+    print(error)
 
 '''
 def getLastPhotoDate(html):
