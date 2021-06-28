@@ -1223,7 +1223,7 @@ Reddit Checks: **{reddit_status_value}**'''
         await ctx.send("You are not authorised to run this command.")
 
 
-@tasks.loop(minutes=45)
+@tasks.loop(minutes=32)
 async def checkInstagramPost():
     await client.wait_until_ready()
     if TASK_FLAG_INSTAGRAM:
@@ -1232,14 +1232,15 @@ async def checkInstagramPost():
             try:
                 post_embed, photo_time = await getInstagramEmbed(username)
                 curr_time = time.time()
-                if (curr_time - photo_time) <= 2700:
+                if (curr_time - photo_time) <= 1920:
                     await sendAllChannels(message_type="publish", embed=post_embed)
             except Exception as error:
                 print(
                     f"Error while fetching Instagram post from {username}: {error}")
+            await asyncio.sleep(5)
 
 
-@tasks.loop(minutes=34)
+@tasks.loop(minutes=55)
 async def checkRedditPost():
     await client.wait_until_ready()
     if TASK_FLAG_REDDIT:
@@ -1250,7 +1251,7 @@ async def checkRedditPost():
             post_time = latest_reddit_post["create_time"]
             current_time = datetime.now()
             time_difference = current_time - post_time
-            if time_difference.seconds < 2040 and time_difference.days == 0:
+            if time_difference.seconds <= 3300 and time_difference.days == 0:
                 post_embed = await getRedditEmbed(latest_reddit_post)
                 await sendAllChannels(message_type="publish", embed=post_embed)
 
@@ -1352,7 +1353,7 @@ async def checkNewDay():
 @tasks.loop(hours=5)
 async def changeStatus():
     '''
-    Changes the status of the PESU Academy bot every 4 hours.
+    Changes the status of the PESU Academy bot every 5 hours.
     '''
     await client.wait_until_ready()
     await client.change_presence(activity=discord.Game(next(status)))
