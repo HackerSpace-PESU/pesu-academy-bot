@@ -56,27 +56,33 @@ async def getLatestInstagramPost(instagram_usernames):
     result = list()
     for username in instagram_usernames:
         print(f"Fetching instagram posts for {username}...")
-        profile = Profile.from_username(instagram_loader.context, username)
-        all_posts = list(profile.get_posts())
-        if all_posts:
-            post = all_posts[0]
-        else:
-            print(f"No posts found for {username}")
-            continue
-        post_content = getInstagramPostContent(post)
-        result.append(post_content)
+        try:
+            profile = Profile.from_username(instagram_loader.context, username)
+            all_posts = list(profile.get_posts())
+            if all_posts:
+                post = all_posts[0]
+            else:
+                print(f"No posts found for {username}")
+                continue
+            post_content = getInstagramPostContent(post)
+            result.append(post_content)
+        except Exception as error:
+            print(f"Error fetching posts from {username}: {error}")
     return result
 
 
 async def getUsernameInstagramPosts(username, n=5):
     result = list()
-    profile = Profile.from_username(instagram_loader.context, username)
-    if not profile.is_private or profile.followed_by_viewer:
-        print(f"Fetching instagram posts for {username}...")
-        all_posts = profile.get_posts()
-        for ctr, post in enumerate(all_posts):
-            post_content = getInstagramPostContent(post)
-            result.append(post_content)
-            if (ctr + 1) == n:
-                break
+    try:
+        profile = Profile.from_username(instagram_loader.context, username)
+        if not profile.is_private or profile.followed_by_viewer:
+            print(f"Fetching instagram posts for {username}...")
+            all_posts = profile.get_posts()
+            for ctr, post in enumerate(all_posts):
+                post_content = getInstagramPostContent(post)
+                result.append(post_content)
+                if (ctr + 1) == n:
+                    break
+    except Exception as error:
+        print(f"Error fetching posts from {username}: {error}")
     return result
