@@ -1,7 +1,6 @@
 import re
 import os
 import sys
-import time
 import random
 import base64
 import asyncio
@@ -1045,15 +1044,18 @@ async def getRedditEmbed(post):
 
 @client.command(aliases=["r"])
 async def reddit(ctx, subreddit="PESU", n=5):
-    reddit_posts = await getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n)
-    if reddit_posts:
-        for p in reddit_posts:
-            embed = await getRedditEmbed(p)
-            await ctx.send(embed=embed)
+    if TASK_FLAG_REDDIT:
+        reddit_posts = await getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n)
+        if reddit_posts:
+            for p in reddit_posts:
+                embed = await getRedditEmbed(p)
+                await ctx.send(embed=embed)
+        else:
+            await ctx.send("No posts found. Please ensure that the subreddit exists and it is not NSFW.")
     else:
-        await ctx.send("No posts found. Please ensure that the subreddit exists and it is not NSFW.")
+        await ctx.send("Reddit feature has been turned off. Please contact the bot devs to enable it and continue.")
 
-
+'''
 async def getInstagramEmbed(username):
     html = getInstagramHTML(username)
     photo_time = getLastPhotoDate(html)
@@ -1068,12 +1070,45 @@ async def getInstagramEmbed(username):
                          :1000] + "... ", inline=False)
     post_embed.set_footer(text=datetime.fromtimestamp(photo_time))
     return post_embed, photo_time
+'''
 
 
-@client.command()
-async def insta(ctx, username="pesuniversity"):
-    post_embed, _ = await getInstagramEmbed(username)
-    await ctx.channel.send(embed=post_embed)
+async def getInstagramEmbed(post, embed_type):
+    post_embed = discord.Embed(
+        title=f'Instagram {embed_type} from {post["username"]}', url=post["img-url"], color=discord.Color.blue())
+    if post["is-video"]:
+        post_embed.url = post["video-url"]
+        post_embed.set_image(url=post["img-url"])
+    else:
+        post_embed.url = post["post-url"]
+        post_embed.set_image(url=post["img-url"])
+
+    post_caption = post["caption"]
+    if post_caption != None:
+        if len(post_caption) >= 1024:
+            content_bodies = post_caption.split('\n')
+            content_bodies = [c for c in content_bodies if c.strip() not in [
+                "", " "]]
+            for c in content_bodies:
+                post_embed.add_field(name=f"\u200b", value=c, inline=False)
+        else:
+            post_embed.add_field(
+                name="\u200b", value=post_caption, inline=False)
+    return post_embed
+
+
+@client.command(aliases=["ig", "igpost"])
+async def insta(ctx, username="pesuniversity", n=3):
+    if TASK_FLAG_INSTAGRAM:
+        all_posts = await getUsernameInstagramPosts(username, n)
+        if all_posts:
+            for post in all_posts:
+                post_embed = await getInstagramEmbed(post, "Post")
+                await ctx.send(embed=post_embed)
+        else:
+            await ctx.send("No posts found.")
+    else:
+        await ctx.send("Instagram feature has been turned off. Please contact the bot devs to enable it and continue.")
 
 
 async def getAnnouncementEmbed(announcement):
@@ -1208,7 +1243,7 @@ Reddit Checks: **{reddit_status_value}**'''
     else:
         await ctx.send("You are not authorised to run this command.")
 
-
+'''
 @tasks.loop(minutes=26)
 async def checkInstagramPost():
     await client.wait_until_ready()
@@ -1223,6 +1258,21 @@ async def checkInstagramPost():
             except Exception as error:
                 print(
                     f"Error while fetching Instagram post from {username}: {error}")
+'''
+
+
+@tasks.loop(minutes=26)
+async def checkInstagramPost():
+    await client.wait_until_ready()
+    if TASK_FLAG_INSTAGRAM:
+        all_posts = await getLatestInstagramPost(instagram_usernames)
+        for post in all_posts:
+            current_time = datetime.now()
+            post_time = post["date-local"]
+            time_difference = current_time - post_time
+            if time_difference.days == 0 and time_difference.seconds <= 1560:
+                post_embed = await getInstagramEmbed(post, "Post")
+                await sendAllChannels(message_type="publish", embed=post_embed)
 
 
 @tasks.loop(minutes=34)
