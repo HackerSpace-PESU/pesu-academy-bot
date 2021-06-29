@@ -275,11 +275,11 @@ async def on_ready():
     await sendAllChannels(message_type="log", embed=embed)
     await subscriptionReminder()
 
-    checkNewDay.start()
-    changeStatus.start()
-    checkInstagramPost.start()
-    checkRedditPost.start()
-    checkPESUAnnouncement.start()
+    # checkNewDay.start()
+    # changeStatus.start()
+    # checkInstagramPost.start()
+    # checkRedditPost.start()
+    # checkPESUAnnouncement.start()
 
 
 @client.event
@@ -1370,4 +1370,9 @@ async def changeStatus():
     await client.change_presence(activity=discord.Game(next(status)))
 
 
+checkNewDay.start()
+changeStatus.start()
+checkInstagramPost.start()
+checkRedditPost.start()
+checkPESUAnnouncement.start()
 client.run(BOT_TOKEN)
