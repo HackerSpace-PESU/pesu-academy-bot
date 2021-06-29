@@ -275,12 +275,6 @@ async def on_ready():
     await sendAllChannels(message_type="log", embed=embed)
     await subscriptionReminder()
 
-    # checkNewDay.start()
-    # changeStatus.start()
-    # checkInstagramPost.start()
-    # checkRedditPost.start()
-    # checkPESUAnnouncement.start()
-
 
 @client.event
 async def on_guild_join(guild):
@@ -609,6 +603,19 @@ async def announcecommand(ctx, message_type=None, *, message: str = None):
         elif message_type == None:
             await ctx.send("Please enter a valid message type.")
         else:
+            await sendAllChannels(message_type=message_type, content=message)
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command(aliases=['announceembed'])
+async def announceembedcommand(ctx, message_type=None, *, message: str = None):
+    if await checkUserIsBotDev(ctx):
+        if message == None:
+            await ctx.send("Please enter a valid message.")
+        elif message_type == None:
+            await ctx.send("Please enter a valid message type.")
+        else:
             embed = discord.Embed(
                 color=discord.Color.blue(),
                 title="PESU Academy Bot - Message from Developer Team",
@@ -707,10 +714,10 @@ async def echo(ctx, *, query=None):
     channel = query.split()[0]
     try:
         channel_id = int(channel)
-        pattern = pattern = re.compile(r"^\d+")
+        pattern = re.compile(r"^\d+")
     except ValueError:
         channel_id = int(channel[2:-1])
-        pattern = pattern = re.compile(r"^<#\d+>")
+        pattern = re.compile(r"^<#\d+>")
 
     if await checkUserEchoReplyPermissions(ctx, channel_id):
         _, content = re.split(pattern, query)
