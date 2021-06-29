@@ -275,6 +275,21 @@ async def on_ready():
     await sendAllChannels(message_type="log", embed=embed)
     await subscriptionReminder()
 
+    if not checkNewDay.is_running():
+        checkNewDay.start()
+
+    if not changeStatus.is_running():
+        changeStatus.start()
+
+    if not checkInstagramPost.is_running():
+        checkInstagramPost.start()
+
+    if not checkRedditPost.is_running():
+        checkRedditPost.start()
+
+    if not checkPESUAnnouncement.is_running():
+        checkPESUAnnouncement.start()
+
 
 @client.event
 async def on_guild_join(guild):
@@ -1377,9 +1392,4 @@ async def changeStatus():
     await client.change_presence(activity=discord.Game(next(status)))
 
 
-checkNewDay.start()
-changeStatus.start()
-checkInstagramPost.start()
-checkRedditPost.start()
-checkPESUAnnouncement.start()
 client.run(BOT_TOKEN)
