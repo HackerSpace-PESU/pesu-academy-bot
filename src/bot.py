@@ -787,14 +787,18 @@ async def help(ctx):
         '`pes.hello`': 'Be nice to me. Say `pes.hello` once in a while 👋',
         '`pes.ping`': 'Perform a `ping` test',
         '`pes.alerts`': 'Setup a channel to receive alerts using `pes.alerts [CHANNEL]`',
-        '`pes.log`': 'Setup a channel to receive logging information using `pes.log [CHANNEL]`',
+        '`pes.removealerts`': 'Unsubscribe a channel from alerts using `pes.removealerts [CHANNEL]`',
+        '`pes.logs`': 'Setup a channel to receive logging information using `pes.logs [CHANNEL]`',
+        '`pes.removelogs`': 'Unsubscribe a channel from logging information using `pes.removelogs [CHANNEL]`',
         '`pes.invite`': 'Obtain the invite link for PESU Academy Bot',
         '`pes.contribute`': 'Learn how to contribute to PESU Academy Bot',
+        '`pes.reachout`': 'Send a message to the developer team',
         '`pes.search`': 'To search the PESU Class and Section Database, use `pes.search [SRN | email]`',
         '`pes.pesdb`': 'Search the Student PESU Database using `pes.pesdb [search 1] & [search 2]`. String together as many filters as needed. You can also use emails and names.',
         '`pes.news`': 'Fetch PESU Announcements using `pes.news [OPTIONAL=today] [OPTIONAL=N]`. Get today\'s announcements with `pes.news today`. Fetch all announcements using `pes.news`. Specify the number of news using `N`.',
-        '`pes.insta`': 'Fetch the last Instagram post from PESU Academy',
-        '`pes.reddit`': 'Fetch the latest posts from r/PESU using `pes.reddit [NUMBER OF POSTS]`',
+        '`pes.faculty`': 'Search for faculty members using `pes.faculty [filter 1] [filter 2]`. Filters can be branches `[cse|ece|me]`, courses `[ds|daa|afll]` or campus `[rr|ec]`. You can even search using a name using `pes.faculty [NAME]`',
+        '`pes.ig`': 'Fetch the last Instagram post from PESU Academy or search for an account using `pes.ig [USERNAME]`',
+        '`pes.reddit`': 'Fetch the latest posts from r/PESU using `pes.reddit [NUMBER OF POSTS]` or search for a subreddit using `pes.reddit [SUBREDDIT] [NUMBER OF POSTS]`',
         '`pes.longrip`': 'Create a shortened long.rip link using `pes.longrip [URL]`',
         '`pes.goto`': 'Create customized redirection links using `pes.goto [LONG URL] [SHORT URL]`',
         '`pes.code`': """Use this to execute Python scripts. Attach your script within blockquotes on the next line. 
@@ -805,10 +809,43 @@ async def help(ctx):
         print(math.pi)
         ```
         <inputs>""",
-        '`pes.spongebob` or `pes.sb`': 'Create a SpongeBob mocking meme. `pes.sb [top text] & [bottom-text]` or `pes.sb [bottom-text]`',
-        '`pes.dict`': 'Search for the meaning of word using `pes.dict [word]`'
+        '`pes.sb`': 'Create a SpongeBob mocking meme. `pes.sb [top text] & [bottom-text]` or `pes.sb [bottom-text]`',
+        '`pes.dict`': 'Search for the meaning of word using `pes.dict [word]`',
+        '`pes.pride`': 'Invoke the PRIDE of PESU'
     }
     embed = discord.Embed(title=f"Help",
+                          color=discord.Color.blue())
+    index = 1
+    for cmd in content:
+        embed.add_field(
+            name=f"**{index}**", value='\t{} : {}'.format(cmd, content[cmd]), inline=False)
+        index += 1
+    await ctx.send(embed=embed)
+
+
+@client.command(aliases=["dh"])
+async def devhelp(ctx):
+    content = {
+        "`pes.remind`": "Send a reminder to servers that have not setup a publish channel",
+        "`pes.syncstatus`": "Sync status flags for tasks",
+        "`pes.syncdb`": "Sync database containing server information. Optional [DO NOT USE WITHOUT READING DOCS]: `pes.syncdb hard`",
+        "`pes.syncfaculty`": "Sync database containing faculty information by fetching from the repository",
+        "`pes.gitpull`": "Performs a `git pull` and fetches new code from the repository",
+        "`pes.restart`": "Performs a `git pull` and reboots the bot",
+        "`pes.shutdown`": "Shuts the bot down",
+        "`pes.taskmanager`": "Switch individual tasks on or off using `pes.taskmanager [FEATURE] [on|off]`",
+        "`pes.taskstatus`": "View all tasks and their running status",
+        "`pes.nohup`": "Fetch and display the error log file",
+        "`pes.guilds`": "Fetch and display the servers to which the bot has been added",
+        "`pes.dbinfo`": "Fetch and display the servers and their channels which have subscribed to the bot",
+        "`pes.reachreply`": "Send a message to any channel from the Developer Team using `pes.reachreply [CHANNEL ID] [MESSAGE]`",
+        "`pes.announce`": "Send an announcement message to all servers using `pes.announce [publish|log] [message]`",
+        "`pes.announceembed`": "Send an announcement embed to all servers using `pes.announceembed [publish|log] [message]`",
+        "`pes.echo`": "Send a message on any channel using `pes.echo [CHANNEL] [MESSAGE]`",
+        "`pes.reply`": "Reply to a message on any channel using `pes.reply [ORIGINAL MESSAGE URL] [MESSAGE]`",
+        "`pes.clear`": "Clear messages on a channel using `pes.clear [N]`",
+    }
+    embed = discord.Embed(title=f"Developer Help",
                           color=discord.Color.blue())
     index = 1
     for cmd in content:
@@ -1272,7 +1309,7 @@ async def checkInstagramPost():
             except Exception as error:
                 print(
                     f"Error while fetching Instagram post from {username}: {error}")
-            await asyncio.sleep(5)
+            await asyncio.sleep(3)
 
 
 @tasks.loop(minutes=55)
