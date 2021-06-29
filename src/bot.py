@@ -660,8 +660,8 @@ async def removealerts(ctx, channel: discord.TextChannel = None):
             await ctx.send("Looks like you do not have the `Manage Server` permission to run this command.")
 
 
-@client.command(aliases=["log"])
-async def logging(ctx, channel: discord.TextChannel = None):
+@client.command()
+async def logs(ctx, channel: discord.TextChannel = None):
     if channel == None:
         await ctx.send("Please mention the channel in which you would like to forward logging information.")
     else:
@@ -684,7 +684,7 @@ async def logging(ctx, channel: discord.TextChannel = None):
 
 
 @client.command()
-async def removelog(ctx, channel: discord.TextChannel = None):
+async def removelogs(ctx, channel: discord.TextChannel = None):
     if channel == None:
         await ctx.send("Please mention the channel you would like to unsubscribe from logging.")
     else:
@@ -1198,7 +1198,6 @@ async def taskmanager(ctx, handle=None, mode=None):
             )
 
             await ctx.send(f"The {handle} feature has been turned **{mode}**")
-            await sendAllChannels(message_type="publish", embed=embed)
             await sendAllChannels(message_type="log", embed=embed)
     else:
         await ctx.send("You are not authorised to run this command.")
@@ -1219,6 +1218,18 @@ Instagram Checks: **{instagram_status_value}**
 Reddit Checks: **{reddit_status_value}**'''
         )
         await ctx.send(embed=embed)
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
+async def nohup(ctx):
+    if await checkUserIsBotDev(ctx) and RUNTIME_ENVIRONMENT == "OTHER":
+        if "nohup.out" in os.listdir():
+            with open("nohup.out") as f:
+                await ctx.send(file=discord.File("nohup.out"))
+        else:
+            await ctx.send("Logging file `nohup.out` not found.")
     else:
         await ctx.send("You are not authorised to run this command.")
 
