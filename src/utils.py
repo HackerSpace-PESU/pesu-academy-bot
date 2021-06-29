@@ -48,8 +48,10 @@ async def checkRuntimeEnvironmentHeroku():
 
 
 async def cleanUp():
-    files = [fname for fname in os.listdir() if Path(fname).suffix in [
-        ".pdf", ".png", ".jpg", ".jpeg", ".doc", ".docx"]
+    files = [
+        fname for fname in os.listdir()
+        if Path(fname).suffix in [".pdf", ".png", ".jpg", ".jpeg", ".doc", ".docx", "*.crdownload", "*.out", "*.txt"]
+        and fname not in ["nohup.out", "nltk.txt"]
     ]
     for fname in files:
         try:

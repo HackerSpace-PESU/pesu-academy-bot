@@ -1293,10 +1293,16 @@ async def nohup(ctx, lines=None):
         if "nohup.out" in os.listdir():
             with open("nohup.out") as nohup_out_file, open("nohup.txt", "w") as nohup_write_file:
                 content = nohup_out_file.readlines()
-                if lines != None and isinstance(lines, int):
-                    content = content[-lines:]
+                if lines != None:
+                    try:
+                        lines = int(lines)
+                        await ctx.send(f"Viewing last {lines} lines...")
+                        content = content[-lines:]
+                    except ValueError:
+                        pass
                 nohup_write_file.writelines(content)
             await ctx.send(file=discord.File("nohup.txt"))
+            os.remove("nohup.txt")
         else:
             await ctx.send("Logging file `nohup.out` not found.")
     else:
