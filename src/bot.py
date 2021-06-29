@@ -1019,6 +1019,7 @@ Enter code here, do not add syntax highlighting
                             with open("output.txt", 'w') as f:
                                 f.write(code_output)
                             await ctx.reply(f"Script took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", file=discord.File("output.txt"))
+                            os.remove("output.txt")
                         else:
                             await ctx.reply(f"{code_output}\nScript took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", mention_author=False)
                     else:
