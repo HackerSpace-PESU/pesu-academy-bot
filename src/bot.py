@@ -1248,8 +1248,10 @@ Reddit Checks: **{reddit_status_value}**'''
 async def nohup(ctx):
     if await checkUserIsBotDev(ctx) and RUNTIME_ENVIRONMENT == "OTHER":
         if "nohup.out" in os.listdir():
-            with open("nohup.out") as f:
-                await ctx.send(file=discord.File("nohup.out"))
+            with open("nohup.out") as nohup_out_file, open("nohup.txt", "w") as nohup_write_file:
+                content = nohup_out_file.read()
+                nohup_write_file.write(content)
+            await ctx.send(file=discord.File("nohup.txt"))
         else:
             await ctx.send("Logging file `nohup.out` not found.")
     else:
