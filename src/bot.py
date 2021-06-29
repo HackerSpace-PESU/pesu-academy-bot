@@ -1013,8 +1013,14 @@ Enter code here, do not add syntax highlighting
                     compiler_keys, key=lambda x: compiler_keys[x])
                 try:
                     result = await executeCode(client_id, client_secret, script, language, inputs)
-                    if not checkSpamCode(result.output.strip()):
-                        await ctx.reply(f"{result.output.strip()}\nScript took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", mention_author=False)
+                    code_output = result.output.strip()
+                    if not checkSpamCode(code_output):
+                        if len(code_output > 4000):
+                            with open("output.txt", 'w') as f:
+                                f.write(code_output)
+                            await ctx.reply(f"Script took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", file=discord.File("output.txt"))
+                        else:
+                            await ctx.reply(f"{code_output}\nScript took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", mention_author=False)
                     else:
                         greeting = random.choice(greetings)[:-1]
                         await ctx.reply(f"Aye {greeting}, you may be smart but I am smarter. No pinging `@everyone` or `@here` with the bot.")
