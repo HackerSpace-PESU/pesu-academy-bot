@@ -265,15 +265,10 @@ async def on_ready():
     await syncTaskStatusDatabase()
     await syncFacultyInformation()
     await setRuntimeEnvironment()
-
+    await subscriptionReminder()
+    
     for client_id, client_secret in compiler_keys.keys():
         compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
-
-    greeting = random.choice(greetings)
-    embed = discord.Embed(title=f"{greeting}, PESU Academy Bot is online",
-                          description="Use `pes.` to access commands", color=discord.Color.blue())
-    await sendAllChannels(message_type="log", embed=embed)
-    await subscriptionReminder()
 
     if not checkNewDay.is_running():
         checkNewDay.start()
