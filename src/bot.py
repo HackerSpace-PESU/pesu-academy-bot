@@ -276,29 +276,29 @@ async def on_ready():
     print("Bot is online")
 
     await client.change_presence(activity=discord.Game(next(status)))
-    # await syncGuildDatabase()
-    # await syncTaskStatusDatabase()
-    # await syncFacultyInformation()
-    # await setRuntimeEnvironment()
-    # await subscriptionReminder()
+    await syncGuildDatabase()
+    await syncTaskStatusDatabase()
+    await syncFacultyInformation()
+    await setRuntimeEnvironment()
+    await subscriptionReminder()
 
     for client_id, client_secret in compiler_keys.keys():
         compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
 
-    # if not checkNewDay.is_running():
-    #     checkNewDay.start()
-#
-    # if not changeStatus.is_running():
-    #     changeStatus.start()
-#
-    # if not checkInstagramPost.is_running():
-    #     checkInstagramPost.start()
-#
-    # if not checkRedditPost.is_running():
-    #     checkRedditPost.start()
-#
-    # if not checkPESUAnnouncement.is_running():
-    #     checkPESUAnnouncement.start()
+    if not checkNewDay.is_running():
+        checkNewDay.start()
+
+    if not changeStatus.is_running():
+        changeStatus.start()
+
+    if not checkInstagramPost.is_running():
+        checkInstagramPost.start()
+
+    if not checkRedditPost.is_running():
+        checkRedditPost.start()
+
+    if not checkPESUAnnouncement.is_running():
+        checkPESUAnnouncement.start()
 
 
 @client.event
@@ -349,17 +349,28 @@ async def on_guild_remove(guild):
 async def on_message(ctx):
     if ctx.author.bot:
         pass
-    elif client.user.mentioned_in(ctx):
-        if "@everyone" not in ctx.content and "@here" not in ctx.content and ctx.reference == None:
-            greeting = random.choice(greetings)[:-1]
-            embed = discord.Embed(
-                color=discord.Color.blue(),
-                title="PESU Academy Bot",
-                description=f"{ctx.author.mention} don't be a {greeting} by pinging the bot. Type `pes.help` to access commands."
-            )
-            await ctx.channel.send(f"{ctx.author.mention}", embed=embed)
+    elif ctx.guild == None:
+        bot_log_channel = client.get_channel(CHANNEL_BOT_LOGS_2)
+        if ctx.reference == None:
+            content = f"{ctx.author.mention} sent this message on DM: {ctx.content}"
         else:
-            await client.process_commands(ctx)
+            parent_message_id = ctx.reference.message_id
+            parent_message_channel_id = ctx.reference.channel_id
+            channel = client.get_channel(parent_message_channel_id)
+            parent_message = await channel.fetch_message(parent_message_id)
+            parent_message_content = parent_message.content
+            content = f'''{ctx.author.mention} replied to a message on DM
+Original Message: {parent_message_content}
+Reply: {ctx.content}'''
+        await bot_log_channel.send(content)
+    elif client.user.mentioned_in(ctx) and "@everyone" not in ctx.content and "@here" not in ctx.content and ctx.reference == None:
+        greeting = random.choice(greetings)[:-1]
+        embed = discord.Embed(
+            color=discord.Color.blue(),
+            title="PESU Academy Bot",
+            description=f"{ctx.author.mention} don't be a {greeting} by pinging the bot. Type `pes.help` to access commands."
+        )
+        await ctx.channel.send(f"{ctx.author.mention}", embed=embed)
     else:
         if "pride" in ctx.content.lower():
             await ctx.reply("Invoking the PRIDE of PESU!", mention_author=False)
@@ -782,7 +793,7 @@ async def dm(ctx, recipient: discord.Member, *, message=None):
         if message != None:
             await sendDM(recipient, content=message)
         else:
-            greeting = random.choice(greetings)
+            greeting = random.choice(greetings)[:-1]
             await ctx.send(f"{greeting.capitalize()}, enter a valid message")
     else:
         await ctx.send(f"You are not authorised to run this command.")
@@ -795,7 +806,7 @@ async def dma(ctx, recipient: discord.Member, *, message=None):
         if message != None:
             await sendDM(recipient, content=message, mention=True)
         else:
-            greeting = random.choice(greetings)
+            greeting = random.choice(greetings)[:-1]
             await ctx.send(f"{greeting.capitalize()}, enter a valid message")
     else:
         await ctx.send(f"You are not authorised to run this command.")
