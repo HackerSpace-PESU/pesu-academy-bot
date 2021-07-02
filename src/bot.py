@@ -145,6 +145,21 @@ async def checkUserHasManageServerPermission(ctx):
     return ctx.channel.permissions_for(ctx.author).manage_guild
 
 
+async def sendDM(recipient, mention=False, content=None, embed=None, file=None):
+    if mention and content != None:
+        content = f"{recipient.mention}\n{content}"
+    if file != None:
+        await recipient.send(file=file)
+    if embed == None and content != None:
+        await recipient.send(content)
+    elif embed != None and content == None:
+        await recipient.send(embed=embed)
+    elif embed != None and content != None:
+        await recipient.send(content, embed=embed)
+    else:
+        pass
+
+
 async def sendChannel(channel_id, content=None, embed=None, file=None):
     channel_id = int(channel_id)
     try:
@@ -261,29 +276,29 @@ async def on_ready():
     print("Bot is online")
 
     await client.change_presence(activity=discord.Game(next(status)))
-    await syncGuildDatabase()
-    await syncTaskStatusDatabase()
-    await syncFacultyInformation()
-    await setRuntimeEnvironment()
-    await subscriptionReminder()
-    
+    # await syncGuildDatabase()
+    # await syncTaskStatusDatabase()
+    # await syncFacultyInformation()
+    # await setRuntimeEnvironment()
+    # await subscriptionReminder()
+
     for client_id, client_secret in compiler_keys.keys():
         compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
 
-    if not checkNewDay.is_running():
-        checkNewDay.start()
-
-    if not changeStatus.is_running():
-        changeStatus.start()
-
-    if not checkInstagramPost.is_running():
-        checkInstagramPost.start()
-
-    if not checkRedditPost.is_running():
-        checkRedditPost.start()
-
-    if not checkPESUAnnouncement.is_running():
-        checkPESUAnnouncement.start()
+    # if not checkNewDay.is_running():
+    #     checkNewDay.start()
+#
+    # if not changeStatus.is_running():
+    #     changeStatus.start()
+#
+    # if not checkInstagramPost.is_running():
+    #     checkInstagramPost.start()
+#
+    # if not checkRedditPost.is_running():
+    #     checkRedditPost.start()
+#
+    # if not checkPESUAnnouncement.is_running():
+    #     checkPESUAnnouncement.start()
 
 
 @client.event
@@ -346,6 +361,9 @@ async def on_message(ctx):
         else:
             await client.process_commands(ctx)
     else:
+        if "pride" in ctx.content.lower():
+            await ctx.reply("Invoking the PRIDE of PESU!", mention_author=False)
+            await ctx.channel.send("https://tenor.com/view/pes-pesuniversity-pesu-may-the-pride-of-pes-may-the-pride-of-pes-be-with-you-gif-21274060")
         await client.process_commands(ctx)
 
 
@@ -753,6 +771,32 @@ async def reply(ctx, *, query=None):
         channel = server.get_channel(channel_id)
         parent_message = await channel.fetch_message(parent_message_id)
         await parent_message.reply(content)
+    else:
+        await ctx.send(f"You are not authorised to run this command.")
+
+
+@client.command()
+async def dm(ctx, recipient: discord.Member, *, message=None):
+    await client.wait_until_ready()
+    if await checkUserIsBotDev(ctx):
+        if message != None:
+            await sendDM(recipient, content=message)
+        else:
+            greeting = random.choice(greetings)
+            await ctx.send(f"{greeting.capitalize()}, enter a valid message")
+    else:
+        await ctx.send(f"You are not authorised to run this command.")
+
+
+@client.command()
+async def dma(ctx, recipient: discord.Member, *, message=None):
+    await client.wait_until_ready()
+    if await checkUserIsBotDev(ctx):
+        if message != None:
+            await sendDM(recipient, content=message, mention=True)
+        else:
+            greeting = random.choice(greetings)
+            await ctx.send(f"{greeting.capitalize()}, enter a valid message")
     else:
         await ctx.send(f"You are not authorised to run this command.")
 
