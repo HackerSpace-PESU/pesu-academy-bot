@@ -476,12 +476,8 @@ async def gitpull(ctx):
 @client.command()
 async def restart(ctx):
     if RUNTIME_ENVIRONMENT == "OTHER" and await checkUserIsBotDev(ctx):
-        await gitpull(ctx)
         await ctx.send("Restarting bot...")
-        p = subprocess.Popen(["rm", "*.pdf"])
-        p = subprocess.Popen(["rm", "*.png"])
-        p = subprocess.Popen(["rm", "*.out"])
-        p = subprocess.Popen(['nohup', 'python3', 'src/bot.py'])
+        p = subprocess.Popen(["./start.sh"])
         sys.exit(0)
     else:
         await ctx.send("You are not authorised to run this command.")
