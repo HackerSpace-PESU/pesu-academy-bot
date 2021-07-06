@@ -352,16 +352,20 @@ async def on_message(ctx):
     elif ctx.guild == None:
         bot_log_channel = client.get_channel(CHANNEL_BOT_LOGS_2)
         if ctx.reference == None:
-            content = f"{ctx.author.mention} sent this message on DM: {ctx.content}"
+            content = f'''{ctx.author.mention} sent a message on DM:\n
+Message URL: {ctx.jump_url}
+Message: {ctx.content}'''
         else:
             parent_message_id = ctx.reference.message_id
             parent_message_channel_id = ctx.reference.channel_id
-            channel = client.get_channel(parent_message_channel_id)
+            channel = await client.fetch_channel(parent_message_channel_id)
             parent_message = await channel.fetch_message(parent_message_id)
             parent_message_content = parent_message.content
             parent_message_url = parent_message.jump_url
-            content = f'''{ctx.author.mention} replied to a message on DM
-Original Message: {parent_message_content}
+            content = f'''{ctx.author.mention} replied to a message on DM\n
+Original Message URL: {parent_message_url}
+Original Message: {parent_message_content}\n
+Reply URL: {ctx.jump_url}
 Reply: {ctx.content}'''
         await bot_log_channel.send(content)
     elif client.user.mentioned_in(ctx) and "@everyone" not in ctx.content and "@here" not in ctx.content and ctx.reference == None:
@@ -770,13 +774,11 @@ async def reply(ctx, *, query=None):
     parent_message_url = query.split()[0]
     _, content = query.split(parent_message_url)
     parent_message_url_components = parent_message_url.split('/')
-    server_id = int(parent_message_url_components[4])
     channel_id = int(parent_message_url_components[5])
     parent_message_id = int(parent_message_url_components[6])
 
     if await checkUserEchoReplyPermissions(ctx, channel_id):
-        server = client.get_guild(server_id)
-        channel = server.get_channel(channel_id)
+        channel = await client.fetch_channel(channel_id)
         parent_message = await channel.fetch_message(parent_message_id)
         await parent_message.reply(content)
     else:
@@ -815,6 +817,22 @@ async def dma(ctx, recipient, *, message=None):
         else:
             greeting = random.choice(greetings)[:-1]
             await ctx.send(f"{greeting.capitalize()}, enter a valid message and recipient")
+    else:
+        await ctx.send(f"You are not authorised to run this command.")
+
+
+@client.command()
+async def dmr(ctx, *, query=None):
+    await client.wait_until_ready()
+    if await checkUserIsBotDev(ctx):
+        parent_message_url = query.split()[0]
+        _, content = query.split(parent_message_url)
+        parent_message_url_components = parent_message_url.split('/')
+        channel_id = int(parent_message_url_components[5])
+        parent_message_id = int(parent_message_url_components[6])
+        channel = await client.fetch_channel(channel_id)
+        parent_message = await channel.fetch_message(parent_message_id)
+        await parent_message.reply(content)
     else:
         await ctx.send(f"You are not authorised to run this command.")
 
