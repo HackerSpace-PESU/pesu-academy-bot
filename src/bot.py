@@ -359,6 +359,7 @@ async def on_message(ctx):
             channel = client.get_channel(parent_message_channel_id)
             parent_message = await channel.fetch_message(parent_message_id)
             parent_message_content = parent_message.content
+            parent_message_url = parent_message.jump_url
             content = f'''{ctx.author.mention} replied to a message on DM
 Original Message: {parent_message_content}
 Reply: {ctx.content}'''
@@ -783,27 +784,37 @@ async def reply(ctx, *, query=None):
 
 
 @client.command()
-async def dm(ctx, recipient: discord.Member, *, message=None):
+async def dm(ctx, recipient=None, *, message=None):
     await client.wait_until_ready()
+    pattern = re.compile(r"^<@!\d+>")
     if await checkUserIsBotDev(ctx):
-        if message != None:
+        if message != None and recipient != None:
+            if re.match(pattern, recipient):
+                recipient = recipient[3:-1]
+            recipient_id = int(recipient)
+            recipient = await client.fetch_user(recipient_id)
             await sendDM(recipient, content=message)
         else:
             greeting = random.choice(greetings)[:-1]
-            await ctx.send(f"{greeting.capitalize()}, enter a valid message")
+            await ctx.send(f"{greeting.capitalize()}, enter a valid message and recipient")
     else:
         await ctx.send(f"You are not authorised to run this command.")
 
 
 @client.command()
-async def dma(ctx, recipient: discord.Member, *, message=None):
+async def dma(ctx, recipient, *, message=None):
     await client.wait_until_ready()
+    pattern = re.compile(r"^<@!\d+>")
     if await checkUserIsBotDev(ctx):
-        if message != None:
+        if message != None and recipient != None:
+            if re.match(pattern, recipient):
+                recipient = recipient[3:-1]
+            recipient_id = int(recipient)
+            recipient = await client.fetch_user(recipient_id)
             await sendDM(recipient, content=message, mention=True)
         else:
             greeting = random.choice(greetings)[:-1]
-            await ctx.send(f"{greeting.capitalize()}, enter a valid message")
+            await ctx.send(f"{greeting.capitalize()}, enter a valid message and recipient")
     else:
         await ctx.send(f"You are not authorised to run this command.")
 
@@ -1061,7 +1072,7 @@ Enter code here, do not add syntax highlighting
                     result = await executeCode(client_id, client_secret, script, language, inputs)
                     code_output = result.output.strip()
                     if not checkSpamCode(code_output):
-                        if len(code_output > 4000):
+                        if len(code_output) > 4000:
                             with open("output.txt", 'w') as f:
                                 f.write(code_output)
                             await ctx.reply(f"Script took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", file=discord.File("output.txt"))
