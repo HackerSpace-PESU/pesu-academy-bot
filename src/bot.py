@@ -349,7 +349,7 @@ async def on_guild_remove(guild):
 async def on_message(ctx):
     if ctx.author.bot:
         pass
-    elif ctx.guild == None:
+    elif ctx.guild == None and ctx.content[:4] != "pes.":
         bot_log_channel = client.get_channel(CHANNEL_BOT_LOGS_2)
         if ctx.reference == None:
             content = f'''{ctx.author.mention} sent a message on DM:\n
