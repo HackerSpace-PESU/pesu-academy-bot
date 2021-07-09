@@ -671,7 +671,7 @@ async def alerts(ctx, channel: discord.TextChannel = None):
     if channel == None:
         await ctx.send("Please mention the channel in which you would like to forward announcements.")
     else:
-        if await checkUserHasManageServerPermission(ctx):
+        if await checkUserHasManageServerPermission(ctx) or await checkUserIsBotDev(ctx):
             channel_id = str(channel.id)
             guild_id = str(ctx.guild.id)
             guild_name = str(ctx.guild.name)
@@ -694,7 +694,7 @@ async def removealerts(ctx, channel: discord.TextChannel = None):
     if channel == None:
         await ctx.send("Please mention the channel you would like to unsubscribe from alerts.")
     else:
-        if await checkUserHasManageServerPermission(ctx):
+        if await checkUserHasManageServerPermission(ctx) or await checkUserIsBotDev(ctx):
             channel_id = str(channel.id)
             guild_id = str(ctx.guild.id)
             if not checkServerChannelAndTypeExists(guild_id, channel_id, "publish"):
@@ -712,7 +712,7 @@ async def logs(ctx, channel: discord.TextChannel = None):
     if channel == None:
         await ctx.send("Please mention the channel in which you would like to forward logging information.")
     else:
-        if await checkUserHasManageServerPermission(ctx):
+        if await checkUserHasManageServerPermission(ctx) or await checkUserIsBotDev(ctx):
             channel_id = str(channel.id)
             guild_id = str(ctx.guild.id)
             guild_name = str(ctx.guild.name)
@@ -735,7 +735,7 @@ async def removelogs(ctx, channel: discord.TextChannel = None):
     if channel == None:
         await ctx.send("Please mention the channel you would like to unsubscribe from logging.")
     else:
-        if await checkUserHasManageServerPermission(ctx):
+        if await checkUserHasManageServerPermission(ctx) or await checkUserIsBotDev(ctx):
             channel_id = str(channel.id)
             guild_id = str(ctx.guild.id)
             if not checkServerChannelAndTypeExists(guild_id, channel_id, "log"):
@@ -1399,7 +1399,7 @@ async def checkInstagramPost():
             except Exception as error:
                 print(
                     f"Error while fetching Instagram post from {username}: {error}")
-            await asyncio.sleep(3)
+            await asyncio.sleep(1.5)
 
 
 @tasks.loop(minutes=55)
