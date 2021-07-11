@@ -1190,7 +1190,7 @@ async def syncfaculty(ctx):
 
 @client.command(aliases=["admitcard", "ht"])
 async def hallticket(ctx, srn=None, password=None):
-    if ctx.guild == None:
+    if ctx.guild == None or await checkUserIsBotDev(ctx):
         if srn == None or password == None:
             await ctx.send(f"Please enter a valid SRN/PRN and password.")
         else:
