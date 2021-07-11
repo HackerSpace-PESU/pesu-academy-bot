@@ -204,6 +204,33 @@ async def generateSpongebobMeme(query):
         outfile.write(response.content)
 
 
+async def getPESUHallTicket(chrome, username, password):
+    chrome.get("https://pesuacademy.com/Academy")
+    time.sleep(2)
+
+    username_box = chrome.find_element_by_xpath(r'//*[@id="j_scriptusername"]')
+    password_box = chrome.find_element_by_xpath(r'//*[@name="j_password"]')
+
+    username_box.send_keys(username)
+    time.sleep(0.3)
+    password_box.send_keys(password)
+    time.sleep(0.3)
+
+    sign_in_button = chrome.find_element_by_xpath(
+        r'//*[@id="postloginform#/Academy/j_spring_security_check"]')
+    sign_in_button.click()
+    time.sleep(1)
+
+    menu_options = chrome.find_elements_by_xpath(r'//*[@class="menu-name"]')
+    menu_options[12].click()
+    time.sleep(0.3)
+
+    download_button = chrome.find_element_by_xpath(
+        r'//*[@class="btn btn-default btn-sm"]')
+    download_button.click()
+    time.sleep(1)
+
+
 async def getPESUAnnouncements(chrome, username, password):
     chrome.get("https://pesuacademy.com/Academy")
     time.sleep(2)

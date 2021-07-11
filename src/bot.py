@@ -47,10 +47,12 @@ REDDIT_USER_AGENT = os.environ["REDDIT_USER_AGENT"]
 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--window-size=1920,1080")
 chrome_options.add_argument('--ignore-ssl-errors=yes')
 chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--allow-running-insecure-content')
 
 COMPILER_CLIENT_ID_1 = os.environ["COMPILER_CLIENT_ID_1"]
 COMPILER_CLIENT_SECRET_1 = os.environ["COMPILER_CLIENT_SECRET_1"]
@@ -94,7 +96,17 @@ async def setRuntimeEnvironment():
     print(f"Setting runtime environment as: {RUNTIME_ENVIRONMENT}")
 
 
-async def getChromedriver():
+async def getChromedriver(experimental=False):
+    if experimental:
+        chrome_options.add_experimental_option(
+            'prefs', {
+                "download.default_directory": os.getcwd(),
+                "download.prompt_for_download": False,
+                "download.directory_upgrade": True,
+                "plugins.always_open_pdf_externally": True
+            }
+        )
+
     if RUNTIME_ENVIRONMENT == "HEROKU":
         driver = webdriver.Chrome(
             executable_path=CHROMEDRIVER_PATH, options=chrome_options)
@@ -385,17 +397,23 @@ Reply: {ctx.content}'''
 
 @client.event
 async def on_command_error(ctx, error):
-    guild_id = str(ctx.guild.id)
     author = ctx.message.author
-    guild_logging_channels = getChannelFromServer(guild_id, "log")
-    if guild_logging_channels:
-        guild_logging_channels = [row[-1] for row in guild_logging_channels]
-        embed = discord.Embed(
-            color=discord.Color.blue(),
-            title="PESU Academy Bot - Command Error Log",
-            description=f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}"
-        )
-        await sendSpecificChannels(guild_logging_channels, embed=embed)
+    embed = discord.Embed(
+        color=discord.Color.blue(),
+        title="PESU Academy Bot - Command Error Log",
+    )
+    if ctx.guild != None:
+        guild_id = str(ctx.guild.id)
+        guild_logging_channels = getChannelFromServer(guild_id, "log")
+        if guild_logging_channels:
+            guild_logging_channels = [row[-1]
+                                      for row in guild_logging_channels]
+            embed.description = f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}"
+            await sendSpecificChannels(guild_logging_channels, embed=embed)
+    else:
+        embed.description = f"Error occured:\n{error}"
+        await ctx.send(embed=embed)
+
     embed = discord.Embed(
         color=discord.Color.blue(),
         title="PESU Academy Bot - Command Error",
@@ -868,6 +886,7 @@ async def help(ctx):
         '`pes.invite`': 'Obtain the invite link for PESU Academy Bot',
         '`pes.contribute`': 'Learn how to contribute to PESU Academy Bot',
         '`pes.reachout`': 'Send a message to the developer team',
+        '`pes.hallticket`': 'Obtain your hall ticket for an upcoming ESA using `pes.hallticket [SRN | PRN] [PASSWORD]. Remember to use this command in a private DM with the bot.`',
         '`pes.search`': 'To search the PESU Class and Section Database, use `pes.search [SRN | email]`',
         '`pes.pesdb`': 'Search the Student PESU Database using `pes.pesdb [search 1] & [search 2]`. String together as many filters as needed. You can also use emails and names.',
         '`pes.news`': 'Fetch PESU Announcements using `pes.news [OPTIONAL=today] [OPTIONAL=N]`. Get today\'s announcements with `pes.news today`. Fetch all announcements using `pes.news`. Specify the number of news using `N`.',
@@ -976,8 +995,11 @@ async def search(ctx, query):
 @client.command()
 async def pesdb(ctx, *, query):
     result, truncated, base_url = await getPESUDBResults(query)
-    if result == None:
-        await ctx.send("No results found.")
+    if not result:
+        embed = discord.Embed(title=f"Search Results",
+                              color=discord.Color.blue(),
+                              description="No results found")
+        await ctx.send(embed=embed)
     else:
         embed = discord.Embed(title=f"Search Results",
                               color=discord.Color.blue())
@@ -1164,6 +1186,33 @@ async def syncfaculty(ctx):
         await ctx.send("Faculty information has been synced")
     else:
         await ctx.send(f"You are not authorised to run this command.")
+
+
+@client.command(aliases=["admitcard", "ht"])
+async def hallticket(ctx, srn=None, password=None):
+    if ctx.guild == None:
+        if srn == None or password == None:
+            await ctx.send(f"Please enter a valid SRN/PRN and password.")
+        else:
+            srn = srn.upper()
+            result, _, _ = await getPESUDBResults(srn)
+            if not result:
+                await ctx.send("Invalid SRN/PRN. Please verify your credentials and try again.")
+            else:
+                prn = result[0][1]
+                driver = await getChromedriver(experimental=True)
+                try:
+                    await getPESUHallTicket(driver, srn, password)
+                    filename = f"AdmitCard_{prn}.pdf"
+                    if filename in os.listdir():
+                        await ctx.send(file=discord.File(filename))
+                    else:
+                        await ctx.send(f"Hall ticket not found,\nYour hall ticket may not have been generated yet. Please try again later.")
+                except Exception as error:
+                    await ctx.send(f'''Error while accessing hall ticket: Please verify your credentials or try again later.''')
+                driver.quit()
+    else:
+        await ctx.send("This command requires access to sensitive data. Please use this command in a DM with the bot.")
 
 
 async def getRedditEmbed(post):
