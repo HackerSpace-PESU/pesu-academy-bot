@@ -1,3 +1,4 @@
+from posix import listdir
 import re
 import os
 import sys
@@ -1205,10 +1206,12 @@ async def hallticket(ctx, srn=None, password=None):
                 try:
                     await getPESUHallTicket(driver, srn, password)
                     filename = f"AdmitCard_{prn}.pdf"
+                    print(os.listdir())
                     if filename in os.listdir():
                         await ctx.send(file=discord.File(filename))
                         os.remove(filename)
                     else:
+                        print(os.listdir())
                         await ctx.send(f"Hall ticket not found,\nYour hall ticket may not have been generated yet. Please try again later.")
                 except Exception:
                     await ctx.send(f'''Error while accessing hall ticket: Please verify your credentials or try again later.''')
