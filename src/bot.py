@@ -303,14 +303,14 @@ async def on_ready():
     if not changeStatus.is_running():
         changeStatus.start()
 
-    #if not checkInstagramPost.is_running():
-    #    checkInstagramPost.start()
+    if not checkInstagramPost.is_running():
+        checkInstagramPost.start()
 
     if not checkRedditPost.is_running():
         checkRedditPost.start()
 
-    #if not checkPESUAnnouncement.is_running():
-    #    checkPESUAnnouncement.start()
+    if not checkPESUAnnouncement.is_running():
+        checkPESUAnnouncement.start()
 
 
 @client.event
@@ -1206,12 +1206,10 @@ async def hallticket(ctx, srn=None, password=None):
                 try:
                     await getPESUHallTicket(driver, srn, password)
                     filename = f"AdmitCard_{prn}.pdf"
-                    print(os.listdir())
                     if filename in os.listdir():
                         await ctx.send(file=discord.File(filename))
                         os.remove(filename)
                     else:
-                        print(os.listdir())
                         await ctx.send(f"Hall ticket not found,\nYour hall ticket may not have been generated yet. Please try again later.")
                 except Exception:
                     await ctx.send(f'''Error while accessing hall ticket: Please verify your credentials or try again later.''')

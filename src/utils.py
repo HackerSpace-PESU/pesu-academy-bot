@@ -228,7 +228,7 @@ async def getPESUHallTicket(chrome, username, password):
     download_button = chrome.find_element_by_xpath(
         r'//*[@class="btn btn-default btn-sm"]')
     download_button.click()
-    time.sleep(2)
+    time.sleep(3)
 
 
 async def getPESUAnnouncements(chrome, username, password):
