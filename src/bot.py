@@ -287,7 +287,6 @@ async def on_ready():
     '''
     print("Bot is online")
 
-    await client.change_presence(activity=discord.Game(next(status)))
     await syncGuildDatabase()
     await syncTaskStatusDatabase()
     await syncFacultyInformation()
@@ -1200,15 +1199,18 @@ async def hallticket(ctx, srn=None, password=None):
                 await ctx.send("Invalid SRN/PRN. Please verify your credentials and try again.")
             else:
                 prn = result[0][1]
+                name = result[0][2]
+                await ctx.send(f"Looking for {name}'s hall ticket...")
                 driver = await getChromedriver(experimental=True)
                 try:
                     await getPESUHallTicket(driver, srn, password)
                     filename = f"AdmitCard_{prn}.pdf"
                     if filename in os.listdir():
                         await ctx.send(file=discord.File(filename))
+                        os.remove(filename)
                     else:
                         await ctx.send(f"Hall ticket not found,\nYour hall ticket may not have been generated yet. Please try again later.")
-                except Exception as error:
+                except Exception:
                     await ctx.send(f'''Error while accessing hall ticket: Please verify your credentials or try again later.''')
                 driver.quit()
     else:
