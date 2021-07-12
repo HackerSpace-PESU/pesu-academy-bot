@@ -98,8 +98,10 @@ async def setRuntimeEnvironment():
 
 
 async def getChromedriver(experimental=False):
+    global chrome_options
+    new_chrome_options = chrome_options
     if experimental:
-        chrome_options.add_experimental_option(
+        new_chrome_options.add_experimental_option(
             'prefs', {
                 "download.default_directory": os.getcwd(),
                 "download.prompt_for_download": False,
@@ -110,9 +112,9 @@ async def getChromedriver(experimental=False):
 
     if RUNTIME_ENVIRONMENT == "HEROKU":
         driver = webdriver.Chrome(
-            executable_path=CHROMEDRIVER_PATH, options=chrome_options)
+            executable_path=CHROMEDRIVER_PATH, options=new_chrome_options)
     else:
-        driver = webdriver.Chrome(options=chrome_options)
+        driver = webdriver.Chrome(options=new_chrome_options)
     return driver
 
 
@@ -287,12 +289,12 @@ async def on_ready():
     Initialising bot after boot
     '''
     print("Bot is online")
+    await client.change_presence(activity=discord.Game(next(status)))
 
     await syncGuildDatabase()
     await syncTaskStatusDatabase()
     await syncFacultyInformation()
     await setRuntimeEnvironment()
-    await subscriptionReminder()
 
     for client_id, client_secret in compiler_keys.keys():
         compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
@@ -1550,7 +1552,7 @@ async def checkPESUAnnouncement():
         driver.quit()
 
 
-@tasks.loop(minutes=20)
+@tasks.loop(minutes=35)
 async def checkNewDay():
     global TODAY_ANNOUNCEMENTS_MADE
     global ALL_ANNOUNCEMENTS_MADE
