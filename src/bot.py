@@ -391,9 +391,9 @@ Reply: {ctx.content}'''
         )
         await ctx.channel.send(f"{ctx.author.mention}", embed=embed)
     else:
-        if "pride" in ctx.content.lower() and ctx.content != "pes.pride":
+        if "pride" in ctx.content.lower() and ctx.content[:9] != "pes.pride":
             await ctx.reply("Invoking the PRIDE of PESU!", mention_author=False)
-            await ctx.channel.send("https://tenor.com/view/pes-pesuniversity-pesu-may-the-pride-of-pes-may-the-pride-of-pes-be-with-you-gif-21274060")
+            await ctx.channel.send("https://media.discordapp.net/attachments/742995787700502565/834782280236662827/Sequence_01_1.gif")
         await client.process_commands(ctx)
 
 
@@ -863,7 +863,7 @@ async def prideofpesu(ctx):
     embed = discord.Embed(
         title=f"{greeting}, may the PRIDE of PESU be with you!", color=discord.Color.blue())
     await ctx.send(embed=embed)
-    await ctx.send("https://tenor.com/view/pes-pesuniversity-pesu-may-the-pride-of-pes-may-the-pride-of-pes-be-with-you-gif-21274060")
+    await ctx.send("https://media.discordapp.net/attachments/742995787700502565/834782280236662827/Sequence_01_1.gif")
 
 
 @client.command()
