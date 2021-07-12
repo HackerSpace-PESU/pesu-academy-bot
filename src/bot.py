@@ -391,7 +391,7 @@ Reply: {ctx.content}'''
         )
         await ctx.channel.send(f"{ctx.author.mention}", embed=embed)
     else:
-        if "pride" in ctx.content.lower():
+        if "pride" in ctx.content.lower() and ctx.content != "pes.pride":
             await ctx.reply("Invoking the PRIDE of PESU!", mention_author=False)
             await ctx.channel.send("https://tenor.com/view/pes-pesuniversity-pesu-may-the-pride-of-pes-may-the-pride-of-pes-be-with-you-gif-21274060")
         await client.process_commands(ctx)
