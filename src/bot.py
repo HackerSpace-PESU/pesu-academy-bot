@@ -1468,7 +1468,7 @@ async def checkRedditPost():
             current_time = datetime.datetime.now()
             print(post_time, current_time)
             time_difference = current_time - post_time
-            print(time_difference)
+            print(time_difference, time_difference.days, time_difference.seconds)
             if time_difference.seconds <= 3300 and time_difference.days == 0:
                 post_embed = await getRedditEmbed(latest_reddit_post)
                 await sendAllChannels(message_type="publish", embed=post_embed)
