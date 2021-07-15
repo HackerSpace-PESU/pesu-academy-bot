@@ -282,6 +282,12 @@ async def syncFacultyInformation():
     initialiseFacultyFilters()
 
 
+async def syncAPICallLimits():
+    global compiler_keys
+    for client_id, client_secret in compiler_keys.keys():
+        compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
+
+
 @client.event
 async def on_ready():
     '''
