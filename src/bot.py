@@ -308,11 +308,11 @@ async def on_ready():
     if not changeStatus.is_running():
         changeStatus.start()
 
-    if not checkInstagramPost.is_running():
-        checkInstagramPost.start()
-
     if not checkRedditPost.is_running():
         checkRedditPost.start()
+
+    if not checkInstagramPost.is_running():
+        checkInstagramPost.start()
 
     if not checkPESUAnnouncement.is_running():
         checkPESUAnnouncement.start()
