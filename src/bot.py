@@ -1257,9 +1257,7 @@ async def reddit(ctx, subreddit="PESU", n=5):
 async def getInstagramEmbed(username):
     html = getInstagramHTML(username)
     photo_time = getLastPhotoDate(html)
-    instagram_embed_colours = [0xcd486b, 0xfbad50,
-                               0xfccc63, 0xbc2a8d, 0xe95950, 0x8a3ab9, 0x4c68d7]
-    embed_colour = random.choice(instagram_embed_colours)
+    embed_colour = next(instagram_embed_colours)
     post_embed = discord.Embed(
         title=f'Instagram Post from {username}', url=getPostLink(html), color=embed_colour)
     if(checkVideo(html)):

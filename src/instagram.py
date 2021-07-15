@@ -1,4 +1,15 @@
 import requests
+from itertools import cycle
+
+instagram_embed_colours = cycle([
+    0xcd486b,
+    0xfbad50,
+    0xfccc63,
+    0xbc2a8d,
+    0xe95950,
+    0x8a3ab9,
+    0x4c68d7
+])
 
 
 def getLastPhotoDate(html):
