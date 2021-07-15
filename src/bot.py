@@ -300,9 +300,7 @@ async def on_ready():
     await syncTaskStatusDatabase()
     await syncFacultyInformation()
     await setRuntimeEnvironment()
-
-    for client_id, client_secret in compiler_keys.keys():
-        compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
+    await syncAPICallLimits()
 
     if not checkNewDay.is_running():
         checkNewDay.start()
