@@ -433,7 +433,7 @@ async def on_guild_channel_delete(channel):
     removeChannel(channel_id)
 
 
-@client.command()
+@client.command(aliases=["ls"])
 async def files(ctx):
     if await checkUserIsBotDev(ctx):
         present_files = '\n'.join(os.listdir())
@@ -1465,12 +1465,6 @@ async def nohup(ctx, lines=None):
             await ctx.send("Logging file `nohup.out` not found.")
     else:
         await ctx.send("You are not authorised to run this command.")
-
-
-@client.command()
-async def updatenews(ctx):
-    await checkPESUAnnouncement()
-    await ctx.send("Updated PESU Announcements.")
 
 
 @tasks.loop(minutes=32)
