@@ -434,6 +434,16 @@ async def on_guild_channel_delete(channel):
 
 
 @client.command()
+async def clean(ctx):
+    if await checkUserIsBotDev(ctx):
+        await cleanUp()
+        present_files = '\n'.join(os.listdir())
+        await ctx.send(f"Directory clean-up completed.\n\nFiles in directory:\n{present_files}")
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
 async def remind(ctx):
     if await checkUserIsBotDev(ctx):
         await subscriptionReminder()

@@ -15,30 +15,6 @@ from faculty import *
 from pydictionary import *
 from instagram import *
 
-instagram_usernames = ['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc',
-                       'acmw.pesu', 'aikya_pesu',
-                       'apostrophe.pesuecc', 'ayra_the.helping.hand_pesu',
-                       'blueprint_pesuecc', 'c.o.d.s_community', 'c.o.d.s_pesu_ecc',
-                       'c.o.d.s_pesu_rr', 'cie.pesu', 'clubs_pesuecc', 'codechef_pesuecc',
-                       'csr.pesu', 'dscpesu.ec', 'dscpesu.rr', 'dsgnr_pesu',
-                       'dsgnr_pesuecc', 'entrepreneurshipclub.pes', 'equinox.pes', 'equinox.pesecc',
-                       'grimmreaders_pesu', 'hayaracing', 'humans_of_pes', 'humans_of_pesu',
-                       'ieee.ras.pesu', 'ieee.ras.pesuecc', 'ieee_pes_sscs_photonics', 'ieeepesit',
-                       'ingeniushackathon', 'kludge_pesu', 'linguista.club',
-                       'maayapesu', 'mangobites.pesu', 'munsoc.pesecc', 'newolfsociety',
-                       'ninaada.pesu', 'parallax_techwarts', 'pes.epsilon', 'pes.lab', 'pes.opensource',
-                       'pes.qforest', 'pes.spacejam', 'pes_ecell', 'pesdebsoc',
-                       'peshackerspace', 'peshackerspace.ecc', 'pesmunsociety', 'pesu.gdc',
-                       'pesu.hashtagcrew', 'pesu.io', 'pesu.tas',
-                       'pesu_covid_support', 'pesu_nirantara', 'pesuniversity', 'pixelloid_pes',
-                       'pixels.pesu', 'quotientquizclub', 'rc_pesu3190', 'saarang_official',
-                       'samarpana.india', 'shakennotstirred.pes', 'swarantraka.pes', 'team.encore',
-                       'team_aeolus', 'teamsanskrithi', 'techplussocialgoodpesu', 'tedxpesu',
-                       'tedxpesuecc', 'tensor.pesu', 'the_changemakers_society', 'the_clefhangers',
-                       'thealcodingclub', 'thebisibelebois', 'themusicclubpesu', 'thenautankiteam',
-                       'thor_pesu', 'throughthelens.pesu', 'trance_pes', 'under25pes', 'under25pesuecc',
-                       'vegaracingelectric', 'writeangle.pesu', 'zeroday.pesuecc']
-
 
 async def checkRuntimeEnvironmentHeroku():
     home_dir = os.path.expanduser("~")
@@ -48,16 +24,13 @@ async def checkRuntimeEnvironmentHeroku():
 
 
 async def cleanUp():
-    files = [
-        fname for fname in os.listdir()
-        if Path(fname).suffix in [".pdf", ".png", ".jpg", ".jpeg", ".doc", ".docx", "*.crdownload", "*.out", "*.txt"]
-        and fname not in ["nohup.out", "nltk.txt"]
-    ]
-    for fname in files:
-        try:
-            os.remove(fname)
-        except FileNotFoundError:
-            pass
+    for fname in os.listdir():
+        if Path(fname).suffix in [".pdf", ".png", ".jpg", ".jpeg", ".doc", ".docx", ".crdownload", ".out", ".txt"] and fname not in ["nltk.txt", "nohup.out"]:
+            print(f"Deleting {fname}...")
+            try:
+                os.remove(fname)
+            except FileNotFoundError:
+                print(f"File missing and could not be deleted: {fname}")
 
 
 async def getDictionaryMeaning(query, n=5):
@@ -318,7 +291,8 @@ async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOK
             post_data["title"] = post.title
             post_data["content"] = post.selftext
             post_data["url"] = f"https://reddit.com{post.permalink}"
-            post_data["create_time"] = datetime.datetime.fromtimestamp(post.created_utc)
+            post_data["create_time"] = datetime.datetime.fromtimestamp(
+                post.created_utc)
             post_data["author"] = post.author.name
             post_data["images"] = list()
 
