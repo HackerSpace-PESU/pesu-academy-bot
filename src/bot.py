@@ -1467,9 +1467,11 @@ async def checkRedditPost():
         reddit_posts = await getRedditPosts("PESU", REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
         if reddit_posts:
             latest_reddit_post = reddit_posts[0]
+            print(latest_reddit_post)
             post_time = latest_reddit_post["create_time"]
             current_time = datetime.datetime.now()
             time_difference = current_time - post_time
+            print(time_difference, time_difference.seconds, time_difference.days)
             if time_difference.seconds <= 3300 and time_difference.days == 0:
                 post_embed = await getRedditEmbed(latest_reddit_post)
                 await sendAllChannels(message_type="publish", embed=post_embed)
