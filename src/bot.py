@@ -434,11 +434,23 @@ async def on_guild_channel_delete(channel):
 
 
 @client.command()
+async def files(ctx):
+    if await checkUserIsBotDev(ctx):
+        present_files = '\n'.join(os.listdir())
+        with open("files.txt", 'w') as f:
+            f.write(present_files)
+        await ctx.send(f"Files in directory:", file=discord.File("files.txt"))
+        os.remove("files.txt")
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command(aliases=["cleanup", "wipe"])
 async def clean(ctx):
     if await checkUserIsBotDev(ctx):
         await cleanUp()
-        present_files = '\n'.join(os.listdir())
-        await ctx.send(f"Directory clean-up completed.\n\nFiles in directory:\n{present_files}")
+        await ctx.send(f"Directory clean-up completed.")
+        await files(ctx)
     else:
         await ctx.send("You are not authorised to run this command.")
 
@@ -1453,6 +1465,12 @@ async def nohup(ctx, lines=None):
             await ctx.send("Logging file `nohup.out` not found.")
     else:
         await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
+async def updatenews(ctx):
+    await checkPESUAnnouncement()
+    await ctx.send("Updated PESU Announcements.")
 
 
 @tasks.loop(minutes=32)

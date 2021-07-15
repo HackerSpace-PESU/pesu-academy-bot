@@ -24,9 +24,9 @@ async def checkRuntimeEnvironmentHeroku():
 
 
 async def cleanUp():
+    print("Starting clean-up...")
     for fname in os.listdir():
-        if Path(fname).suffix in [".pdf", ".png", ".jpg", ".jpeg", ".doc", ".docx", ".crdownload", ".out", ".txt"] and fname not in ["nltk.txt", "nohup.out"]:
-            print(f"Deleting {fname}...")
+        if Path(fname).suffix in [".pdf", ".png", ".jpg", ".jpeg", ".doc", ".docx", ".crdownload", ".out", ".txt"] and fname not in ["nltk.txt", "nohup.out", "requirements.txt"]:
             try:
                 os.remove(fname)
             except FileNotFoundError:
