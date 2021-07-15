@@ -304,19 +304,15 @@ async def on_ready():
 
     if not checkNewDay.is_running():
         checkNewDay.start()
-        time.sleep(0.5)
 
     if not changeStatus.is_running():
         changeStatus.start()
-        time.sleep(0.5)
 
     if not checkRedditPost.is_running():
         checkRedditPost.start()
-        time.sleep(0.5)
 
     if not checkInstagramPost.is_running():
         checkInstagramPost.start()
-        time.sleep(0.5)
 
     if not checkPESUAnnouncement.is_running():
         checkPESUAnnouncement.start()
@@ -1127,7 +1123,7 @@ Enter code here, do not add syntax highlighting
                             await ctx.reply(f"Script took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", file=discord.File("output.txt"))
                             os.remove("output.txt")
                         else:
-                            await ctx.reply(f"{code_output}\nScript took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", mention_author=False)
+                            await ctx.reply(f"```\n{code_output}```\nScript took {result.cpuTime} seconds to execute and consumed {result.memory} kilobyte(s)", mention_author=False)
                     else:
                         greeting = random.choice(greetings)[:-1]
                         await ctx.reply(f"Aye {greeting}, you may be smart but I am smarter. No pinging `@everyone` or `@here` with the bot.")
