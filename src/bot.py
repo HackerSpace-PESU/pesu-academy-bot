@@ -524,6 +524,8 @@ async def restart(ctx):
 @client.command()
 async def shutdown(ctx):
     if RUNTIME_ENVIRONMENT == "OTHER" and await checkUserIsBotDev(ctx):
+        greeting = random.choice(greetings)
+        await ctx.send(f"Goodbye {greeting}! 👋")
         sys.exit(0)
     else:
         await ctx.send("You are not authorised to run this command.")
