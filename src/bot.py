@@ -7,7 +7,7 @@ import asyncio
 import discord
 import subprocess
 from itertools import cycle
-from datetime import datetime
+import datetime
 from dotenv import load_dotenv
 from selenium import webdriver
 from discord.ext import commands, tasks
@@ -1271,7 +1271,7 @@ async def getInstagramEmbed(username):
         else:
             post_embed.add_field(
                 name="\u200b", value=post_caption, inline=False)
-    post_embed.set_footer(text=datetime.fromtimestamp(photo_time))
+    post_embed.set_footer(text=datetime.datetime.fromtimestamp(photo_time))
     return post_embed, photo_time
 
 
@@ -1465,7 +1465,7 @@ async def checkRedditPost():
             latest_reddit_post = reddit_posts[0]
             print(latest_reddit_post)
             post_time = latest_reddit_post["create_time"]
-            current_time = datetime.now()
+            current_time = datetime.datetime.now()
             print(post_time, current_time)
             time_difference = current_time - post_time
             print(time_difference)
@@ -1494,7 +1494,7 @@ async def checkPESUAnnouncement():
         print(f"NEW announcements found: {new_announcement_count}")
 
         ALL_ANNOUNCEMENTS_MADE.sort(key=lambda x: x["date"], reverse=True)
-        current_date = datetime.now().date()
+        current_date = datetime.datetime.now().date()
         db_records = getCompleteGuildDatabase()
         for announcement in all_announcements:
             if announcement["date"] == current_date:
@@ -1560,7 +1560,7 @@ async def checkNewDay():
     global ALL_ANNOUNCEMENTS_MADE
     await client.wait_until_ready()
 
-    current_time = datetime.now()
+    current_time = datetime.datetime.now()
     if current_time.hour == 0:
         TODAY_ANNOUNCEMENTS_MADE = list()
         ALL_ANNOUNCEMENTS_MADE = list()

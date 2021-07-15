@@ -7,7 +7,7 @@ from asyncprawcore.exceptions import RequestException
 import requests
 import pydoodle
 from pathlib import Path
-from datetime import datetime
+import datetime
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from db import *
@@ -264,7 +264,7 @@ async def getPESUAnnouncements(chrome, username, password):
 
         date_box = a_box.find_element_by_xpath(
             r'.//*[@class="text-muted text-date pull-right"]')
-        date = datetime.strptime(date_box.text, "%d-%B-%Y").date()
+        date = datetime.datetime.strptime(date_box.text, "%d-%B-%Y").date()
 
         bodies = a_box.find_elements_by_xpath(r'.//*[@class="col-md-12"]')
         all_attachments = list()
@@ -318,7 +318,7 @@ async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOK
             post_data["title"] = post.title
             post_data["content"] = post.selftext
             post_data["url"] = f"https://reddit.com{post.permalink}"
-            post_data["create_time"] = datetime.fromtimestamp(post.created)
+            post_data["create_time"] = datetime.datetime.fromtimestamp(post.created_utc)
             post_data["author"] = post.author.name
             post_data["images"] = list()
 
