@@ -304,18 +304,22 @@ async def on_ready():
 
     if not checkNewDay.is_running():
         checkNewDay.start()
+        time.sleep(0.3)
 
     if not changeStatus.is_running():
         changeStatus.start()
+        time.sleep(0.3)
 
     if not checkRedditPost.is_running():
         checkRedditPost.start()
+        time.sleep(0.3)
 
-    '''if not checkInstagramPost.is_running():
+    if not checkInstagramPost.is_running():
         checkInstagramPost.start()
+        time.sleep(0.3)
 
     if not checkPESUAnnouncement.is_running():
-        checkPESUAnnouncement.start()'''
+        checkPESUAnnouncement.start()
 
 
 @client.event
