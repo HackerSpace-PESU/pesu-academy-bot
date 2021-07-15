@@ -311,11 +311,11 @@ async def on_ready():
     if not checkRedditPost.is_running():
         checkRedditPost.start()
 
-    if not checkInstagramPost.is_running():
+    '''if not checkInstagramPost.is_running():
         checkInstagramPost.start()
 
     if not checkPESUAnnouncement.is_running():
-        checkPESUAnnouncement.start()
+        checkPESUAnnouncement.start()'''
 
 
 @client.event
