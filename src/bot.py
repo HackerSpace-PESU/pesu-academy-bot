@@ -1223,9 +1223,9 @@ async def hallticket(ctx, srn=None, password=None):
         await ctx.send("This command requires access to sensitive data. Please use this command in a DM with the bot.")
 
 
-async def getRedditEmbed(post):
-    embed = discord.Embed(title="New Reddit Post",
-                          url=post["url"], color=discord.Color.blue())
+async def getRedditEmbed(post, subreddit="PESU"):
+    embed = discord.Embed(title=f"Reddit Post from r/{subreddit}",
+                          url=post["url"], color=0xff6314)
     if post["content"]:
         if len(post["content"]) > 1024:
             embed.add_field(
@@ -1246,7 +1246,7 @@ async def reddit(ctx, subreddit="PESU", n=5):
         reddit_posts = await getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n)
         if reddit_posts:
             for p in reddit_posts:
-                embed = await getRedditEmbed(p)
+                embed = await getRedditEmbed(p, subreddit)
                 await ctx.send(embed=embed)
         else:
             await ctx.send("No posts found. Please ensure that the subreddit exists and it is not NSFW.")
@@ -1257,8 +1257,11 @@ async def reddit(ctx, subreddit="PESU", n=5):
 async def getInstagramEmbed(username):
     html = getInstagramHTML(username)
     photo_time = getLastPhotoDate(html)
+    instagram_embed_colours = [0xcd486b, 0xfbad50,
+                               0xfccc63, 0xbc2a8d, 0xe95950, 0x8a3ab9, 0x4c68d7]
+    embed_colour = random.choice(instagram_embed_colours)
     post_embed = discord.Embed(
-        title=f'Instagram Post from {username}', url=getPostLink(html), color=discord.Color.blue())
+        title=f'Instagram Post from {username}', url=getPostLink(html), color=embed_colour)
     if(checkVideo(html)):
         post_embed.set_image(url=getVideoURL(html))
     else:
