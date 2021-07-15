@@ -1,4 +1,3 @@
-from posix import listdir
 import re
 import os
 import sys
@@ -291,28 +290,28 @@ async def on_ready():
     print("Bot is online")
     await client.change_presence(activity=discord.Game(next(status)))
 
-    await syncGuildDatabase()
+    #await syncGuildDatabase()
     await syncTaskStatusDatabase()
-    await syncFacultyInformation()
-    await setRuntimeEnvironment()
+    #await syncFacultyInformation()
+    #await setRuntimeEnvironment()
 
-    for client_id, client_secret in compiler_keys.keys():
-        compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
+    #for client_id, client_secret in compiler_keys.keys():
+    #    compiler_keys[(client_id, client_secret)] = await updateCodeAPICallLimits(client_id, client_secret)
 
-    if not checkNewDay.is_running():
+    '''if not checkNewDay.is_running():
         checkNewDay.start()
 
     if not changeStatus.is_running():
         changeStatus.start()
 
     if not checkInstagramPost.is_running():
-        checkInstagramPost.start()
+        checkInstagramPost.start()'''
 
     if not checkRedditPost.is_running():
         checkRedditPost.start()
 
-    if not checkPESUAnnouncement.is_running():
-        checkPESUAnnouncement.start()
+    '''if not checkPESUAnnouncement.is_running():
+        checkPESUAnnouncement.start()'''
 
 
 @client.event
@@ -1464,9 +1463,12 @@ async def checkRedditPost():
         reddit_posts = await getRedditPosts("PESU", REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT)
         if reddit_posts:
             latest_reddit_post = reddit_posts[0]
+            print(latest_reddit_post)
             post_time = latest_reddit_post["create_time"]
             current_time = datetime.now()
+            print(post_time, current_time)
             time_difference = current_time - post_time
+            print(time_difference)
             if time_difference.seconds <= 3300 and time_difference.days == 0:
                 post_embed = await getRedditEmbed(latest_reddit_post)
                 await sendAllChannels(message_type="publish", embed=post_embed)
