@@ -1500,7 +1500,7 @@ async def checkRedditPost():
                 await sendAllChannels(message_type="publish", embed=post_embed)
 
 
-@tasks.loop(minutes=5)
+@tasks.loop(minutes=10)
 async def checkPESUAnnouncement():
     global TODAY_ANNOUNCEMENTS_MADE
     global ALL_ANNOUNCEMENTS_MADE
