@@ -296,7 +296,7 @@ async def on_ready():
     print("Bot is online")
     await client.change_presence(activity=discord.Game(next(status)))
 
-    await syncGuildDatabase()
+    '''await syncGuildDatabase()
     await syncTaskStatusDatabase()
     await syncFacultyInformation()
     await setRuntimeEnvironment()
@@ -315,7 +315,7 @@ async def on_ready():
         checkInstagramPost.start()
 
     if not checkPESUAnnouncement.is_running():
-        checkPESUAnnouncement.start()
+        checkPESUAnnouncement.start()'''
 
 
 @client.event
@@ -401,6 +401,14 @@ Reply: {ctx.content}'''
 
 
 @client.event
+async def on_message_edit(message_before, message_after):
+    edited_content = message_after.content
+    if "pride" in edited_content.lower():
+        await message_before.reply("You cannot escape the PRIDE of PESU!", mention_author=False)
+        await message_after.channel.send("https://media.discordapp.net/attachments/742995787700502565/834782280236662827/Sequence_01_1.gif")
+
+
+'''@client.event
 async def on_command_error(ctx, error):
     author = ctx.message.author
     embed = discord.Embed(
@@ -424,7 +432,7 @@ async def on_command_error(ctx, error):
         title="PESU Academy Bot - Command Error",
         description="Incorrect command. Please type `pes.help` to view all commands."
     )
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed)'''
 
 
 @client.event
