@@ -408,7 +408,7 @@ async def on_message_edit(message_before, message_after):
         await message_after.channel.send("https://media.discordapp.net/attachments/742995787700502565/834782280236662827/Sequence_01_1.gif")
 
 
-'''@client.event
+@client.event
 async def on_command_error(ctx, error):
     author = ctx.message.author
     embed = discord.Embed(
@@ -432,7 +432,7 @@ async def on_command_error(ctx, error):
         title="PESU Academy Bot - Command Error",
         description="Incorrect command. Please type `pes.help` to view all commands."
     )
-    await ctx.send(embed=embed)'''
+    await ctx.send(embed=embed)
 
 
 @client.event
