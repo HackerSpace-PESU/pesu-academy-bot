@@ -296,7 +296,7 @@ async def on_ready():
     print("Bot is online")
     await client.change_presence(activity=discord.Game(next(status)))
 
-    '''await syncGuildDatabase()
+    await syncGuildDatabase()
     await syncTaskStatusDatabase()
     await syncFacultyInformation()
     await setRuntimeEnvironment()
@@ -315,7 +315,7 @@ async def on_ready():
         checkInstagramPost.start()
 
     if not checkPESUAnnouncement.is_running():
-        checkPESUAnnouncement.start()'''
+        checkPESUAnnouncement.start()
 
 
 @client.event
