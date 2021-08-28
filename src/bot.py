@@ -552,6 +552,16 @@ async def shutdown(ctx):
 
 
 @client.command()
+async def fixpesdb(ctx):
+    if await checkUserIsBotDev(ctx):
+        await ctx.send("Fixing PESU Academy database...")
+        fixPESUDB()
+        await ctx.send("Database fix completed. Restart is required to activate changes.")
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command()
 async def invite(ctx):
     embed = discord.Embed(title="Invite PESU Academy Bot to your Discord Server", url="http://bit.ly/pesu-academy-bot",
                           description="Use the following link: http://bit.ly/pesu-academy-bot", color=discord.Color.blue())

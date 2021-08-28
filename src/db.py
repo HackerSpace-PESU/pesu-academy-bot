@@ -210,6 +210,11 @@ def searchPESUDatabase(filters):
         return listResult, truncated
 
 
+def fixPESUDB():
+    transaction = pesudb_connection.begin()
+    transaction.rollback()
+
+
 def addGuild(guild_id, guild_name, channel_id=None, channel_type=None):
     query = guilddb_table.insert().values(guild_id=guild_id, guild_name=guild_name,
                                           channel_id=channel_id, channel_type=channel_type)
