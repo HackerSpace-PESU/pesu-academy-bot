@@ -521,7 +521,7 @@ async def gitpull(ctx):
     if RUNTIME_ENVIRONMENT == "OTHER" and await checkUserIsBotDev(ctx):
         sys.stdout.flush()
         await ctx.send("Pulling changes from repository..")
-        p = subprocess.Popen(['git', 'pull'], stdout=subprocess.PIPE)
+        p = subprocess.Popen(['sudo', 'git', 'pull'], stdout=subprocess.PIPE)
         for line in iter(p.stdout.readline, ''):
             if not line:
                 break
