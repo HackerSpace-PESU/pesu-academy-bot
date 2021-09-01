@@ -1499,6 +1499,7 @@ async def fakeResults(ctx, SRN):
             GPA_value = FAKE_RESULTS[author_id]
         else:
             GPA_value = round(10 * random.random(), 2)
+            FAKE_RESULTS[author_id] = GPA_value
         results = discord.Embed(title="Results", color=0x00FF00)
         results.add_field(name="SRN", value=SRN)
         results.add_field(name="SGPA", value=GPA_value)
