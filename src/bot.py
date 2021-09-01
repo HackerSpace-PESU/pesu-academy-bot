@@ -1492,9 +1492,7 @@ async def fakeResults(ctx, SRN):
     global FAKE_RESULTS
     author_id = ctx.message.author.id
     srn_length = len(SRN.strip())
-    if srn_length != re.match(r"PES[12]20(18|19|20)0[0-9]{4}", SRN).span()[1] or srn_length != re.match(r"PES[12]UG(18|19|20)CS[0-9]{3}", SRN).span()[1]:
-        await ctx.send("Invalid SRN")
-    else:
+    if re.match(r"PES[12]20(18|19|20)0[0-9]{4}", SRN) != None or re.match(r"PES[12]UG(18|19|20)CS[0-9]{3}", SRN) != None:
         if author_id in FAKE_RESULTS:
             GPA_value = FAKE_RESULTS[author_id]
         else:
@@ -1504,6 +1502,8 @@ async def fakeResults(ctx, SRN):
         results.add_field(name="SRN", value=SRN)
         results.add_field(name="SGPA", value=GPA_value)
         await ctx.send(embed=results)
+    else:
+        await ctx.send("Invalid SRN")
 
 
 @tasks.loop(minutes=32)
