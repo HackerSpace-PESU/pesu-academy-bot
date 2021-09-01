@@ -82,6 +82,8 @@ TASK_FLAG_REDDIT = False
 TASK_FLAG_INSTAGRAM = False
 TASK_FLAG_MAP = {"on": True, "off": False}
 
+FAKE_RESULTS = dict()
+
 
 async def setRuntimeEnvironment():
     global RUNTIME_ENVIRONMENT
@@ -1484,14 +1486,25 @@ async def nohup(ctx, lines=None):
     else:
         await ctx.send("You are not authorised to run this command.")
 
-@client.command(aliases = ['results'])
+
+@client.command(aliases=['results'])
 async def fakeResults(ctx, SRN):
-    rand = round(10 * random.random(), 2)
-    results = discord.Embed(title="Results", color=0x00FF00)
-    results.add_field(name = "SRN", value = SRN)
-    results.add_field(name = "GPA", value = rand)
-    await ctx.send(embed = results)
-    
+    global FAKE_RESULTS
+    author_id = ctx.message.author.id
+    srn_length = len(SRN.strip())
+    if srn_length != re.match(r"PES[12]20(18|19|20)0[0-9]{4}", SRN).span()[1] or srn_length != re.match(r"PES[12]UG(18|19|20)CS[0-9]{3}", SRN).span()[1]:
+        await ctx.send("Invalid SRN")
+    else:
+        if author_id in FAKE_RESULTS:
+            GPA_value = FAKE_RESULTS[author_id]
+        else:
+            GPA_value = round(10 * random.random(), 2)
+        results = discord.Embed(title="Results", color=0x00FF00)
+        results.add_field(name="SRN", value=SRN)
+        results.add_field(name="SGPA", value=GPA_value)
+        await ctx.send(embed=results)
+
+
 @tasks.loop(minutes=32)
 async def checkInstagramPost():
     await client.wait_until_ready()
