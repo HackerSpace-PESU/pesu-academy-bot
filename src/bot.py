@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from selenium import webdriver
 from discord.ext import commands, tasks
 from utils import *
-
+import random
 
 load_dotenv()
 client = commands.Bot(command_prefix='pes.',
@@ -1484,7 +1484,14 @@ async def nohup(ctx, lines=None):
     else:
         await ctx.send("You are not authorised to run this command.")
 
-
+@client.command(aliases = ['results'])
+async def fakeResults(ctx, SRN):
+    rand = round(10 * random.random(), 2)
+    results = discord.Embed(title="Results", color=0x00FF00)
+    results.add_field(name = "SRN", value = SRN)
+    results.add_field(name = "GPA", value = rand)
+    await ctx.send(embed = results)
+    
 @tasks.loop(minutes=32)
 async def checkInstagramPost():
     await client.wait_until_ready()
