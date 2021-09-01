@@ -1494,7 +1494,7 @@ async def fakeResults(ctx, SRN):
     srn_length = len(SRN.strip())
     if re.match(r"PES[12]20(18|19|20)0[0-9]{4}", SRN) != None or re.match(r"PES[12]UG(18|19|20)[A-Z]{2}[0-9]{3}", SRN) != None:
         if author_id in FAKE_RESULTS:
-            GPA_value = FAKE_RESULTS[author_id]
+            GPA_value = FAKE_RESULTS[SRN]
         else:
             GPA_whole = random.randint(5, 10)
             GPA_decimal = random.random()
@@ -1503,7 +1503,7 @@ async def fakeResults(ctx, SRN):
                 GPA_value = 10.0
             else:
                 GPA_value = round(GPA_value, 2)
-            FAKE_RESULTS[author_id] = GPA_value
+            FAKE_RESULTS[SRN] = GPA_value
         results = discord.Embed(title="Results", color=0x00FF00)
         results.add_field(name="SRN", value=SRN)
         results.add_field(name="SGPA", value=GPA_value)
