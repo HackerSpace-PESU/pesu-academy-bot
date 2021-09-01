@@ -1490,10 +1490,8 @@ async def nohup(ctx, lines=None):
 @client.command(aliases=['results'])
 async def fakeResults(ctx, SRN):
     global FAKE_RESULTS
-    author_id = ctx.message.author.id
-    srn_length = len(SRN.strip())
     if re.match(r"PES[12]20(18|19|20)0[0-9]{4}", SRN) != None or re.match(r"PES[12]UG(18|19|20)[A-Z]{2}[0-9]{3}", SRN) != None:
-        if author_id in FAKE_RESULTS:
+        if SRN in FAKE_RESULTS:
             GPA_value = FAKE_RESULTS[SRN]
         else:
             GPA_whole = random.randint(5, 10)
