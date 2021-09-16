@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import mosspy
 import asyncio
 import asyncpraw
 from asyncprawcore.exceptions import RequestException
@@ -325,3 +326,14 @@ async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOK
         return await getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n)
 
     return data
+
+
+async def evaluatePlagiarismContent(MOSS_USER_ID, filenames, language):
+    m = mosspy.Moss(MOSS_USER_ID, language)
+    for fname in filenames:
+        try:
+            m.addFile(fname)
+        except:
+            pass
+    url = m.send()
+    return url

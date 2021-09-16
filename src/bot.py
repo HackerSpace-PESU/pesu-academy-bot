@@ -54,6 +54,7 @@ chrome_options.add_argument('--ignore-ssl-errors=yes')
 chrome_options.add_argument('--ignore-certificate-errors')
 chrome_options.add_argument('--allow-running-insecure-content')
 
+MOSS_USER_ID = os.environ.get("MOSS_USER_ID")
 COMPILER_CLIENT_ID_1 = os.environ["COMPILER_CLIENT_ID_1"]
 COMPILER_CLIENT_SECRET_1 = os.environ["COMPILER_CLIENT_SECRET_1"]
 COMPILER_CLIENT_ID_2 = os.environ["COMPILER_CLIENT_ID_2"]
@@ -81,8 +82,6 @@ TASK_FLAG_PESU = False
 TASK_FLAG_REDDIT = False
 TASK_FLAG_INSTAGRAM = False
 TASK_FLAG_MAP = {"on": True, "off": False}
-
-FAKE_RESULTS = dict()
 
 
 async def setRuntimeEnvironment():
@@ -1267,6 +1266,65 @@ async def hallticket(ctx, srn=None, password=None):
         await ctx.send("This command requires access to sensitive data. Please use this command in a DM with the bot.")
 
 
+@client.command(aliases=["mossfile", "moss-file", "fmoss"])
+async def plagiarismCheckFiles(ctx, language=None, *filenames):
+    supported_languages = {
+            "c": ".c",
+            "cc": ".cc",
+            "java": ".java",
+            "ml": ".ml",
+            "pascal": ".pas",
+            "ada": ".ada",
+            "lisp": ".lisp",
+            "scheme": ".scm",
+            "haskell": ".hs",
+            "fortran": ".f",
+            "ascii": ".txt",
+            "vhdl": ".vhdl",
+            "verilog": ".v",
+            "perl": ".pl",
+            "matlab": ".m",
+            "python": ".py",
+            "mips": ".s",
+            "prolog": ".pl",
+            "spice": ".sp",
+            "vb": ".vb",
+            "csharp": ".cs",
+            "modula2": ".mod",
+            "a8086": ".asm",
+            "javascript": ".js",
+            "plsql": ".plsql",
+    }
+    if language == None or language not in list(supported_languages.keys()):
+        await ctx.send(f"Please enter a valid language. Supported languages are: ```{supported_languages}```")
+    else:
+        file_extension = supported_languages[language]
+        all_attachments = list()
+        async for message in ctx.history(limit=100):
+            if message.attachments:
+                for attachment in message.attachments:
+                    if attachment.filename.endswith(file_extension):
+                        with open(attachment.filename, "wb") as f:
+                            await attachment.save(f)
+                        all_attachments.append(attachment.filename)
+
+        if filenames:
+            all_attachments = [fname for fname in all_attachments if fname in filenames]
+        
+        await ctx.send(f"Calculating plagiarism in {len(all_attachments)} files...")
+        try:
+            url = await evaluatePlagiarismContent(MOSS_USER_ID, all_attachments, language)
+            await ctx.send(f"Plagiarism Results: {url}")
+        except ConnectionRefusedError:
+            await ctx.send("Connection to MOSS API refused. Try again later.")
+
+        for fname in all_attachments:
+            try:
+                os.remove(fname)
+            except:
+                pass
+
+
 async def getRedditEmbed(post, subreddit="PESU"):
     embed = discord.Embed(title=f"Reddit Post from r/{subreddit}",
                           url=post["url"], color=0xff6314)
@@ -1485,29 +1543,6 @@ async def nohup(ctx, lines=None):
             await ctx.send("Logging file `nohup.out` not found.")
     else:
         await ctx.send("You are not authorised to run this command.")
-
-
-@client.command(aliases=['results'])
-async def fakeResults(ctx, SRN):
-    global FAKE_RESULTS
-    if re.match(r"PES[12]20(18|19|20)0[0-9]{4}", SRN) != None or re.match(r"PES[12]UG(18|19|20)[A-Z]{2}[0-9]{3}", SRN) != None:
-        if SRN in FAKE_RESULTS:
-            GPA_value = FAKE_RESULTS[SRN]
-        else:
-            GPA_whole = random.randint(5, 10)
-            GPA_decimal = random.random()
-            GPA_value = GPA_whole + GPA_decimal
-            if GPA_value > 10:
-                GPA_value = 10.0
-            else:
-                GPA_value = round(GPA_value, 2)
-            FAKE_RESULTS[SRN] = GPA_value
-        results = discord.Embed(title="Results", color=0x00FF00)
-        results.add_field(name="SRN", value=SRN)
-        results.add_field(name="SGPA", value=GPA_value)
-        await ctx.send(embed=results)
-    else:
-        await ctx.send("Invalid SRN")
 
 
 @tasks.loop(minutes=32)
