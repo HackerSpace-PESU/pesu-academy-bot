@@ -234,6 +234,7 @@ async def getPESUAnnouncements(chrome, username, password):
     for option in menu_options:
         if option.text == "Announcements":
             option.click()
+            break
     time.sleep(1)
 
     announcement_boxes = chrome.find_elements_by_xpath(
