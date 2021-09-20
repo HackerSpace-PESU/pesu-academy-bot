@@ -1,15 +1,1 @@
 bot/
-venv/
-src/__pycache__/
-.vscode/
-test/
-.env
-test*.py
-chromedriver
-chromedriver.exe
-*.pdf
-*.pem
-log.txt
-requirements-backup.txt
-setHerokuConfig.py
-todo.md
