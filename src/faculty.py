@@ -14,7 +14,6 @@ def readDataFrame():
     response = requests.get(faculty_df_link)
     faculty_df_content = StringIO(response.content.decode())
     faculty_df = pd.read_csv(faculty_df_content, sep=',')
-    # faculty_df = faculty_df[~faculty_df["COURSE"].isna()]
 
 
 def initialiseFacultyFilters():

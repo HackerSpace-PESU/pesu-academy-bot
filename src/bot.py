@@ -83,6 +83,7 @@ TASK_FLAG_REDDIT = False
 TASK_FLAG_INSTAGRAM = False
 TASK_FLAG_MAP = {"on": True, "off": False}
 
+DEBUG_MODE = sys.argv[1].lower() == "debug"
 
 async def setRuntimeEnvironment():
     global RUNTIME_ENVIRONMENT
@@ -297,26 +298,27 @@ async def on_ready():
     print("Bot is online")
     await client.change_presence(activity=discord.Game(next(status)))
 
-    await syncGuildDatabase()
-    await syncTaskStatusDatabase()
-    await syncFacultyInformation()
-    await setRuntimeEnvironment()
-    await syncAPICallLimits()
+    if not DEBUG_MODE:
+        await syncGuildDatabase()
+        await syncTaskStatusDatabase()
+        await syncFacultyInformation()
+        await setRuntimeEnvironment()
+        await syncAPICallLimits()
 
-    if not checkNewDay.is_running():
-        checkNewDay.start()
+        if not checkNewDay.is_running():
+            checkNewDay.start()
 
-    if not changeStatus.is_running():
-        changeStatus.start()
+        if not changeStatus.is_running():
+            changeStatus.start()
 
-    if not checkRedditPost.is_running():
-        checkRedditPost.start()
+        if not checkRedditPost.is_running():
+            checkRedditPost.start()
 
-    if not checkInstagramPost.is_running():
-        checkInstagramPost.start()
+        if not checkInstagramPost.is_running():
+            checkInstagramPost.start()
 
-    if not checkPESUAnnouncement.is_running():
-        checkPESUAnnouncement.start()
+        if not checkPESUAnnouncement.is_running():
+            checkPESUAnnouncement.start()
 
 
 @client.event
@@ -409,31 +411,32 @@ async def on_message_edit(message_before, message_after):
         await message_after.channel.send("https://media.discordapp.net/attachments/742995787700502565/834782280236662827/Sequence_01_1.gif")
 
 
-@client.event
-async def on_command_error(ctx, error):
-    author = ctx.message.author
-    embed = discord.Embed(
-        color=discord.Color.blue(),
-        title="PESU Academy Bot - Command Error Log",
-    )
-    if ctx.guild != None:
-        guild_id = str(ctx.guild.id)
-        guild_logging_channels = getChannelFromServer(guild_id, "log")
-        if guild_logging_channels:
-            guild_logging_channels = [row[-1]
-                                      for row in guild_logging_channels]
-            embed.description = f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}"
-            await sendSpecificChannels(guild_logging_channels, embed=embed)
-    else:
-        embed.description = f"Error occured:\n{error}"
-        await ctx.send(embed=embed)
+if not DEBUG_MODE:
+    @client.event
+    async def on_command_error(ctx, error):
+        author = ctx.message.author
+        embed = discord.Embed(
+            color=discord.Color.blue(),
+            title="PESU Academy Bot - Command Error Log",
+        )
+        if ctx.guild != None:
+            guild_id = str(ctx.guild.id)
+            guild_logging_channels = getChannelFromServer(guild_id, "log")
+            if guild_logging_channels:
+                guild_logging_channels = [row[-1]
+                                        for row in guild_logging_channels]
+                embed.description = f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}"
+                await sendSpecificChannels(guild_logging_channels, embed=embed)
+        else:
+            embed.description = f"Error occured:\n{error}"
+            await ctx.send(embed=embed)
 
-    embed = discord.Embed(
-        color=discord.Color.blue(),
-        title="PESU Academy Bot - Command Error",
-        description="Incorrect command. Please type `pes.help` to view all commands."
-    )
-    await ctx.send(embed=embed)
+        embed = discord.Embed(
+            color=discord.Color.blue(),
+            title="PESU Academy Bot - Command Error",
+            description="Incorrect command. Please type `pes.help` to view all commands."
+        )
+        await ctx.send(embed=embed)
 
 
 @client.event
