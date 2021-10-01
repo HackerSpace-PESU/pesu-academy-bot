@@ -1,8 +1,9 @@
 const Discord = require("discord.js");
 const fs = require("fs");
-const config = require("./config.json");
+require("dotenv").config();
+const BOT_TOKEN = process.env.TOKEN;
 
-const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS] });
+const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_PRESENCES] });
 client.commands = new Discord.Collection();
 const command_files = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
 
@@ -31,4 +32,9 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 
-client.login(config.BOT_TOKEN);
+process.on("uncaughtException", function(err) {
+    console.log("Caught exception: " + err);
+});
+
+
+client.login(BOT_TOKEN);
