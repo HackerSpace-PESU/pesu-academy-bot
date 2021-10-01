@@ -1,11 +1,11 @@
 # PESU Academy Bot
 
 <p align="center">
-    <a href="https://github.com/aditeyabaral/pesu-academy-bot/issues" alt="issues">
+    <a href="https://github.com/HackerSpace-PESU/pesu-academy-bot/issues" alt="issues">
     <img alt="GitHub forks" src="https://img.shields.io/github/issues/aditeyabaral/pesu-academy-bot"></a>
-    <a href="https://github.com/aditeyabaral/pesu-academy-bot/stargazers" alt="Stars">
+    <a href="https://github.com/HackerSpace-PESU/pesu-academy-bot/stargazers" alt="Stars">
     <img alt="GitHub stars" src="https://img.shields.io/github/stars/aditeyabaral/pesu-academy-bot"></a>
-    <a href="https://github.com/aditeyabaral/pesu-academy-bot/contributors" alt="Contributors">
+    <a href="https://github.com/HackerSpace-PESU/pesu-academy-bot/contributors" alt="Contributors">
     <img src="https://img.shields.io/github/contributors/aditeyabaral/pesu-academy-bot"/></a>
 </p>
 
@@ -50,7 +50,7 @@ CHANNEL_BOT_LOGS=
 BOT_ID=
 BOT_TOKEN=
 BOT_INVITE="https://discord.com/api/oauth2/authorize?client_id=847138055978614845&permissions=2148006976&scope=bot%20applications.commands"
-BOT_GITHUB="https://github.com/aditeyabaral/pesu-academy-bot"
+BOT_GITHUB="https://github.com/HackerSpace-PESU/pesu-academy-bot"
 CHROMEDRIVER_PATH=
 GOOGLE_CHROME_BIN=
 PESU_DATABASE_URL=
