@@ -43,7 +43,7 @@ node index.js
 ## Maintainers
 
 Contact any of us for any support.
-
+[Arvind Krishna](https://github.com/ArvindAroo)<br>
 [Aditeya Baral](https://github.com/aditeyabaral)<br>
 [Aronya Baksy](https://github.com/abaksy)
 
