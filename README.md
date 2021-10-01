@@ -2,11 +2,11 @@
 
 <p align="center">
     <a href="https://github.com/HackerSpace-PESU/pesu-academy-bot/issues" alt="issues">
-    <img alt="GitHub forks" src="https://img.shields.io/github/issues/aditeyabaral/pesu-academy-bot"></a>
+    <img alt="GitHub forks" src="https://img.shields.io/github/issues/HackerSpace-PESU/pesu-academy-bot"></a>
     <a href="https://github.com/HackerSpace-PESU/pesu-academy-bot/stargazers" alt="Stars">
-    <img alt="GitHub stars" src="https://img.shields.io/github/stars/aditeyabaral/pesu-academy-bot"></a>
+    <img alt="GitHub stars" src="https://img.shields.io/github/stars/HackerSpace-PESU/pesu-academy-bot"></a>
     <a href="https://github.com/HackerSpace-PESU/pesu-academy-bot/contributors" alt="Contributors">
-    <img src="https://img.shields.io/github/contributors/aditeyabaral/pesu-academy-bot"/></a>
+    <img src="https://img.shields.io/github/contributors/HackerSpace-PESU/pesu-academy-bot"/></a>
 </p>
 
 PESU Academy Discord Bot built for PESsants and PESts of PES University
@@ -19,7 +19,7 @@ You can add the bot to your Discord Server using [this link](http://bit.ly/pesu-
 2. It is connected to a student database, and allows you to perform a query based lookup to search
 3. It updates you about Instagram posts made by clubs
 4. It also follows PES social media handles - Instagram and Reddit
-4. It contains two URL shortners - [long.rip](http://www.long.rip/) by [Adarsh Shetty](https://github.com/ObliviousParadigm) and [redirector](https://github.com/aditeyabaral/redirector) by me
+4. It contains two URL shortners - [long.rip](http://www.long.rip/) by [Adarsh Shetty](https://github.com/ObliviousParadigm) and [redirector](https://github.com/HackerSpace-PESU/redirector) by me
 5. You can also execute Python code!
 6. It features a meme-generator - [SaaS](https://github.com/aditeyabaral/spongebob-as-a-service) and an [English Dictionary](https://github.com/aditeyabaral/pydictionary)
 
