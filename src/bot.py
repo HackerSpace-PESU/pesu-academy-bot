@@ -83,7 +83,15 @@ TASK_FLAG_REDDIT = False
 TASK_FLAG_INSTAGRAM = False
 TASK_FLAG_MAP = {"on": True, "off": False}
 
-DEBUG_MODE = sys.argv[1].lower() == "debug"
+DEBUG_MODE = False
+if len(sys.argv) > 1:
+    if sys.argv[1] == "--debug":
+        print("Running in test mode.")
+        DEBUG_MODE = True
+    else:
+        print("Running in production mode.")
+        DEBUG_MODE = False
+
 
 async def setRuntimeEnvironment():
     global RUNTIME_ENVIRONMENT
@@ -424,7 +432,7 @@ if not DEBUG_MODE:
             guild_logging_channels = getChannelFromServer(guild_id, "log")
             if guild_logging_channels:
                 guild_logging_channels = [row[-1]
-                                        for row in guild_logging_channels]
+                                          for row in guild_logging_channels]
                 embed.description = f"{author.mention} made this error in {ctx.message.channel.mention}:\n{error}"
                 await sendSpecificChannels(guild_logging_channels, embed=embed)
         else:
@@ -555,7 +563,7 @@ async def shutdown(ctx):
         await ctx.send("You are not authorised to run this command.")
 
 
-@client.command()
+@client.command(aliases=["fixdb"])
 async def fixpesdb(ctx):
     if await checkUserIsBotDev(ctx):
         await ctx.send("Fixing PESU Academy database...")
@@ -954,9 +962,12 @@ async def help(ctx):
         print(math.pi)
         ```
         <inputs>""",
+        '`pes.moss`': "Compute plagiarism in inline scripts using MOSS. Use `pes.moss [LANGUAGE] ```[SCRIPT 1]``` ```[SCRIPT 2]````",
+        '`pes.fmoss`': "Compute plagiarism in files using MOSS. Upload files to channel and use `pes.fmoss [LANGUAGE]`",
         '`pes.sb`': 'Create a SpongeBob mocking meme. `pes.sb [top text] & [bottom-text]` or `pes.sb [bottom-text]`',
         '`pes.dict`': 'Search for the meaning of word using `pes.dict [word]`',
-        '`pes.pride`': 'Invoke the PRIDE of PESU'
+        '`pes.pride`': 'Invoke the PRIDE of PESU',
+        '`pes.devhelp`': 'Get a list of commands available to bot developers'
     }
     embed = discord.Embed(title=f"Help",
                           color=discord.Color.blue())
@@ -974,6 +985,7 @@ async def devhelp(ctx):
         "`pes.remind`": "Send a reminder to servers that have not setup a publish channel",
         "`pes.syncstatus`": "Sync status flags for tasks",
         "`pes.syncdb`": "Sync database containing server information. Optional [DO NOT USE WITHOUT READING DOCS]: `pes.syncdb hard`",
+        "`pes.fixdb`": "Fix database transaction error",
         "`pes.syncfaculty`": "Sync database containing faculty information by fetching from the repository",
         "`pes.gitpull`": "Performs a `git pull` and fetches new code from the repository",
         "`pes.restart`": "Performs a `git pull` and reboots the bot",
@@ -989,6 +1001,9 @@ async def devhelp(ctx):
         "`pes.echo`": "Send a message on any channel using `pes.echo [CHANNEL] [MESSAGE]`",
         "`pes.reply`": "Reply to a message on any channel using `pes.reply [ORIGINAL MESSAGE URL] [MESSAGE]`",
         "`pes.clear`": "Clear messages on a channel using `pes.clear [N]`",
+        "`pes.files`": "Lists all the files in the current repository directory",
+        "`pes.clean`": "Cleans up unnecessary and redundant files",
+
     }
     embed = discord.Embed(title=f"Developer Help",
                           color=discord.Color.blue())
@@ -1272,31 +1287,31 @@ async def hallticket(ctx, srn=None, password=None):
 @client.command(aliases=["mossfile", "moss-file", "fmoss"])
 async def plagiarismCheckFiles(ctx, language=None, *filenames):
     supported_languages = {
-            "c": ".c",
-            "cc": ".cc",
-            "java": ".java",
-            "ml": ".ml",
-            "pascal": ".pas",
-            "ada": ".ada",
-            "lisp": ".lisp",
-            "scheme": ".scm",
-            "haskell": ".hs",
-            "fortran": ".f",
-            "ascii": ".txt",
-            "vhdl": ".vhdl",
-            "verilog": ".v",
-            "perl": ".pl",
-            "matlab": ".m",
-            "python": ".py",
-            "mips": ".s",
-            "prolog": ".pl",
-            "spice": ".sp",
-            "vb": ".vb",
-            "csharp": ".cs",
-            "modula2": ".mod",
-            "a8086": ".asm",
-            "javascript": ".js",
-            "plsql": ".plsql",
+        "c": ".c",
+        "cc": ".cc",
+        "java": ".java",
+        "ml": ".ml",
+        "pascal": ".pas",
+        "ada": ".ada",
+        "lisp": ".lisp",
+        "scheme": ".scm",
+        "haskell": ".hs",
+        "fortran": ".f",
+        "ascii": ".txt",
+        "vhdl": ".vhdl",
+        "verilog": ".v",
+        "perl": ".pl",
+        "matlab": ".m",
+        "python": ".py",
+        "mips": ".s",
+        "prolog": ".pl",
+        "spice": ".sp",
+        "vb": ".vb",
+        "csharp": ".cs",
+        "modula2": ".mod",
+        "a8086": ".asm",
+        "javascript": ".js",
+        "plsql": ".plsql",
     }
     if language == None or language not in list(supported_languages.keys()):
         await ctx.send(f"Please enter a valid language. Supported languages are: ```{supported_languages}```")
@@ -1312,8 +1327,9 @@ async def plagiarismCheckFiles(ctx, language=None, *filenames):
                         all_attachments.append(attachment.filename)
 
         if filenames:
-            all_attachments = [fname for fname in all_attachments if fname in filenames]
-        
+            all_attachments = [
+                fname for fname in all_attachments if fname in filenames]
+
         await ctx.send(f"Calculating plagiarism in {len(all_attachments)} files...")
         try:
             url = await evaluatePlagiarismContent(MOSS_USER_ID, all_attachments, language)
@@ -1331,38 +1347,39 @@ async def plagiarismCheckFiles(ctx, language=None, *filenames):
 @client.command(aliases=["moss"])
 async def plagiarismCheck(ctx, language=None, *, script=None):
     supported_languages = {
-            "c": ".c",
-            "cc": ".cc",
-            "java": ".java",
-            "ml": ".ml",
-            "pascal": ".pas",
-            "ada": ".ada",
-            "lisp": ".lisp",
-            "scheme": ".scm",
-            "haskell": ".hs",
-            "fortran": ".f",
-            "ascii": ".txt",
-            "vhdl": ".vhdl",
-            "verilog": ".v",
-            "perl": ".pl",
-            "matlab": ".m",
-            "python": ".py",
-            "python3": ".py",
-            "mips": ".s",
-            "prolog": ".pl",
-            "spice": ".sp",
-            "vb": ".vb",
-            "csharp": ".cs",
-            "modula2": ".mod",
-            "a8086": ".asm",
-            "javascript": ".js",
-            "plsql": ".plsql",
+        "c": ".c",
+        "cc": ".cc",
+        "java": ".java",
+        "ml": ".ml",
+        "pascal": ".pas",
+        "ada": ".ada",
+        "lisp": ".lisp",
+        "scheme": ".scm",
+        "haskell": ".hs",
+        "fortran": ".f",
+        "ascii": ".txt",
+        "vhdl": ".vhdl",
+        "verilog": ".v",
+        "perl": ".pl",
+        "matlab": ".m",
+        "python": ".py",
+        "python3": ".py",
+        "mips": ".s",
+        "prolog": ".pl",
+        "spice": ".sp",
+        "vb": ".vb",
+        "csharp": ".cs",
+        "modula2": ".mod",
+        "a8086": ".asm",
+        "javascript": ".js",
+        "plsql": ".plsql",
     }
     if language == None or language not in list(supported_languages.keys()):
         await ctx.send(f"Please enter a valid language. Supported languages are: ```{supported_languages}```")
     else:
         source_codes = script.split("```")
-        source_codes = [source.strip() for source in source_codes if source.strip() != str()]
+        source_codes = [source.strip()
+                        for source in source_codes if source.strip() != str()]
         filenames = list()
         for i in range(len(source_codes)):
             filename = f"moss_filename_{i+1}.{supported_languages[language]}"
