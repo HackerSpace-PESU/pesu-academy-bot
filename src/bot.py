@@ -352,7 +352,7 @@ async def on_guild_join(guild):
 
     server_owner = guild.owner
     try:
-        await server_owner.send("Thank you for adding the PESU Academy bot to your server! run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`\nIf you have any queries, please visit https://github.com/aditeyabaral/pesu-academy-bot")
+        await server_owner.send("Thank you for adding the PESU Academy bot to your server! run `pes.alerts {CHANNEL NAME}` to setup the bot.\n You can optionally also setup a logging channel using `pes.log {CHANNEL NAME}`\nIf you have any queries, please visit https://github.com/HackerSpace-PESU/pesu-academy-bot")
     except:
         pass
 
@@ -574,7 +574,7 @@ async def contribute(ctx, *params):
     embed = discord.Embed(
         title="Contribute to PESU Academy Bot", color=discord.Color.blue())
     embed.add_field(
-        name="Github repository", value="https://github.com/aditeyabaral/pesu-academy-bot", inline=False)
+        name="Github repository", value="https://github.com/HackerSpace-PESU/pesu-academy-bot", inline=False)
     embed.add_field(
         name='\u200b', value="If you wish to contribute to the bot, run these steps:", inline=False)
     rules = {
@@ -626,7 +626,7 @@ async def reachoutcommand(ctx, *, message: str = None):
             await channel.send(embed=embed)
 
     else:
-        await ctx.send("You are not authorised to run this command. Only members with administrator permissions can run this command. Contact your server administrator or anyone with a role who has administrator privileges. You can always contact us on our GitHub page: https://github.com/aditeyabaral/pesu-academy-bot")
+        await ctx.send("You are not authorised to run this command. Only members with administrator permissions can run this command. Contact your server administrator or anyone with a role who has administrator privileges. You can always contact us on our GitHub page: https://github.com/HackerSpace-PESU/pesu-academy-bot")
 
 
 @client.command(aliases=['reachreply'])
@@ -1224,7 +1224,7 @@ async def faculty(ctx, *, query):
         )
     await ctx.send(embed=embed)
     if truncated:
-        await ctx.send("To view more results, visit https://github.com/aditeyabaral/pesu-academy-bot/blob/main/data/faculty.csv")
+        await ctx.send("To view more results, visit https://github.com/HackerSpace-PESU/pesu-academy-bot/blob/main/data/faculty.csv")
 
 
 @client.command()
@@ -1319,6 +1319,62 @@ async def plagiarismCheckFiles(ctx, language=None, *filenames):
             await ctx.send("Connection to MOSS API refused. Try again later.")
 
         for fname in all_attachments:
+            try:
+                os.remove(fname)
+            except:
+                pass
+
+
+@client.command(aliases=["moss"])
+async def plagiarismCheck(ctx, language=None, *, script=None):
+    supported_languages = {
+            "c": ".c",
+            "cc": ".cc",
+            "java": ".java",
+            "ml": ".ml",
+            "pascal": ".pas",
+            "ada": ".ada",
+            "lisp": ".lisp",
+            "scheme": ".scm",
+            "haskell": ".hs",
+            "fortran": ".f",
+            "ascii": ".txt",
+            "vhdl": ".vhdl",
+            "verilog": ".v",
+            "perl": ".pl",
+            "matlab": ".m",
+            "python": ".py",
+            "python3": ".py",
+            "mips": ".s",
+            "prolog": ".pl",
+            "spice": ".sp",
+            "vb": ".vb",
+            "csharp": ".cs",
+            "modula2": ".mod",
+            "a8086": ".asm",
+            "javascript": ".js",
+            "plsql": ".plsql",
+    }
+    if language == None or language not in list(supported_languages.keys()):
+        await ctx.send(f"Please enter a valid language. Supported languages are: ```{supported_languages}```")
+    else:
+        source_codes = script.split("```")
+        source_codes = [source.strip() for source in source_codes if source.strip() != str()]
+        filenames = list()
+        for i in range(len(source_codes)):
+            filename = f"moss_filename_{i+1}.{supported_languages[language]}"
+            with open(filename, 'w') as f:
+                f.write(source_codes[i])
+                filenames.append(filename)
+
+        await ctx.send(f"Calculating plagiarism in {len(filenames)} files...")
+        try:
+            url = await evaluatePlagiarismContent(MOSS_USER_ID, filenames, language)
+            await ctx.send(f"Plagiarism Results: {url}")
+        except ConnectionRefusedError:
+            await ctx.send("Connection to MOSS API refused. Try again later.")
+
+        for fname in filenames:
             try:
                 os.remove(fname)
             except:
