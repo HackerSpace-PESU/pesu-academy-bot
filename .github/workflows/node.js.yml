@@ -5,9 +5,11 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - pesu-academy-bot-js
   pull_request:
-    branches: [ main ]
+    branches:
+      - pesu-academy-bot-js
 
 jobs:
   build:
