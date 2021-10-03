@@ -1,6 +1,7 @@
 import re
 import os
 import sys
+import pytz
 import random
 import base64
 import asyncio
@@ -21,6 +22,8 @@ status = cycle(["with the PRIDE of PESU", "with lives",
                "with your future", "with PESsants", "with PESts"])
 greetings = ["PESsants", "PESts"]
 
+IST = pytz.timezone('Asia/Kolkata')
+
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 BOT_ID = int(os.environ["BOT_ID"])
 
@@ -28,10 +31,8 @@ ARONYABAKSY_ID = int(os.environ["ARONYA_ID"])
 ADITEYABARAL_ID = int(os.environ["BARAL_ID"])
 BOT_DEVS = [ARONYABAKSY_ID, ADITEYABARAL_ID]
 
-CHANNEL_BOT_LOGS_1 = 842466762985701406
-CHANNEL_BOT_LOGS_2 = 848634702944010252
-DEV_SERVER_1 = 768874819474292746
-DEV_SERVER_2 = 848632052059471912
+CHANNEL_BOT_LOGS = 848634702944010252
+DEV_SERVER = 848632052059471912
 
 BITLY_TOKEN = os.environ["BITLY_TOKEN"]
 BITLY_GUID = os.environ["BITLY_GUID"]
@@ -377,8 +378,8 @@ async def on_guild_remove(guild):
 async def on_message(ctx):
     if ctx.author.bot:
         pass
-    elif ctx.guild == None and ctx.content[:4] != "pes.":
-        bot_log_channel = client.get_channel(CHANNEL_BOT_LOGS_2)
+    elif ctx.guild == None and ctx.content[:4].lower() != "pes.":
+        bot_log_channel = client.get_channel(CHANNEL_BOT_LOGS)
         if ctx.reference == None:
             content = f'''{ctx.author.mention} sent a message on DM:\n
 Message URL: {ctx.jump_url}
@@ -599,7 +600,7 @@ async def contribute(ctx, *params):
         embed.add_field(
             name='\u200b', value=f"{rule}: {rules[rule]}", inline=False)
 
-    guild_object = client.get_guild(DEV_SERVER_1)
+    guild_object = client.get_guild(DEV_SERVER)
     aditeyabaral = guild_object.get_member(ADITEYABARAL_ID).mention
     abaksy = guild_object.get_member(ARONYABAKSY_ID).mention
     embed.add_field(
@@ -633,7 +634,7 @@ async def reachoutcommand(ctx, *, message: str = None):
 **Channel ID**: `{ctx.channel.id}`\n
 **Message**: {message}'''
             )
-            channel = client.get_channel(CHANNEL_BOT_LOGS_2)
+            channel = client.get_channel(CHANNEL_BOT_LOGS)
             await channel.send(embed=embed)
 
     else:
@@ -1415,6 +1416,7 @@ async def getRedditEmbed(post, subreddit="PESU"):
         embed.add_field(name=post["title"], value="\u200b", inline=False)
     if post["images"]:
         embed.set_image(url=post["images"][0])
+    embed.set_footer(text=datetime.datetime.now(IST))
     return embed
 
 
@@ -1438,11 +1440,7 @@ async def getInstagramEmbed(username):
     embed_colour = next(instagram_embed_colours)
     post_embed = discord.Embed(
         title=f'Instagram Post from {username}', url=getPostLink(html), color=embed_colour)
-    if(checkVideo(html)):
-        post_embed.set_image(url=getVideoURL(html))
-    else:
-        post_embed.set_image(url=getLastThumbnailURL(html))
-
+    post_embed.set_image(url=getLastThumbnailURL(html))
     post_caption = getPhotoDescription(html)
     if post_caption != None:
         if len(post_caption) >= 1024:
@@ -1454,7 +1452,8 @@ async def getInstagramEmbed(username):
         else:
             post_embed.add_field(
                 name="\u200b", value=post_caption, inline=False)
-    post_embed.set_footer(text=datetime.datetime.fromtimestamp(photo_time))
+    post_time = datetime.datetime.fromtimestamp(photo_time).astimezone(IST)
+    post_embed.set_footer(text= post_time)
     return post_embed, photo_time
 
 
@@ -1491,6 +1490,7 @@ async def getAnnouncementEmbed(announcement):
         embed.add_field(
             name=str(announcement["date"]), value=content_body)
 
+    embed.set_footer(text=datetime.datetime.now(IST))
     return embed
 
 
@@ -1740,7 +1740,7 @@ async def checkNewDay():
     global ALL_ANNOUNCEMENTS_MADE
     await client.wait_until_ready()
 
-    current_time = datetime.datetime.now()
+    current_time = datetime.datetime.now(IST)
     if current_time.hour == 0:
         TODAY_ANNOUNCEMENTS_MADE = list()
         ALL_ANNOUNCEMENTS_MADE = list()
