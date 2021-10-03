@@ -35,7 +35,7 @@ instagram_usernames = ['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc
                        'thor_pesu', 'throughthelens.pesu', 'trance_pes', 'under25pes', 'under25pesuecc',
                        'vegaracingelectric', 'writeangle.pesu', 'zeroday.pesuecc', 'adconnect_pesu', 'cognitivemd_pesu',
                        'appex.pesu', 'adgpesu', 'pesumeraki_fc', 'pesuventurelabs', 'terpsichore_pesu', 'panachepesuecc',
-                       'isfcr.pesu', 'abhyudaya.pesu']
+                       'isfcr.pesu', 'abhyudaya.pesu', 'thecoderfactory_pesu', 'etal.pesu']
 
 
 def getLastPhotoDate(html):
