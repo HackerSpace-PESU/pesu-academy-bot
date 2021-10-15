@@ -1,3 +1,13 @@
+# PESU Academy Bot
+
+<p align="center">
+    <a href="https://github.com/HackerSpace-PESU/pesu-academy-bot" alt="Build status">
+    <img src="https://github.com/HackerSpace-PESU/pesu-academy-bot/actions/workflows/node.js.yml/badge.svg"/></a>
+    <a href="https://github.com/HackerSpace-PESU/pesu-academy-bot" alt="Stars">
+    <img alt="GitHub stars" src="https://img.shields.io/github/stars/HackerSpace-PESU/pesu-academy-bot"></a>
+</p>
+
+
 ## How to run PESU Academy Bot?
 
 1. Clone the repository
@@ -17,6 +27,9 @@ npm ci
 BOT_TOKEN=
 BOT_INVITE="https://discord.com/api/oauth2/authorize?client_id=847138055978614845&permissions=2148006976&scope=bot%20applications.commands"
 BOT_GITHUB="https://github.com/HackerSpace-PESU/pesu-academy-bot"
+
+clientID = "" client id and secret from the jdoodle api
+clientSecret = ""
 ```
 
 4. Run the bot using the following command
@@ -42,7 +55,8 @@ node index.js
 
 ## Maintainers
 
-Contact any of us for any support.
+Contact any of us for any support:
+
 [Arvind Krishna](https://github.com/ArvindAroo)<br>
 [Aditeya Baral](https://github.com/aditeyabaral)<br>
 [Aronya Baksy](https://github.com/abaksy)
