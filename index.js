@@ -1,7 +1,6 @@
 
 const Discord = require("discord.js");
 const fs = require("fs");
-const getMention = require('discord-mentions');
 require("dotenv").config();
 const BOT_TOKEN = process.env.TOKEN;
 
