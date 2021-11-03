@@ -602,9 +602,9 @@ async def contribute(ctx, *params):
 
     guild_object = client.get_guild(DEV_SERVER)
     aditeyabaral = guild_object.get_member(ADITEYABARAL_ID).mention
-    abaksy = guild_object.get_member(ARONYABAKSY_ID).mention
+    # abaksy = guild_object.get_member(ARONYABAKSY_ID).mention  # F for retired member
     embed.add_field(
-        name="Reviewers", value=f"`aditeyabaral` - {aditeyabaral}\n`abaksy` - {abaksy}", inline=False)
+        name="Reviewers", value=f"`aditeyabaral` - {aditeyabaral}", inline=False)
     embed.add_field(
         name="Important", value="**Under no circumstances is anyone allowed to merge to the main branch.**", inline=False)
     embed.add_field(
