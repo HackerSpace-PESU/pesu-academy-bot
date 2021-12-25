@@ -215,6 +215,15 @@ def fixPESUDB():
     transaction.rollback()
 
 
+def executeQueryString(query, connection_type):
+    if connection_type == "pesudb":
+        connection = pesudb_connection
+    elif connection_type == "guilddb":
+        connection = guilddb_connection
+    result = connection.execute(query)
+    return result.fetchall()
+
+
 def addGuild(guild_id, guild_name, channel_id=None, channel_type=None):
     query = guilddb_table.insert().values(guild_id=guild_id, guild_name=guild_name,
                                           channel_id=channel_id, channel_type=channel_type)

@@ -287,6 +287,29 @@ async def syncTaskStatusDatabase():
     TASK_FLAG_INSTAGRAM = TASK_FLAG_MAP[getVariableValue("instagram")]
 
 
+async def executeDatabaseQuery(ctx, query, connection_type, send_file=False):
+    try:
+        result = executeQueryString(query, connection_type)
+        if result:
+            formatted_result = str()
+            for row in result:
+                row = list(map(str, row))
+                row = ','.join(row)
+                formatted_result += f"{row}\n"
+            formatted_result = formatted_result.strip()
+            if send_file:
+                with open("db_query_result.csv", "w") as f:
+                    f.write(formatted_result)
+                await ctx.send(file=discord.File("db_query_result.csv"))
+                os.remove("db_query_result.csv")
+            else:
+                await ctx.send(f"```csv\n{formatted_result}```")
+        else:
+            print("No result")
+    except Exception as error_message:
+        await ctx.send(f"Query failed: {error_message}")
+
+
 async def syncFacultyInformation():
     print("Syncing faculty info...")
     readDataFrame()
@@ -1617,6 +1640,21 @@ async def nohup(ctx, lines=None):
             os.remove("nohup.txt")
         else:
             await ctx.send("Logging file `nohup.out` not found.")
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+
+@client.command(aliases=["dbf", "dbqf"])
+async def dbqueryfile(ctx, connection_type, *, query):
+    if await checkUserIsBotDev(ctx):
+        executeDatabaseQuery(query, connection_type, True)
+    else:
+        await ctx.send("You are not authorised to run this command.")
+
+@client.command(aliases=["db", "dbq"])
+async def dbquery(ctx, connection_type, *, query):
+    if await checkUserIsBotDev(ctx):
+        executeDatabaseQuery(query, connection_type, False)
     else:
         await ctx.send("You are not authorised to run this command.")
 
