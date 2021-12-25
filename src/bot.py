@@ -305,7 +305,7 @@ async def executeDatabaseQuery(ctx, query, connection_type, send_file=False):
             else:
                 await ctx.send(f"```csv\n{formatted_result}```")
         else:
-            print("No result")
+            await ctx.send("No results returned.")
     except Exception as error_message:
         await ctx.send(f"Query failed: {error_message}")
 
@@ -1647,14 +1647,14 @@ async def nohup(ctx, lines=None):
 @client.command(aliases=["dbf", "dbqf"])
 async def dbqueryfile(ctx, connection_type, *, query):
     if await checkUserIsBotDev(ctx):
-        executeDatabaseQuery(query, connection_type, True)
+        await executeDatabaseQuery(ctx, query, connection_type, True)
     else:
         await ctx.send("You are not authorised to run this command.")
 
 @client.command(aliases=["db", "dbq"])
 async def dbquery(ctx, connection_type, *, query):
     if await checkUserIsBotDev(ctx):
-        executeDatabaseQuery(query, connection_type, False)
+        await executeDatabaseQuery(ctx, query, connection_type, False)
     else:
         await ctx.send("You are not authorised to run this command.")
 

@@ -216,11 +216,10 @@ def fixPESUDB():
 
 
 def executeQueryString(query, connection_type):
-    if connection_type == "pesudb":
-        connection = pesudb_connection
-    elif connection_type == "guilddb":
-        connection = guilddb_connection
-    result = connection.execute(query)
+    if connection_type in ["pesudb", "pesu"]:
+        result = pesudb_connection.execute(query)
+    elif connection_type in ["guilddb", "guild"]:
+        result = guilddb_connection.execute(query)
     return result.fetchall()
 
 

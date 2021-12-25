@@ -10,7 +10,7 @@ unique_course = set()
 
 def readDataFrame():
     global faculty_df
-    faculty_df_link = "https://raw.githubusercontent.com/aditeyabaral/pesu-academy-bot/main/data/faculty.csv"
+    faculty_df_link = "https://raw.githubusercontent.com/HackerSpace-PESU/pesu-academy-bot/main/data/faculty.csv"
     response = requests.get(faculty_df_link)
     faculty_df_content = StringIO(response.content.decode())
     faculty_df = pd.read_csv(faculty_df_content, sep=',')
