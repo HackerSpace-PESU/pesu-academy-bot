@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "src/bot.py", line 8, in <module>
-    import discord
-ModuleNotFoundError: No module named 'discord'

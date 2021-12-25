@@ -13,3 +13,4 @@ log.txt
 requirements-backup.txt
 setHerokuConfig.py
 todo.md
+*.out
