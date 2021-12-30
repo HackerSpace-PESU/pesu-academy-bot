@@ -3,17 +3,26 @@ import json
 import mosspy
 import asyncio
 import asyncpraw
-from asyncprawcore.exceptions import RequestException
 import requests
 import pydoodle
 from pathlib import Path
 import datetime
+from gingerit.gingerit import GingerIt
 from bs4 import BeautifulSoup
+from asyncprawcore.exceptions import RequestException
+
 from db import *
 from faculty import *
 from pydictionary import *
 from instagram import *
 from pesuacademy import *
+
+GINGERIT_GRAMMAR_CHECKER = GingerIt()
+
+
+async def correctGrammar(text):
+    output = GINGERIT_GRAMMAR_CHECKER.parse(text)
+    return output['result']
 
 
 async def checkRuntimeEnvironmentHeroku():

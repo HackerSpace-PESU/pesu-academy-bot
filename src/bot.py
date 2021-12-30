@@ -82,6 +82,7 @@ RUNTIME_ENVIRONMENT = None
 TASK_FLAG_PESU = False
 TASK_FLAG_REDDIT = False
 TASK_FLAG_INSTAGRAM = False
+TASK_FLAG_GRAMMAR = False
 TASK_FLAG_MAP = {"on": True, "off": False}
 
 DEBUG_MODE = False
@@ -281,10 +282,12 @@ async def syncTaskStatusDatabase():
     global TASK_FLAG_PESU
     global TASK_FLAG_REDDIT
     global TASK_FLAG_INSTAGRAM
+    global TASK_FLAG_GRAMMAR
 
     TASK_FLAG_PESU = TASK_FLAG_MAP[getVariableValue("pesu")]
     TASK_FLAG_REDDIT = TASK_FLAG_MAP[getVariableValue("reddit")]
     TASK_FLAG_INSTAGRAM = TASK_FLAG_MAP[getVariableValue("instagram")]
+    TASK_FLAG_GRAMMAR = TASK_FLAG_MAP[getVariableValue("grammar")]
 
 
 async def executeDatabaseQuery(ctx, query, connection_type, send_file=False):
@@ -433,6 +436,17 @@ Reply: {ctx.content}'''
             await ctx.reply("Invoking the PRIDE of PESU!", mention_author=False)
             await ctx.channel.send("https://media.discordapp.net/attachments/742995787700502565/834782280236662827/Sequence_01_1.gif")
         await client.process_commands(ctx)
+
+    if not ctx.author.bot and ctx.content[:4].lower() != "pes." and TASK_FLAG_GRAMMAR:
+        corrected_message = await correctGrammar(ctx.content)
+        if corrected_message != ctx.content:
+            greeting = random.choice(greetings)[:-1]
+            embed = discord.Embed(
+                color=discord.Color.blue(),
+                title="PESU Academy Bot - Incorrect Grammar Usage",
+                description=f"**Correct Usage**: {corrected_message}"
+            )
+            await ctx.reply(embed=embed)
 
 
 @client.event
@@ -1575,7 +1589,7 @@ async def pesunews(ctx, *, query=None):
 @client.command()
 async def taskmanager(ctx, handle=None, mode=None):
     if await checkUserIsBotDev(ctx):
-        allowed_handles = ["instagram", "reddit", "pesu"]
+        allowed_handles = ["instagram", "reddit", "pesu", "grammar"]
         allowed_modes = ["on", "off"]
         if handle == None or handle not in allowed_handles:
             await ctx.send(f"Please enter a valid handle. Allowed handles are: {allowed_handles}")
@@ -1610,12 +1624,14 @@ async def taskstatus(ctx):
         pesu_status_value = getVariableValue("pesu").upper()
         reddit_status_value = getVariableValue("reddit").upper()
         instagram_status_value = getVariableValue("instagram").upper()
+        grammar_status_value = getVariableValue("grammar").upper()
         embed = discord.Embed(
             color=discord.Color.blue(),
             title="PESU Academy Bot - Task Status",
             description=f'''PESU Announcement Checks: **{pesu_status_value}**
 Instagram Checks: **{instagram_status_value}**
-Reddit Checks: **{reddit_status_value}**'''
+Reddit Checks: **{reddit_status_value}**
+Grammar Checks: **{grammar_status_value}**'''
         )
         await ctx.send(embed=embed)
     else:
