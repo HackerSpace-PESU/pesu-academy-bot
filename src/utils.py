@@ -27,12 +27,15 @@ async def correctGrammar(text):
     return output['result']
 
 
-async def translateText(text):
+async def translateText(text, to_language='en', optimise=True):
     detected_language_code = langdetect.detect(text)
-    translated_text = text
-    if detected_language_code != "en":
-        translated_text = ts.google(text)
-    return translated_text
+    if optimise:
+        translated_text = text
+        if detected_language_code != "en":
+            translated_text = ts.google(text)
+        return translated_text
+    else:
+        return ts.google(text, to_language=to_language)
 
 
 async def checkRuntimeEnvironmentHeroku():

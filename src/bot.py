@@ -1397,6 +1397,24 @@ async def plagiarismCheckFiles(ctx, language=None, *filenames):
                 pass
 
 
+@client.command(aliases=['ts'])
+async def translate(ctx, language=None, *, text=None):
+    supported_language_codes = ['af', 'am', 'ar', 'auto', 'az', 'be', 'bg', 'bn', 'bs', 'ca', 'ceb', 'co', 'cs', 'cy', 'da', 'de', 'el', 'en', 'en-US', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'fy', 'ga', 'gd', 'gl', 'gu', 'ha', 'haw', 'hi', 'hmn', 'hr', 'ht', 'hu', 'hy', 'id', 'ig', 'is', 'it', 'iw', 'ja', 'jw', 'ka', 'kk', 'km', 'kn', 'ko', 'ku', 'ky',
+                                'la', 'lb', 'lo', 'lt', 'lv', 'mg', 'mi', 'mk', 'ml', 'mn', 'mr', 'ms', 'mt', 'my', 'ne', 'nl', 'no', 'ny', 'or', 'pa', 'pl', 'ps', 'pt', 'ro', 'ru', 'rw', 'sd', 'si', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'sr', 'st', 'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'tk', 'tl', 'tr', 'tt', 'ug', 'uk', 'ur', 'uz', 'vi', 'xh', 'yi', 'yo', 'zh-CN', 'zh-TW', 'zu']
+    if language not in supported_language_codes or language is None:
+        await ctx.send(f"Please enter a valid language. Supported languages are: ```{supported_language_codes}```")
+    elif text is None:
+        await ctx.send(f"Please enter some text to translate.")
+    else:
+        translated_text = await translateText(text, language, optimise=False)
+        embed = discord.Embed(
+            color=discord.Color.blue(),
+            title="PESU Academy Bot - Translator",
+            description=f"**Translation**: {translated_text}"
+        )
+        await ctx.reply(embed=embed, mention_author=False)
+
+
 @client.command(aliases=["moss"])
 async def plagiarismCheck(ctx, language=None, *, script=None):
     supported_languages = {
@@ -1505,7 +1523,7 @@ async def getInstagramEmbed(username):
             post_embed.add_field(
                 name="\u200b", value=post_caption, inline=False)
     post_time = datetime.datetime.fromtimestamp(photo_time).astimezone(IST)
-    post_embed.set_footer(text= post_time)
+    post_embed.set_footer(text=post_time)
     return post_embed, photo_time
 
 
@@ -1604,7 +1622,8 @@ async def pesunews(ctx, *, query=None):
 @client.command()
 async def taskmanager(ctx, handle=None, mode=None):
     if await checkUserIsBotDev(ctx):
-        allowed_handles = ["instagram", "reddit", "pesu", "grammar", "translate"]
+        allowed_handles = ["instagram", "reddit",
+                           "pesu", "grammar", "translate"]
         allowed_modes = ["on", "off"]
         if handle == None or handle not in allowed_handles:
             await ctx.send(f"Please enter a valid handle. Allowed handles are: {allowed_handles}")
@@ -1683,6 +1702,7 @@ async def dbqueryfile(ctx, connection_type, *, query):
         await executeDatabaseQuery(ctx, query, connection_type, True)
     else:
         await ctx.send("You are not authorised to run this command.")
+
 
 @client.command(aliases=["db", "dbq"])
 async def dbquery(ctx, connection_type, *, query):
