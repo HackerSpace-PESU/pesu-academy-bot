@@ -442,6 +442,7 @@ Reply: {ctx.content}'''
 
     if not ctx.author.bot and ctx.content[:4].lower() != "pes.":
 
+        cleaned_content = re.sub(r"(:[A-Za-z0-9]*:)", "", ctx.content).strip()
         if TASK_FLAG_GRAMMAR:
             corrected_message = await correctGrammar(ctx.content)
             if corrected_message != ctx.content:
@@ -452,9 +453,9 @@ Reply: {ctx.content}'''
                 )
                 await ctx.reply(embed=embed)
 
-        if TASK_FLAG_TRANSLATE:
-            translated_message = await translateText(ctx.content)
-            if translated_message != ctx.content:
+        if cleaned_content and TASK_FLAG_TRANSLATE:
+            translated_message = await translateText(cleaned_content)
+            if translated_message != cleaned_content:
                 embed = discord.Embed(
                     color=discord.Color.blue(),
                     title="PESU Academy Bot - Translator",
@@ -1639,13 +1640,15 @@ async def taskstatus(ctx):
         reddit_status_value = getVariableValue("reddit").upper()
         instagram_status_value = getVariableValue("instagram").upper()
         grammar_status_value = getVariableValue("grammar").upper()
+        translation_status_value = getVariableValue("translate").upper()
         embed = discord.Embed(
             color=discord.Color.blue(),
             title="PESU Academy Bot - Task Status",
             description=f'''PESU Announcement Checks: **{pesu_status_value}**
 Instagram Checks: **{instagram_status_value}**
 Reddit Checks: **{reddit_status_value}**
-Grammar Checks: **{grammar_status_value}**'''
+Grammar Checks: **{grammar_status_value}**
+Translator: **{translation_status_value}**'''
         )
         await ctx.send(embed=embed)
     else:
