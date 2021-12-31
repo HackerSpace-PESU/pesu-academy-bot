@@ -7,6 +7,8 @@ import requests
 import pydoodle
 from pathlib import Path
 import datetime
+import langdetect
+import translators as ts
 from gingerit.gingerit import GingerIt
 from bs4 import BeautifulSoup
 from asyncprawcore.exceptions import RequestException
@@ -23,6 +25,14 @@ GINGERIT_GRAMMAR_CHECKER = GingerIt()
 async def correctGrammar(text):
     output = GINGERIT_GRAMMAR_CHECKER.parse(text)
     return output['result']
+
+
+async def translateText(text):
+    detected_language_code = langdetect.detect(text)
+    translated_text = text
+    if detected_language_code != "en":
+        translated_text = ts.google(text)
+    return translated_text
 
 
 async def checkRuntimeEnvironmentHeroku():
