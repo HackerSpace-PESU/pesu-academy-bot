@@ -1,76 +1,18 @@
+import warnings
+warnings.filterwarnings("ignore")
+
+import sys
 import time
-import asyncio
 import datetime
-from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+username = sys.argv[1]
+password = sys.argv[2]
 
-async def searchPESUAcademy(driver, query):
-    query = query.upper()
-
-    driver.get("https://www.pesuacademy.com/Academy/")
-    class_section_button = driver.find_element_by_xpath(
-        r'//*[@id="knowClsSection"]')
-    class_section_button.click()
-
-    entry_box = driver.find_element_by_xpath(
-        r'//*[@id="knowClsSectionModalLoginId"]')
-    await asyncio.sleep(0.4)
-
-    entry_box.send_keys(query)
-
-    search_button = driver.find_element_by_xpath(
-        r'//*[@id="knowClsSectionModalSearch"]')
-    search_button.click()
-    await asyncio.sleep(0.4)
-
-    try:
-        _ = driver.find_element_by_xpath(
-            r'//*[@id="knowClsSectionModalTableDate"]/tr/td[3]').text
-    except:
-        return None
-    else:
-        result = list()
-        table = driver.find_element(By.ID, 'knowClsSectionModalTableDate')
-        rows = table.find_elements(By.TAG_NAME, "tr")
-        for row in rows:
-            col = row.find_elements(By.TAG_NAME, "td")
-            col = [t.text for t in col]
-            result.append(col)
-    return result
-
-
-async def getPESUHallTicket(chrome, username, password):
-    chrome.get("https://pesuacademy.com/Academy")
-    time.sleep(2)
-
-    username_box = chrome.find_element_by_xpath(r'//*[@id="j_scriptusername"]')
-    password_box = chrome.find_element_by_xpath(r'//*[@name="j_password"]')
-
-    username_box.send_keys(username)
-    time.sleep(0.3)
-    password_box.send_keys(password)
-    time.sleep(0.3)
-
-    sign_in_button = chrome.find_element_by_xpath(
-        r'//*[@id="postloginform#/Academy/j_spring_security_check"]')
-    sign_in_button.click()
-    time.sleep(1)
-
-    menu_options = chrome.find_elements_by_xpath(r'//*[@class="menu-name"]')
-    menu_options[12].click()
-    time.sleep(0.3)
-
-    download_button = chrome.find_element_by_xpath(
-        r'//*[@class="btn btn-default btn-sm"]')
-    download_button.click()
-    time.sleep(3)
-
-
-async def getPESUAnnouncements(chrome, username, password):
+def getPESUAnnouncements(chrome, username, password):
     chrome.get("https://pesuacademy.com/Academy")
 
     try:
@@ -146,3 +88,18 @@ async def getPESUAnnouncements(chrome, username, password):
         data.append(temp)
 
     return data
+
+
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--window-size=1920,1080")
+chrome_options.add_argument('--ignore-ssl-errors=yes')
+chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--allow-running-insecure-content')
+
+driver = webdriver.Chrome(options=chrome_options)
+result = getPESUAnnouncements(driver, username, password)
+driver.quit()
+print(result)

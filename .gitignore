@@ -9,6 +9,7 @@ chromedriver
 chromedriver.exe
 *.pdf
 *.pem
+*.crdownload
 log.txt
 requirements-backup.txt
 setHerokuConfig.py
