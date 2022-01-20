@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 from asyncprawcore.exceptions import RequestException
 
 from db import *
+from events import *
 from faculty import *
 from pydictionary import *
 from instagram import *

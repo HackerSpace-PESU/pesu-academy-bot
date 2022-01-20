@@ -1,6 +1,6 @@
 bot/
 venv/
-src/__pycache__/
+__pycache__/
 .vscode/
 test/
 .env
@@ -15,3 +15,4 @@ requirements-backup.txt
 setHerokuConfig.py
 todo.md
 *.out
+~*

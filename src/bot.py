@@ -322,6 +322,10 @@ async def syncFacultyInformation():
     initialiseFacultyFilters()
 
 
+async def syncCalendarInformation():
+    print("Syncing calendar info...")
+    loadPESUCalendar()
+
 async def syncAPICallLimits():
     global compiler_keys
     for client_id, client_secret in compiler_keys.keys():
@@ -340,6 +344,7 @@ async def on_ready():
         await syncGuildDatabase()
         await syncTaskStatusDatabase()
         await syncFacultyInformation()
+        await syncCalendarInformation()
         await setRuntimeEnvironment()
         await syncAPICallLimits()
 
@@ -1305,6 +1310,49 @@ async def syncfaculty(ctx):
         await ctx.send("Faculty information has been synced")
     else:
         await ctx.send(f"You are not authorised to run this command.")
+
+
+@client.command()
+async def synccalendar(ctx):
+    if await checkUserIsBotDev(ctx):
+        await syncCalendarInformation()
+        await ctx.send("Calendar information has been synced")
+    else:
+        await ctx.send(f"You are not authorised to run this command.")
+
+
+async def getCalendarResultEmbed(result):
+    embed = discord.Embed(
+        title="Calendar",
+        color=discord.Color.blue()
+    )
+    for row in result:
+        day = row[0]
+        events = '\n'.join(row[1])
+        embed.add_field(
+            name=datetime.datetime.strftime(day, "%d %b %Y"),
+            value=events,
+            inline=True
+        )
+            
+    return embed
+
+
+@client.command()
+async def calendar(ctx, query, num_results=1):
+    possible_arguments = ["LWD", "EWD", "H", "PTM", "ASD", "CCM", "FASD", "FAM", "ISA", "week", "day", "month", "dd-mm-yyyy"]
+    if query == "help":
+        await ctx.send(f"`calendar` supports the following arguments: `{possible_arguments}`. Add a number after the argument to specify the number of results to return.\n\nExample: `.calendar LWD 3`")
+    results = getCalendarResults(query, num_results)
+    if results == "file":
+        await ctx.send(file=discord.File("data/calendar.docx"))
+    elif results == None:
+        await ctx.send(f"Invalid search. Possible arguments are {possible_arguments}")
+    elif not results:
+        await ctx.send("No results found")
+    else:
+        embed = await getCalendarResultEmbed(results)
+        await ctx.send(embed=embed)
 
 
 @client.command(aliases=["admitcard", "ht"])
