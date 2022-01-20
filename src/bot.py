@@ -1343,16 +1343,17 @@ async def calendar(ctx, query, num_results=1):
     possible_arguments = ["LWD", "EWD", "H", "PTM", "ASD", "CCM", "FASD", "FAM", "ISA", "week", "day", "month", "dd-mm-yyyy"]
     if query == "help":
         await ctx.send(f"`calendar` supports the following arguments: `{possible_arguments}`. Add a number after the argument to specify the number of results to return.\n\nExample: `.calendar LWD 3`")
-    results = getCalendarResults(query, num_results)
-    if results == "file":
-        await ctx.send(file=discord.File("data/calendar.docx"))
-    elif results == None:
-        await ctx.send(f"Invalid search. Possible arguments are {possible_arguments}")
-    elif not results:
-        await ctx.send("No results found")
     else:
-        embed = await getCalendarResultEmbed(results)
-        await ctx.send(embed=embed)
+        results = getCalendarResults(query, num_results)
+        if results == "file":
+            await ctx.send(file=discord.File("data/calendar.docx"))
+        elif results == None:
+            await ctx.send(f"Invalid search. Possible arguments are {possible_arguments}")
+        elif not results:
+            await ctx.send("No results found")
+        else:
+            embed = await getCalendarResultEmbed(results)
+            await ctx.send(embed=embed)
 
 
 @client.command(aliases=["admitcard", "ht"])
