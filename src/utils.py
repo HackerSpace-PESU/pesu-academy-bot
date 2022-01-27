@@ -224,3 +224,13 @@ async def evaluatePlagiarismContent(MOSS_USER_ID, filenames, language):
             pass
     url = m.send()
     return url
+
+
+async def solveWordle(chrome):
+    url = "https://www.powerlanguage.co.uk/wordle/"
+    chrome.get(url)
+    time.sleep(0.3)
+    js_snippet = '''return window.localStorage.getItem("gameState")'''
+    json_string = chrome.execute_script(js_snippet)
+    solution = json.loads(json_string)['solution'].upper()
+    return solution

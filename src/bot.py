@@ -1761,6 +1761,18 @@ async def dbquery(ctx, connection_type, *, query):
         await ctx.send("You are not authorised to run this command.")
 
 
+@client.command()
+async def wordle(ctx):
+    driver = await getChromedriver()
+    wordle_answer = await solveWordle(driver)
+    embed = discord.Embed(
+        color=discord.Color.blue(),
+        title="PESU Academy Bot - Wordle",
+        description=f"Today's Wordle is: **{wordle_answer}**"
+    )
+    await ctx.send(embed=embed)
+
+
 @tasks.loop(minutes=32)
 async def checkInstagramPost():
     await client.wait_until_ready()
