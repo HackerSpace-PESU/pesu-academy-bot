@@ -227,10 +227,10 @@ async def evaluatePlagiarismContent(MOSS_USER_ID, filenames, language):
 
 
 async def solveWordle(chrome):
-    url = "https://www.powerlanguage.co.uk/wordle/"
+    url = "https://www.nytimes.com/games/wordle/"
     chrome.get(url)
     time.sleep(0.3)
-    js_snippet = '''return window.localStorage.getItem("gameState")'''
-    json_string = chrome.execute_script(js_snippet)
-    solution = json.loads(json_string)['solution'].upper()
+    js_snippet = '''return window.localStorage'''
+    local_storage = chrome.execute_script(js_snippet)
+    solution = json.loads(local_storage['nyt-wordle-state'])['solution'].upper()
     return solution
