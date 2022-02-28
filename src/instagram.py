@@ -34,7 +34,7 @@ instagram_usernames = ['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc
                        'thealcodingclub', 'thebisibelebois', 'themusicclubpesu', 'thenautankiteam',
                        'thor_pesu', 'throughthelens.pesu', 'trance_pes', 'under25pes', 'under25pesuecc',
                        'vegaracingelectric', 'writeangle.pesu', 'zeroday.pesuecc', 'adconnect_pesu', 'cognitivemd_pesu',
-                       'appex.pesu', 'adgpesu', 'pesumeraki_fc', 'pesuventurelabs', 'terpsichore_pesu', 'panachepesuecc',
+                       'appex.pesu', 'adgpesu', 'pesumeraki_fc', 'pesuventurelabs', 'terpsichore_pesu', 'panachepesuecc', 'ieee.cs.pesu'
                        'isfcr.pesu', 'abhyudaya.pesu', 'thecoderfactory_pesu', 'etal.pesu', 'hallothon.pesu', 'gamedev_pesu']
 
 
