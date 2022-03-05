@@ -64,6 +64,33 @@ async def cleanUp():
                 print(f"File missing and could not be deleted: {fname}")
 
 
+async def calculateSGPA(credit_grade_pairs):
+    grade_map = {
+        'S': 10,
+        'A': 9,
+        'B': 8,
+        'C': 7,
+        'D': 6,
+        'E': 5,
+        'F': 4
+    }
+    weighted_credits = 0
+    total_credits = 0
+    for course_credit, grade in credit_grade_pairs:
+        weighted_credits += grade_map[grade] * course_credit
+        total_credits += course_credit
+    return weighted_credits / total_credits
+
+
+async def calculateCGPA(credit_sgpa_pairs):
+    weighted_credits = 0
+    total_credits = 0
+    for semester_credits, sgpa in credit_sgpa_pairs:
+        weighted_credits += semester_credits * sgpa
+        total_credits += semester_credits
+    return weighted_credits / total_credits
+
+
 async def getDictionaryMeaning(query, n=5):
     flag, word = checkWordExistsInDictionary(query)
     if flag:

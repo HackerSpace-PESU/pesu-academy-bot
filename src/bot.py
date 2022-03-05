@@ -1093,6 +1093,55 @@ async def clear(ctx, amount=1):
         await ctx.send(f"You are not authorised to run this command.")
 
 
+@client.command()
+async def sgpa(ctx, *, args):
+    args = args.strip()
+    if args == "" or args == "help":
+        await ctx.send("The argument format is: `pes.sgpa [CREDITS][GRADE] [CREDITS][GRADE ... (for each course)`\nExample: `pes.sgpa 4A 4B 3C` indicates A grade in a 4 credit course, B grade in a 4 credit course, and C grade in a 3 credit course.")
+    else:
+        args = args.split(" ")
+        credit_grade_pairs = list()
+        for arg in args:
+            if len(arg) == 2:
+                credit_grade_pairs.append([int(arg[0]), arg[1]])
+            else:
+                await ctx.send("Incorrect argument format. Type `pes.sgpa help` for more information.")
+                return
+        sgpa = await calculateSGPA(credit_grade_pairs)
+        sgpa = round(sgpa, 2)
+        embed = discord.Embed(
+            title=f"PESU Academy Bot - SGPA",
+            color=discord.Color.blue(),
+            description=f"Your SGPA is: **{sgpa}**"
+        )
+        await ctx.send(embed=embed)
+
+
+@client.command()
+async def cgpa(ctx, *, args):
+    args = args.strip()
+    if args == "" or args == "help":
+        await ctx.send("The argument format is: `pes.cgpa [CREDITS IN SEMESTER],[SGPA] [CREDITS IN SEMESTER],[SGPA] ... (for each semester)`\nExample: `pes.cgpa 24,8.0 24,8.2` indicates 24 credits in the first semester and 8.0 SGPA, 24 credits in the second semester and and 8.2 SGPA.")
+    else:
+        args = args.split(" ")
+        credits_sgpa_pairs = list()
+        for arg in args:
+            arg = arg.split(",")
+            if len(arg) == 2:
+                credits_sgpa_pairs.append([float(arg[0]), float(arg[1])])
+            else:
+                await ctx.send("Incorrect argument format. Type `pes.cgpa help` for more information.")
+                return
+        cgpa = await calculateCGPA(credits_sgpa_pairs)
+        cgpa = round(cgpa, 2)
+        embed = discord.Embed(
+            title=f"PESU Academy Bot - CGPA",
+            color=discord.Color.blue(),
+            description=f"Your CGPA is: **{cgpa}**"
+        )
+        await ctx.send(embed=embed)
+
+
 @client.command(aliases=["searchsrn", "searchpes"])
 async def search(ctx, query):
     driver = await getChromedriver()
