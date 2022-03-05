@@ -10,7 +10,7 @@ RUN echo "pip version: $(pip3 --version)"
 
 # Install Chrome
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt install nano wget dpkg unzip tzdata -y
+RUN apt install vim wget dpkg unzip tzdata -y
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 RUN apt install ./google-chrome-stable_current_amd64.deb -y
 RUN rm ./google-chrome-stable_current_amd64.deb
@@ -24,13 +24,15 @@ RUN rm chromedriver_linux64.zip
 RUN echo "Chromedriver version: $(chromedriver --version) installed at $(which chromedriver)"
 
 # Setting up Python environment
-COPY src/ src/
-COPY data/ data/
-COPY .env_template .env_template
-COPY start.sh start.sh
-RUN apt install libpq-dev python3-dev -y
-COPY requirements.txt requirements.txt
-RUN pip3 install  --no-deps -r requirements.txt
+COPY ../src/ src/
+COPY ../data/ data/
+COPY ../.env .env
+COPY ../start.sh start.sh
+RUN apt install git libpq-dev python3-dev -y
+RUN git config --global user.email "emailaddress@domain.com"
+RUN git config --global user.name "Your Name"
+COPY ../requirements.txt requirements.txt
+RUN pip3 install --no-deps -r requirements.txt
 RUN python3 -c "import nltk; nltk.download('wordnet')"
 
 # Running the bot

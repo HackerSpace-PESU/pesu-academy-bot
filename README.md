@@ -19,7 +19,7 @@ You can add the bot to your Discord Server using [this link](http://bit.ly/pesu-
 2. It is connected to a student database, and allows you to perform a query based lookup to search
 3. It updates you about Instagram posts made by clubs
 4. It also follows PES social media handles - Instagram and Reddit
-4. It contains two URL shortners - [long.rip](http://www.long.rip/) by [Adarsh Shetty](https://github.com/ObliviousParadigm) and [redirector](https://github.com/HackerSpace-PESU/redirector) by me
+4. It contains two URL shortners - [long.rip](http://www.long.rip/) by [Adarsh Shetty](https://github.com/ObliviousParadigm) and [redirector](https://github.com/HackerSpace-PESU/redirector) by [Aditeya Baral](https://github.com/aditeyabaral)
 5. You can also execute Python code!
 6. It features a meme-generator - [SaaS](https://github.com/aditeyabaral/spongebob-as-a-service) and an [English Dictionary](https://github.com/aditeyabaral/pydictionary)
 
@@ -27,6 +27,38 @@ You can add the bot to your Discord Server using [this link](http://bit.ly/pesu-
 
 Execute `pes.help` after adding the bot to your server to check out all the features.
 ## How to run PESU Academy Bot?
+
+### Docker
+
+PESU Academy Bot's environment has now been containerized to make running the bot easy. To run the bot now, all you need is the `.env` file. There are two ways to go about this:
+
+1. Build the Docker image from scratch and run it (easy)
+
+    - Set your environment variables in the `.env` file
+    - Set your git username and email address in the `.env` file
+    - Build and deploy:
+    ```bash
+    docker build -t pesu-academy-bot -f docker/Dockerfile .
+    docker run -d pesu-academy-bot
+    ```
+
+2. Pulling a pre-built Docker image (difficult)
+
+    - Pull the latest Docker image from DockerHub and access the filesystem
+    ```bash
+    docker pull aditeyabaral/pesu-academy-bot-env
+    docker run -it aditeyabaral/pesu-academy-bot-env bash
+    vi .env
+    ```
+    - This will open a Vim editor. Now, paste the contents of the `.env` file and close it. Type `exit` to quit the image. 
+    - Type `docker ps -a` to see the container. Copy the container ID, and then run `docker commit CONTAINER_ID aditeyabaral/pesu-academy-bot-env` to commit the container
+    - Run the container with the following commands (can also be done using Docker Desktop's CLI):
+    ```bash
+    docker run -it aditeyabaral/pesu-academy-bot-env bash
+    python3 src/bot.py
+    ```
+
+### Python Environment
 
 1. Clone the repository
 ```bash
@@ -41,7 +73,7 @@ source bot/bin/activate
 pip3 install -r requirements.txt
 ```
 
-3. Setup the following environment variables in a `.env`
+3. Setup the `.env_template` file and rename it to `.env`
 
 ```bash
 ARONYA_ID=
