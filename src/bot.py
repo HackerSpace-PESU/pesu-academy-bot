@@ -771,7 +771,7 @@ async def dbinfo(ctx):
         await ctx.send("You are not authorised to run this command.")
 
 
-@client.command(aliases=['announceembed'])
+@client.command(aliases=['announcecommand'])
 async def announce(ctx, message_type=None, *, message: str = None):
     if await checkUserIsBotDev(ctx):
         if message == None:
