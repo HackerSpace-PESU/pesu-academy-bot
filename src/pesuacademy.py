@@ -74,9 +74,12 @@ async def getPESUAnnouncements(chrome, username, password):
     chrome.get("https://pesuacademy.com/Academy")
 
     try:
-        username_box = WebDriverWait(chrome, 10).until(EC.presence_of_element_located((By.ID, "j_scriptusername")))
-        password_box = WebDriverWait(chrome, 10).until(EC.presence_of_element_located((By.NAME, "j_password")))
-        login_button = WebDriverWait(chrome, 10).until(EC.presence_of_element_located((By.ID, "postloginform#/Academy/j_spring_security_check")))
+        username_box = WebDriverWait(chrome, 10).until(
+            EC.presence_of_element_located((By.ID, "j_scriptusername")))
+        password_box = WebDriverWait(chrome, 10).until(
+            EC.presence_of_element_located((By.NAME, "j_password")))
+        login_button = WebDriverWait(chrome, 10).until(EC.presence_of_element_located(
+            (By.ID, "postloginform#/Academy/j_spring_security_check")))
     except:
         return list()
 
@@ -87,7 +90,8 @@ async def getPESUAnnouncements(chrome, username, password):
     login_button.click()
 
     try:
-        menu_options = WebDriverWait(chrome, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "menu-name")))
+        menu_options = WebDriverWait(chrome, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "menu-name")))
     except:
         return list()
 
@@ -97,7 +101,8 @@ async def getPESUAnnouncements(chrome, username, password):
             break
 
     try:
-        announcement_boxes = WebDriverWait(chrome, 15).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "elem-info-wrapper")))
+        announcement_boxes = WebDriverWait(chrome, 15).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "elem-info-wrapper")))
     except:
         return list()
 

@@ -326,6 +326,7 @@ async def syncCalendarInformation():
     print("Syncing calendar info...")
     loadPESUCalendar()
 
+
 async def syncAPICallLimits():
     global compiler_keys
     for client_id, client_secret in compiler_keys.keys():
@@ -621,8 +622,8 @@ async def shutdown(ctx):
         await ctx.send("You are not authorised to run this command.")
 
 
-@client.command(aliases=["fixdb"])
-async def fixpesdb(ctx):
+@client.command(aliases=["fixpesdb"])
+async def fixdb(ctx):
     if await checkUserIsBotDev(ctx):
         await ctx.send("Fixing PESU Academy database...")
         fixPESUDB()
@@ -669,8 +670,8 @@ async def contribute(ctx, *params):
     await ctx.send(embed=embed)
 
 
-@client.command(aliases=['reachout'])
-async def reachoutcommand(ctx, *, message: str = None):
+@client.command()
+async def reachout(ctx, *, message: str = None):
     if await checkUserIsAdminOrBotDev(ctx):
         if(message == None):
             await ctx.send("Type a message to send to the developers.")
@@ -698,8 +699,8 @@ async def reachoutcommand(ctx, *, message: str = None):
         await ctx.send("You are not authorised to run this command. Only members with administrator permissions can run this command. Contact your server administrator or anyone with a role who has administrator privileges. You can always contact us on our GitHub page: https://github.com/HackerSpace-PESU/pesu-academy-bot")
 
 
-@client.command(aliases=['reachreply'])
-async def reachreplycommand(ctx, destination_channel_id: int = None, *, message: str = None):
+@client.command()
+async def reachreply(ctx, destination_channel_id: int = None, *, message: str = None):
     if await checkUserIsBotDev(ctx):
         if(destination_channel_id == None):
             await ctx.send("Enter a valid channel ID")
@@ -733,8 +734,8 @@ async def reachreplycommand(ctx, destination_channel_id: int = None, *, message:
         await ctx.send("You do not have the permission to execute this command")
 
 
-@client.command(aliases=['guilds'])
-async def guildscommand(ctx):
+@client.command(aliases=['guildscommand'])
+async def guilds(ctx):
     if await checkUserIsBotDev(ctx):
         await ctx.channel.trigger_typing()
         count = 0
@@ -770,8 +771,8 @@ async def dbinfo(ctx):
         await ctx.send("You are not authorised to run this command.")
 
 
-@client.command(aliases=['announce'])
-async def announcecommand(ctx, message_type=None, *, message: str = None):
+@client.command(aliases=['announceembed'])
+async def announce(ctx, message_type=None, *, message: str = None):
     if await checkUserIsBotDev(ctx):
         if message == None:
             await ctx.send("Please enter a valid message.")
@@ -783,8 +784,8 @@ async def announcecommand(ctx, message_type=None, *, message: str = None):
         await ctx.send("You are not authorised to run this command.")
 
 
-@client.command(aliases=['announceembed'])
-async def announceembedcommand(ctx, message_type=None, *, message: str = None):
+@client.command(aliases=['announceembedcommand'])
+async def announceembed(ctx, message_type=None, *, message: str = None):
     if await checkUserIsBotDev(ctx):
         if message == None:
             await ctx.send("Please enter a valid message.")
@@ -972,8 +973,8 @@ async def dmr(ctx, *, query=None):
         await ctx.send(f"You are not authorised to run this command.")
 
 
-@client.command(aliases=["vc", "pride"])
-async def prideofpesu(ctx):
+@client.command(aliases=["vc", "prideofpesu"])
+async def pride(ctx):
     greeting = random.choice(greetings)
     embed = discord.Embed(
         title=f"{greeting}, may the PRIDE of PESU be with you!", color=discord.Color.blue())
@@ -995,6 +996,7 @@ async def ping(ctx):
 async def help(ctx):
     content = {
         '`pes.hello`': 'Be nice to me. Say `pes.hello` once in a while 👋',
+        '`pes.help`': 'Invoke this help command for assistance',
         '`pes.ping`': 'Perform a `ping` test',
         '`pes.alerts`': 'Setup a channel to receive alerts using `pes.alerts [CHANNEL]`',
         '`pes.removealerts`': 'Unsubscribe a channel from alerts using `pes.removealerts [CHANNEL]`',
@@ -1004,6 +1006,7 @@ async def help(ctx):
         '`pes.contribute`': 'Learn how to contribute to PESU Academy Bot',
         '`pes.reachout`': 'Send a message to the developer team',
         '`pes.hallticket`': 'Obtain your hall ticket for an upcoming ESA using `pes.hallticket [SRN | PRN] [PASSWORD]. Remember to use this command in a private DM with the bot.`',
+        '`pes.calendar`': 'Obtain the calendar for the upcoming semester using `pes.calendar help`',
         '`pes.search`': 'To search the PESU Class and Section Database, use `pes.search [SRN | email]`',
         '`pes.pesdb`': 'Search the Student PESU Database using `pes.pesdb [search 1] & [search 2]`. String together as many filters as needed. You can also use emails and names.',
         '`pes.news`': 'Fetch PESU Announcements using `pes.news [OPTIONAL=today] [OPTIONAL=N]`. Get today\'s announcements with `pes.news today`. Fetch all announcements using `pes.news`. Specify the number of news using `N`.',
@@ -1022,9 +1025,13 @@ async def help(ctx):
         <inputs>""",
         '`pes.moss`': "Compute plagiarism in inline scripts using MOSS. Use `pes.moss [LANGUAGE] ```[SCRIPT 1]``` ```[SCRIPT 2]````",
         '`pes.fmoss`': "Compute plagiarism in files using MOSS. Upload files to channel and use `pes.fmoss [LANGUAGE]`",
-        '`pes.sb`': 'Create a SpongeBob mocking meme. `pes.sb [top text] & [bottom-text]` or `pes.sb [bottom-text]`',
-        '`pes.dict`': 'Search for the meaning of word using `pes.dict [word]`',
+        '`pes.spongebob`': 'Create a SpongeBob mocking meme. `pes.sb [top text] & [bottom-text]` or `pes.sb [bottom-text]`',
+        '`pes.dictionary`': 'Search for the meaning of word using `pes.dict [word]`',
         '`pes.pride`': 'Invoke the PRIDE of PESU',
+        '`pes.translate`': 'Translate text using `pes.translate [LANGUAGE CODE] [TEXT]`',
+        '`pes.wordle`': 'Find today\'s WORDLE solution',
+        '`pes.sgpa`': 'Calculate your SGPA. Type `pes.sgpa help` for more information',
+        '`pes.cgpa`': 'Calculate your CGPA. Type `pes.cgpa help` for more information',
         '`pes.devhelp`': 'Get a list of commands available to bot developers'
     }
     embed = discord.Embed(title=f"Help",
@@ -1061,7 +1068,12 @@ async def devhelp(ctx):
         "`pes.clear`": "Clear messages on a channel using `pes.clear [N]`",
         "`pes.files`": "Lists all the files in the current repository directory",
         "`pes.clean`": "Cleans up unnecessary and redundant files",
-
+        "`pes.dbquery`": "Run an SQL query on the database using `pes.dbquery [DATABASE] [QUERY]`",
+        "`pes.dbqueryfile`": "Run an SQL query on the database using `pes.dbquery [DATABASE] [QUERY]` and return the results in a file",
+        "`pes.synccalendar`": "Sync the semester's calendar",
+        "`pes.dmr`": "Reply to a message in DMs",
+        "`pes.dm`": "Send a message in DMs",
+        "`pes.dma`": "Send a message in DMs and ping the recipient",
     }
     embed = discord.Embed(title=f"Developer Help",
                           color=discord.Color.blue())
@@ -1229,8 +1241,8 @@ async def dictionary(ctx, query, n=5):
             await ctx.send(f"Word not found. Did you mean {result}?")
 
 
-@client.command(aliases=["goto"])
-async def redirector(ctx, long_url, short_url):
+@client.command(aliases=["redirector"])
+async def goto(ctx, long_url, short_url):
     response = await shortenLinkRedirector(short_url, long_url)
     if response.status_code == 200:
         await ctx.send(f"{long_url} is now shortened to https://goto-link.herokuapp.com/{short_url}")
@@ -1383,13 +1395,14 @@ async def getCalendarResultEmbed(result):
             value=events,
             inline=True
         )
-            
+
     return embed
 
 
 @client.command()
 async def calendar(ctx, query, num_results=1):
-    possible_arguments = ["LWD", "EWD", "H", "PTM", "ASD", "CCM", "FASD", "FAM", "ISA", "week", "day", "month", "dd-mm-yyyy"]
+    possible_arguments = ["LWD", "EWD", "H", "PTM", "ASD", "CCM",
+                          "FASD", "FAM", "ISA", "week", "day", "month", "dd-mm-yyyy"]
     if query == "help":
         await ctx.send(f"`calendar` supports the following arguments: `{possible_arguments}`. Add a number after the argument to specify the number of results to return.\n\nExample: `.calendar LWD 3`")
     else:
@@ -1435,8 +1448,8 @@ async def hallticket(ctx, srn=None, password=None):
         await ctx.send("This command requires access to sensitive data. Please use this command in a DM with the bot.")
 
 
-@client.command(aliases=["mossfile", "moss-file", "fmoss"])
-async def plagiarismCheckFiles(ctx, language=None, *filenames):
+@client.command(aliases=["mossfile", "moss-file"])
+async def fmoss(ctx, language=None, *filenames):
     supported_languages = {
         "c": ".c",
         "cc": ".cc",
@@ -1513,8 +1526,8 @@ async def translate(ctx, language=None, *, text=None):
         await ctx.reply(embed=embed, mention_author=False)
 
 
-@client.command(aliases=["moss"])
-async def plagiarismCheck(ctx, language=None, *, script=None):
+@client.command()
+async def moss(ctx, language=None, *, script=None):
     supported_languages = {
         "c": ".c",
         "cc": ".cc",
@@ -1625,13 +1638,23 @@ async def getInstagramEmbed(username):
     return post_embed, photo_time
 
 
-@client.command(aliases=["ig", "igpost"])
-async def insta(ctx, username="pesuniversity"):
+@client.command(aliases=["insta", "igpost"])
+async def ig(ctx, username="pesuniversity"):
     if TASK_FLAG_INSTAGRAM:
         post_embed, _ = await getInstagramEmbed(username)
         await ctx.send(embed=post_embed)
     else:
         await ctx.send("Instagram feature has been turned off. Please contact the bot devs to enable it and continue.")
+
+
+@client.command()
+async def syncnews(ctx):
+    if await checkUserIsAdminOrBotDev(ctx):
+        await ctx.send("Syncing news...")
+        await checkPESUAnnouncement()
+        await ctx.send("Done.")
+    else:
+        await ctx.send("You are not authorized to use this command.")
 
 
 async def getAnnouncementEmbed(announcement):
@@ -1662,8 +1685,8 @@ async def getAnnouncementEmbed(announcement):
     return embed
 
 
-@client.command(aliases=["news"])
-async def pesunews(ctx, *, query=None):
+@client.command(aliases=["pesunews"])
+async def news(ctx, *, query=None):
     global TODAY_ANNOUNCEMENTS_MADE
     global ALL_ANNOUNCEMENTS_MADE
 

@@ -259,5 +259,6 @@ async def solveWordle(chrome):
     time.sleep(0.3)
     js_snippet = '''return window.localStorage'''
     local_storage = chrome.execute_script(js_snippet)
-    solution = json.loads(local_storage['nyt-wordle-state'])['solution'].upper()
+    solution = json.loads(
+        local_storage['nyt-wordle-state'])['solution'].upper()
     return solution
