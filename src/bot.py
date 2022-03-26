@@ -127,6 +127,8 @@ async def getChromedriver(experimental=False):
             executable_path=CHROMEDRIVER_PATH, options=new_chrome_options)
     else:
         driver = webdriver.Chrome(options=new_chrome_options)
+    tz_params = {'timezoneId': 'Asia/Kolkata'}
+    driver.execute_cdp_cmd('Emulation.setTimezoneOverride', tz_params)
     return driver
 
 
