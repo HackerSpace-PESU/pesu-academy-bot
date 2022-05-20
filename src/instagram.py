@@ -11,21 +11,21 @@ instagram_embed_colours = cycle([
     0x4c68d7
 ])
 
-instagram_usernames = ['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc',
+instagram_usernames = ['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc', '_oncreate'
                        'acmw.pesu', 'aikya_pesu',
                        'apostrophe.pesuecc', 'ayra_the.helping.hand_pesu',
                        'blueprint_pesuecc', 'c.o.d.s_community', 'c.o.d.s_pesu_ecc',
                        'c.o.d.s_pesu_rr', 'cie.pesu', 'clubs_pesuecc', 'codechef_pesuecc',
-                       'csr.pesu', 'dscpesu.ec', 'dscpesu.rr', 'dsgnr_pesu',
+                       'csr.pesu', 'gdscpesu.ec', 'dscpesu.rr', 'dsgnr_pesu',
                        'dsgnr_pesuecc', 'entrepreneurshipclub.pes', 'equinox.pes', 'equinox.pesecc',
                        'grimmreaders_pesu', 'hayaracing', 'humans_of_pes', 'humans_of_pesu',
                        'ieee.ras.pesu', 'ieee.ras.pesuecc', 'ieee_pes_sscs_photonics', 'ieeepesit',
                        'ingeniushackathon', 'kludge_pesu', 'linguista.club',
-                       'maayapesu', 'mangobites.pesu', 'munsoc.pesecc', 'newolfsociety',
+                       'maayapesu', 'mangobites.pesu', 'munsoc.pesuecc', 'newolfsociety',
                        'ninaada.pesu', 'parallax_techwarts', 'pes.epsilon', 'pes.lab', 'pes.opensource',
                        'pes.qforest', 'pes.spacejam', 'pes_ecell', 'pesdebsoc',
                        'peshackerspace', 'peshackerspace.ecc', 'pesmunsociety', 'pesu.gdc',
-                       'pesu.hashtagcrew', 'pesu.io', 'pesu.tas',
+                       'pesu.hashtagcrew', 'pesu.io', 'pesu.tas', 'qqc_ecc', 'teamvegavath_pesu', 'avionsaero', 'predict.this',
                        'pesu_covid_support', 'pesu_nirantara', 'pesuniversity', 'pixelloid_pes',
                        'pixels.pesu', 'quotientquizclub', 'rc_pesu3190', 'saarang_official',
                        'samarpana.india', 'shakennotstirred.pes', 'swarantraka.pes', 'team.encore',
@@ -34,7 +34,7 @@ instagram_usernames = ['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc
                        'thealcodingclub', 'thebisibelebois', 'themusicclubpesu', 'thenautankiteam',
                        'thor_pesu', 'throughthelens.pesu', 'trance_pes', 'under25pes', 'under25pesuecc',
                        'vegaracingelectric', 'writeangle.pesu', 'zeroday.pesuecc', 'adconnect_pesu', 'cognitivemd_pesu',
-                       'appex.pesu', 'adgpesu', 'pesumeraki_fc', 'pesuventurelabs', 'terpsichore_pesu', 'panachepesuecc', 'ieee.cs.pesu',
+                       'appex.pesu', 'adgpes', 'pesumeraki_fc', 'pesuventurelabs', 'terpsichore_pesu', 'panachepesuecc', 'ieee.cs.pesu',
                        'isfcr.pesu', 'abhyudaya.pesu', 'thecoderfactory_pesu', 'etal.pesu', 'hallothon.pesu', 'gamedev_pesu']
 
 
