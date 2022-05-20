@@ -653,7 +653,7 @@ async def contribute(ctx, *params):
         1: "Fork this repository",
         2: "Create a new branch called `username-beta`",
         3: "Make your changes and create a pull request with the following information in the request message: `The functionality you wish to change/add | What did you change/add`. Remember to add a few screenshots of the feature working at your end",
-        4: "Send a review request to `aditeyabaral` or `abaksy`",
+        4: "Send a review request to `alfadelta10010`",
         5: "Wait for approval for reviewers. Your PR may be directly accepted or requested for further changes"
     }
     for rule in rules:
@@ -664,7 +664,7 @@ async def contribute(ctx, *params):
     aditeyabaral = guild_object.get_member(ADITEYABARAL_ID).mention
     # abaksy = guild_object.get_member(ARONYABAKSY_ID).mention  # F for retired member
     embed.add_field(
-        name="Reviewers", value=f"`aditeyabaral` - {aditeyabaral}", inline=False)
+        name="Reviewers", value=f"`alfadelta10010` - {aditeyabaral}", inline=False)
     embed.add_field(
         name="Important", value="**Under no circumstances is anyone allowed to merge to the main branch.**", inline=False)
     embed.add_field(
