@@ -11,7 +11,7 @@ instagram_embed_colours = cycle([
     0x4c68d7
 ])
 
-instagram_usernames = ['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc', '_oncreate'
+instagram_usernames = ['_sour_candy_', '_techwarts', 'aatmatrisha_', 'acmpesuecc', '_oncreate',
                        'acmw.pesu', 'aikya_pesu',
                        'apostrophe.pesuecc', 'ayra_the.helping.hand_pesu',
                        'blueprint_pesuecc', 'c.o.d.s_community', 'c.o.d.s_pesu_ecc',
