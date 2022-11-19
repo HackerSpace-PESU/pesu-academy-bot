@@ -6,11 +6,11 @@ from dbmodels import Student
 from dotenv import load_dotenv
 
 load_dotenv()
-pesudb_engine = create_engine(os.environ["PESU_DATABASE_URL"])
-pesudb_connection = pesudb_engine.connect()
-pesudb_metadata = MetaData()
-pesudb_Session = sessionmaker(bind=pesudb_engine)
-pesudb_session = pesudb_Session()
+#pesudb_engine = create_engine(os.environ["PESU_DATABASE_URL"])
+#pesudb_connection = pesudb_engine.connect()
+#pesudb_metadata = MetaData()
+#pesudb_Session = sessionmaker(bind=pesudb_engine)
+#pesudb_session = pesudb_Session()
 
 guilddb_engine = create_engine(os.environ["SERVER_CHANNEL_DATABASE_URL"])
 guilddb_connection = guilddb_engine.connect()
@@ -23,7 +23,7 @@ guilddb_table = Table("guild", guilddb_metadata,
 statusdb_table = Table("status", guilddb_metadata,
                        autoload=True, autoload_with=guilddb_engine)
 
-
+'''
 def processFilter(filter_type, filter):
     filter_value_map = {
         "DES": "B.DES",
@@ -213,12 +213,12 @@ def searchPESUDatabase(filters):
 def fixPESUDB():
     transaction = pesudb_connection.begin()
     transaction.rollback()
-
+'''
 
 def executeQueryString(query, connection_type):
-    if connection_type in ["pesudb", "pesu"]:
-        result = pesudb_connection.execute(query)
-    elif connection_type in ["guilddb", "guild"]:
+    #if connection_type in ["pesudb", "pesu"]:
+    #    result = pesudb_connection.execute(query)
+    if connection_type in ["guilddb", "guild"]:
         result = guilddb_connection.execute(query)
     return result.fetchall()
 

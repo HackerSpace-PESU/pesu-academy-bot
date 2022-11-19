@@ -1178,7 +1178,7 @@ async def search(ctx, query):
         await ctx.send(embed=embed)
     driver.quit()
 
-
+"""
 @client.command()
 async def pesdb(ctx, *, query):
     result, truncated, base_url = await getPESUDBResults(query)
@@ -1214,7 +1214,7 @@ async def spongebob(ctx, *, query):
         picture = discord.File(f)
         await ctx.send(file=picture)
     os.remove("meme.jpg")
-
+"""
 
 @client.command(aliases=["dict"])
 async def dictionary(ctx, query, n=5):
@@ -1419,7 +1419,7 @@ async def calendar(ctx, query, num_results=1):
             embed = await getCalendarResultEmbed(results)
             await ctx.send(embed=embed)
 
-
+"""
 @client.command(aliases=["admitcard", "ht"])
 async def hallticket(ctx, srn=None, password=None):
     if ctx.guild == None or await checkUserIsBotDev(ctx):
@@ -1448,7 +1448,7 @@ async def hallticket(ctx, srn=None, password=None):
                 driver.quit()
     else:
         await ctx.send("This command requires access to sensitive data. Please use this command in a DM with the bot.")
-
+"""
 
 @client.command(aliases=["mossfile", "moss-file"])
 async def fmoss(ctx, language=None, *filenames):
@@ -1842,7 +1842,7 @@ async def wordle(ctx):
     embed = discord.Embed(
         color=discord.Color.blue(),
         title="PESU Academy Bot - Wordle",
-        description=f"Today's Wordle is: **{wordle_answer}**"
+        description=f"Today's Wordle is: ||**{wordle_answer}**||"
     )
     await ctx.send(embed=embed)
 

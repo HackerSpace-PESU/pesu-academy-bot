@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
-
+'''
 class Student(Base):
     __tablename__ = "student"
     _id = Column(Integer, primary_key=True, autoincrement=True)
@@ -30,7 +30,7 @@ class Student(Base):
         self.campus = campus
         self.email = email
         self.phone = phone
-
+'''
 
 class Guild(Base):
     __tablename__ = "guild"

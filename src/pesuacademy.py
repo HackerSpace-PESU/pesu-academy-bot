@@ -41,7 +41,7 @@ async def searchPESUAcademy(driver, query):
             col = [t.text for t in col]
             result.append(col)
     return result
-
+'''
 
 async def getPESUHallTicket(chrome, username, password):
     chrome.get("https://pesuacademy.com/Academy")
@@ -68,7 +68,7 @@ async def getPESUHallTicket(chrome, username, password):
         r'//*[@class="btn btn-default btn-sm"]')
     download_button.click()
     time.sleep(3)
-
+'''
 
 async def getPESUAnnouncements(chrome, username, password):
     chrome.get("https://pesuacademy.com/Academy")

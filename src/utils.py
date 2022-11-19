@@ -119,7 +119,7 @@ async def updateCodeAPICallLimits(COMPILER_CLIENT_ID, COMPILER_CLIENT_SECRET):
         clientId=COMPILER_CLIENT_ID, clientSecret=COMPILER_CLIENT_SECRET)
     return 200 - executor.usage()
 
-
+'''
 async def getPESUDBResults(query):
     query = query.upper()
     filters = query.split("&")
@@ -130,7 +130,7 @@ async def getPESUDBResults(query):
         base_url += "/" + f
     listResult, truncated = searchPESUDatabase(filters)
     return listResult, truncated, base_url
-
+'''
 
 async def shortenLinkBitly(long_url, BITLY_TOKEN, BITLY_GUID):
     headers = {
@@ -173,7 +173,7 @@ async def shortenLinkRedirector(short_url, long_url):
 
     return response
 
-
+'''
 async def generateSpongebobMeme(query):
     captions = query.split('&')
     if len(captions) == 1:
@@ -198,7 +198,7 @@ async def generateSpongebobMeme(query):
     response = requests.get(img_url)
     with open("meme.jpg", 'wb') as outfile:
         outfile.write(response.content)
-
+'''
 
 async def getRedditPosts(subreddit, REDDIT_PERSONAL_USE_TOKEN, REDDIT_SECRET_TOKEN, REDDIT_USER_AGENT, n=5):
     reddit = asyncpraw.Reddit(client_id=REDDIT_PERSONAL_USE_TOKEN,
