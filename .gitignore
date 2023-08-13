@@ -1,4 +1,6 @@
 __pycache__/
 .vscode/
 .idea/
+announcements/
 *.log
+config.yml
