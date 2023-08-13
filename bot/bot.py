@@ -26,7 +26,7 @@ async def setup():
     await client.add_cog(cogs.BaseCog(client, database_cog))
     await client.add_cog(cogs.PublicCog(client))
     await client.add_cog(cogs.ModeratorCog(client, database_cog))
-    await client.add_cog(cogs.DeveloperCog(client))
+    await client.add_cog(cogs.DeveloperCog(client, config))
     logging.info(f"Successfully added all cogs. Starting bot now")
     await client.start(config["bot"]["token"])
 
