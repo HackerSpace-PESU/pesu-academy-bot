@@ -22,3 +22,5 @@ class PublicCog(commands.Cog):
             color=discord.Color.blue(),
         )
         await interaction.response.send_message(embed=embed)
+
+

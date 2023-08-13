@@ -3,6 +3,7 @@ venv/
 __pycache__/
 .vscode/
 test/
+.idea/
 .env
 test*.py
 chromedriver

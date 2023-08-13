@@ -21,8 +21,12 @@ async def setup():
     Adds all cogs to the bot and starts the bot
     """
     logging.info(f"Adding cogs to bot")
-    await client.add_cog(cogs.BaseCog(client))
+    database_cog = cogs.DatabaseCog(client, config)
+    await client.add_cog(database_cog)
+    await client.add_cog(cogs.BaseCog(client, database_cog))
     await client.add_cog(cogs.PublicCog(client))
+    await client.add_cog(cogs.ModeratorCog(client, database_cog))
+    await client.add_cog(cogs.DeveloperCog(client))
     logging.info(f"Successfully added all cogs. Starting bot now")
     await client.start(config["bot"]["token"])
 
@@ -35,5 +39,4 @@ if __name__ == "__main__":
     intents.members = True
     intents.message_content = True
     client = commands.Bot(command_prefix=bot_prefix, help_command=None, intents=intents)
-    setattr(client, "config", config)
     asyncio.run(setup())
