@@ -35,7 +35,7 @@ class DeveloperCog(commands.Cog):
             embed = discord.Embed(
                 title="Commands synced with Discord",
                 description="The bot has finished syncing commands with Discord",
-                color=discord.Color.blue(),
+                color=discord.Color.green(),
             )
             await interaction.followup.send(embed=embed)
         else:
@@ -46,6 +46,7 @@ class DeveloperCog(commands.Cog):
                             "If you think this is an error, please contact the bot developers",
                 color=discord.Color.red(),
             )
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            await interaction.response.send_message(embed=embed)
+            # TODO: Fix bug
             await self.developer_log_channel.send(f"User {interaction.user} tried to sync commands with Discord")
 

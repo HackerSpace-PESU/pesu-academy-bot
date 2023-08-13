@@ -18,10 +18,10 @@ The bot is undergoing a complete rewrite and will be available soon.
 ## TODO:
 
 ### PESU Academy Features
-- [ ] PESU Announcements
+- [ ] PESU Announcements - img, links
 - [ ] PESU Calendar
 - [ ] Video Archives (might be removed)
-- [ ] Know your class and section
+- [x] Know your class and section
 
 Other features involving auth will be added later
 
@@ -30,7 +30,9 @@ Other features involving auth will be added later
 - [ ] Reddit
 
 ### Moderator Commands
-- [ ] Clear
+- [x] Clear
+- [x] Echo
+- [x] Reply
 
 ### Developer Commands
 - [ ] Cleanup
@@ -48,6 +50,8 @@ Other features involving auth will be added later
 - [ ] Text translator
 - [ ] Reddit FAQ
 - [ ] PESU Guide
+- [x] Periodically change bot status
+- [ ] On server join, send message to logs
 
 
 

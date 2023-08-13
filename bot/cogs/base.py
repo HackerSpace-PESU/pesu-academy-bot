@@ -1,6 +1,8 @@
 import logging
+from itertools import cycle
 
-from discord.ext import commands
+import discord
+from discord.ext import commands, tasks
 
 from .db import DatabaseCog
 
@@ -13,6 +15,15 @@ class BaseCog(commands.Cog):
     def __init__(self, client: commands.Bot, db: DatabaseCog):
         self.client = client
         self.db = db
+        self.statuses = cycle([
+            "with the PRIDE of PESU",
+            "with lives",
+            "with your future",
+            "with PESsants",
+            "with PESts"
+        ])
+
+        self.change_status_loop.start()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -20,8 +31,6 @@ class BaseCog(commands.Cog):
         # TODO: Change status periodically
 
         # TODO: Send log to all log channels
-
-        # TODO: Start tasks here
 
         await self.client.tree.sync()
 
@@ -35,3 +44,9 @@ class BaseCog(commands.Cog):
     async def on_guild_remove(self, guild):
         logging.info(f"Left server {guild.name}")
         self.db.remove_server(guild.id)
+
+    @tasks.loop(hours=5)
+    async def change_status_loop(self):
+        await self.client.wait_until_ready()
+        logging.info("Changing bot status")
+        await self.client.change_presence(activity=discord.Game(next(self.statuses)))
