@@ -1,7 +1,0 @@
-bot:
-    token: ''
-    developer_user_ids:
-      - 543143780925177857  # rowlet
-    developer_channel_ids:
-      - 848634702944010252  # rowlet's private server
-    db: 'mongodb://localhost:27017/'
