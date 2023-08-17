@@ -110,7 +110,7 @@ class PESUAcademyCog(commands.Cog):
 
         return profile
 
-    async def update_announcements(self):
+    async def get_announcements(self):
         """
         Fetches the available announcements
         """
@@ -234,7 +234,7 @@ class PESUAcademyCog(commands.Cog):
         """
         await self.client.wait_until_ready()
         logging.info("Updating announcements")
-        updated_announcements = await self.update_announcements()
+        updated_announcements = await self.get_announcements()
         if updated_announcements:
             updated_announcements.sort(key=lambda x: x["date"], reverse=True)
             self.all_announcements = updated_announcements
@@ -252,6 +252,7 @@ class PESUAcademyCog(commands.Cog):
                         text=announcement["text"]
                     )
                     for channel in channels:
+                        # TODO: Enable this while not testing
                         # await channel.send("@everyone", embed=embed)
                         await channel.send(embed=embed)
                         if announcement["attachments"]:

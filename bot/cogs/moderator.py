@@ -74,6 +74,7 @@ class ModeratorCog(commands.Cog):
     @app_commands.default_permissions(administrator=True)
     @app_commands.describe(number="The number of messages to clear")
     async def clear(self, interaction: discord.Interaction, number: int):
+        # TODO: Take an optional channel argument to clear messages from a different channel
         logging.info(f"Clearing {number} messages from {interaction.channel}")
         await interaction.response.defer()
         await interaction.channel.purge(limit=number + 1)
@@ -122,6 +123,7 @@ class ModeratorCog(commands.Cog):
         app_commands.Choice(name="No", value=0)
     ])
     async def reply(self, interaction: discord.Interaction, message_id: str, reply: str, embed: int):
+        # TODO: Check bug - see if someone can reply to a message on a different server
         logging.info(f"Replying to {message_id} with {reply}")
         await interaction.response.defer()
         message = await interaction.channel.fetch_message(int(message_id))
