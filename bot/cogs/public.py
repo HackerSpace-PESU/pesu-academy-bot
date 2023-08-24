@@ -18,8 +18,8 @@ class PublicCog(commands.Cog):
         app_cmds = []
         cmds = await self.client.tree.fetch_commands()
         for cmd in cmds:
-            if isinstance(cmd, app_commands.Group):
-                for sub_cmd in cmd.commands:
+            if any(isinstance(opt, app_commands.AppCommandGroup) for opt in cmd.options):
+                for sub_cmd in cmd.options:
                     app_cmds.append(sub_cmd)
             else:
                 app_cmds.append(cmd)
