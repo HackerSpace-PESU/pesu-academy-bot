@@ -1,18 +1,16 @@
-from ast import Interactive
 import datetime
 import logging
 import re
 import traceback
 from pathlib import Path
 from typing import Optional
+
 import discord
 import pytz
 import requests_html
 from bs4 import BeautifulSoup
 from discord import app_commands
 from discord.ext import commands, tasks
-
-
 
 from .db import DatabaseCog
 
@@ -33,7 +31,6 @@ class PESUAcademyCog(commands.Cog):
 
         self.update_announcements_loop.start()
         self.reset_announcements_loop.start()
-    
 
     def get_announcement_embed(self, date: datetime.date, title: str, text: str):
         """
@@ -278,28 +275,23 @@ class PESUAcademyCog(commands.Cog):
             self.posted_announcements = list()
             logging.info("Announcements reset")
 
-    
-    
-
     @app_commands.command(name="know_my_sgpa",description="sgpa_calculator")
-
-    async def know_my_sgpa(self, interaction: discord.Interaction,sub1_grade:str,sub1_credits:int,sub2_grade:str=None,sub2_credits:int=0,sub3_grade:str=None,sub3_credits:int=0,sub4_grade:str=None,sub4_credits:int=0,sub5_grade:str=None,sub5_credits:int=0,sub6_grade:str=None,sub6_credits:int=0,sub7_grade:str=None,sub7_credits:int=0,sub8_grade:str=None,sub8_credits:int=0,sub9_grade:str=None,sub9_credits:int=0,sub10_grade:str=None,sub10_credits:int=0):
-    
+    @app_commands.describe(sub1_grade="Enter your grade for subject 1", sub1_credits="Enter the credits for subject 1", sub2_grade="Enter your grade for subject 2", sub2_credits="Enter the credits for subject 2", sub3_grade="Enter your grade for subject 3", sub3_credits="Enter the credits for subject 3", sub4_grade="Enter your grade for subject 4", sub4_credits="Enter the credits for subject 4", sub5_grade="Enter your grade for subject 5", sub5_credits="Enter the credits for subject 5", sub6_grade="Enter your grade for subject 6", sub6_credits="Enter the credits for subject 6", sub7_grade="Enter your grade for subject 7", sub7_credits="Enter the credits for subject 7", sub8_grade="Enter your grade for subject 8", sub8_credits="Enter the credits for subject 8", sub9_grade="Enter your grade for subject 9", sub9_credits="Enter the credits for subject 9", sub10_grade="Enter your grade for subject 10", sub10_credits="Enter the credits for subject 10")
+    async def know_my_sgpa(self, interaction: discord.Interaction, sub1_grade: str, sub1_credits: app_commands.Range[int, 1, 6], sub2_grade: str=None, sub2_credits: app_commands.Range[int, 1, 6]=0, sub3_grade: str=None, sub3_credits: app_commands.Range[int, 1, 6]=0, sub4_grade: str=None, sub4_credits: app_commands.Range[int, 1, 6]=0, sub5_grade: str=None, sub5_credits: app_commands.Range[int, 1, 6]=0, sub6_grade: str=None, sub6_credits: app_commands.Range[int, 1, 6]=0, sub7_grade: str=None,sub7_credits: app_commands.Range[int, 1, 6]=0, sub8_grade: str=None, sub8_credits: app_commands.Range[int, 1, 6]=0, sub9_grade: str=None, sub9_credits: app_commands.Range[int, 1, 6]=0, sub10_grade: str=None, sub10_credits: app_commands.Range[int, 1, 6]=0):
+        """
+        Calculates the sgpa of the student
+        """
+        await interaction.response.defer(ephemeral=True)
         grade_copy = {"S": 10, "A": 9, "B": 8, "C": 7, "D": 6, "E": 5, "F": 0}
-
-        grades=[sub1_grade,sub2_grade,sub3_grade,sub4_grade,sub5_grade,sub6_grade,sub7_grade,sub8_grade,sub9_grade,sub10_grade]
-        credits=[sub1_credits,sub2_credits,sub3_credits,sub4_credits,sub5_credits,sub6_credits,sub7_credits,sub8_credits,sub9_credits,sub10_credits]
-        sgpa_sum=0
-        total_credits_taken=sum(credits)
-        number_of_subjects=total_credits_taken/len(credits)
-        for i in range(len(credits)):
-            if(credits[i]!=0 and grades[i]!=None):
-                sgpa_sum+=(grade_copy[grades[i]])*credits[i]
-
-        await interaction.response.send_message("Your sgpa is "+"{:.2f}".format(round(sgpa_sum/total_credits_taken,2)))
-
-       
-
-
-    
-    
+        sgpa_sum, total_credits_taken = 0, 0
+        try:
+            for i in range(1,11):
+                grade = eval(f"sub{i}_grade")
+                credits = eval(f"sub{i}_credits")
+                if grade and credits:
+                    sgpa_sum += grade_copy[grade] * credits
+                    total_credits_taken += credits
+        except KeyError:
+            await interaction.followup.send("Invalid Grade")
+            return
+        await interaction.followup.send("Your SGPA is "+"`{:.2f}`".format(round(sgpa_sum/total_credits_taken,2)))
