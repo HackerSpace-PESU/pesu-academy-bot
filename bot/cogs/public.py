@@ -31,7 +31,10 @@ class PublicCog(commands.Cog):
             embed.set_thumbnail(url=self.client.user.avatar.url)
         for cmd in self.app_commands[page * 5 - 5:page * 5]:
             embed.add_field(name=cmd.mention, value=cmd.description, inline=False)
-        embed.set_footer(text=f'Page {page} of {len(self.app_commands) // 5 + 1}')
+        pages = len(self.app_commands) // 5 + 1
+        if len(self.app_commands) % 5 == 0:
+            pages -= 1
+        embed.set_footer(text=f'Page {page} of {pages}')
         return embed
 
     @app_commands.command(name="ping", description="Perform a ping test")
@@ -51,7 +54,10 @@ class PublicCog(commands.Cog):
         embed = self.help_embed_gen(1)
         if self.client.user.avatar:
             embed.set_thumbnail(url=self.client.user.avatar.url)
-        view = HelpPagination(pages=len(self.app_commands) // 5 + 1, em_gen_fn=self.help_embed_gen, interaction=interaction)
+        pages = len(self.app_commands) // 5 + 1
+        if len(self.app_commands) % 5 == 0:
+            pages -= 1
+        view = HelpPagination(pages=pages, em_gen_fn=self.help_embed_gen, interaction=interaction)
         await interaction.followup.send(embed=embed, view=view)
 
 class HelpPagination(discord.ui.View):
