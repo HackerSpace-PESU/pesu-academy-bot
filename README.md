@@ -42,7 +42,7 @@ Other features involving auth will be added later
 
 ### Miscellaneous
 - [x] SGPA Calculator
-- [ ] CGPA Calculator
+- [x] CGPA Calculator
 - [ ] Dictionary
 - [ ] MOSS Plagiarism Checker
 - [ ] JDoodle Code Compiler
