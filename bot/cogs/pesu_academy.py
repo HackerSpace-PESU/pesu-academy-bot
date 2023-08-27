@@ -295,3 +295,19 @@ class PESUAcademyCog(commands.Cog):
             await interaction.followup.send("Invalid Grade")
             return
         await interaction.followup.send("Your SGPA is "+"`{:.2f}`".format(round(sgpa_sum/total_credits_taken,2)))
+
+    @app_commands.command(name="cgpa",description="Calculates the CGPA of the student")
+    @app_commands.describe(sem1_gpa="Enter your SGPA for semester 1", sem1_credits="Enter the credits for semester 1", sem2_gpa="Enter your SGPA for semester 2", sem2_credits="Enter the credits for semester 2", sem3_gpa="Enter your SGPA for semester 3", sem3_credits="Enter the credits for semester 3", sem4_gpa="Enter your SGPA for semester 4", sem4_credits="Enter the credits for semester 4", sem5_gpa="Enter your SGPA for semester 5", sem5_credits="Enter the credits for semester 5", sem6_gpa="Enter your SGPA for semester 6", sem6_credits="Enter the credits for semester 6", sem7_gpa="Enter your SGPA for semester 7", sem7_credits="Enter the credits for semester 7", sem8_gpa="Enter your SGPA for semester 8", sem8_credits="Enter the credits for semester 8")
+    async def cgpa(self, interaction: discord.Interaction, sem1_gpa: app_commands.Range[float, 0, 10], sem1_credits: app_commands.Range[int, 1, 30], sem2_gpa: float=None, sem2_credits: app_commands.Range[int, 1, 30]=0, sem3_gpa: float=None, sem3_credits: app_commands.Range[int, 1, 30]=0, sem4_gpa: float=None, sem4_credits: app_commands.Range[int, 1, 30]=0, sem5_gpa: float=None, sem5_credits: app_commands.Range[int, 1, 30]=0, sem6_gpa: float=None, sem6_credits: app_commands.Range[int, 1, 30]=0, sem7_gpa: float=None, sem7_credits: app_commands.Range[int, 1, 30]=0, sem8_gpa: float=None, sem8_credits: app_commands.Range[int, 1, 30]=0):
+        """
+        Calculates the cgpa of the student
+        """
+        await interaction.response.defer(ephemeral=True)
+        cgpa_sum, total_credits_taken = 0, 0
+        for i in range(1,9):
+            gpa = eval(f"sem{i}_gpa")
+            credits = eval(f"sem{i}_credits")
+            if gpa and credits:
+                cgpa_sum += gpa * credits
+                total_credits_taken += credits
+        await interaction.followup.send("Your CGPA is "+"`{:.2f}`".format(round(cgpa_sum/total_credits_taken,2)))
