@@ -12,9 +12,9 @@ class ModeratorCog(commands.Cog):
     This cog contains all commands and functionalities available to server admins
     """
 
-    def __init__(self, client: commands.Bot, db: DatabaseCog):
+    def __init__(self, client: commands.Bot):
         self.client = client
-        self.db = db
+        self.db = client.db
 
     @app_commands.command(name="subscribe", description="Subscribe to announcements or logs on a channel")
     @app_commands.default_permissions(administrator=True)
@@ -142,3 +142,10 @@ class ModeratorCog(commands.Cog):
             color=discord.Color.green(),
         )
         await interaction.followup.send(embed=embed, ephemeral=True)
+
+
+async def setup(client: commands.Bot):
+    """
+    Adds the cog to the bot
+    """
+    await client.add_cog(ModeratorCog(client))

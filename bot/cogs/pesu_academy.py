@@ -22,10 +22,10 @@ class PESUAcademyCog(commands.Cog):
     This cog contains all commands and functionalities to interact with PESU Academy
     """
 
-    def __init__(self, client: commands.Bot, config: dict, db: DatabaseCog):
+    def __init__(self, client: commands.Bot):
         self.client = client
-        self.config = config
-        self.db = db
+        self.config = client.config
+        self.db = client.db
         self.all_announcements = list()
         self.posted_announcements = list()
 
@@ -311,3 +311,10 @@ class PESUAcademyCog(commands.Cog):
                 cgpa_sum += gpa * credits
                 total_credits_taken += credits
         await interaction.followup.send("Your CGPA is "+"`{:.2f}`".format(round(cgpa_sum/total_credits_taken,2)))
+
+
+async def setup(client: commands.Bot):
+    """
+    Adds the cog to the bot
+    """
+    await client.add_cog(PESUAcademyCog(client))
