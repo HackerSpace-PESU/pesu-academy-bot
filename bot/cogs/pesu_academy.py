@@ -274,8 +274,10 @@ class PESUAcademyCog(commands.Cog):
                         # TODO: Enable this while not testing
                         # await channel.send("@everyone", embed=embed)
                         file = None
-                        if announcement["images"]:
-                            file = discord.File(announcement["images"][0], filename="image.png")
+                    if announcement["images"]:
+                        buffer = announcement["images"][0]
+                        buffer.seek(0)
+                        file = discord.File(buffer, filename="image.png")
                         try:
                             await channel.send(file=file, embed=embed)
                         except discord.errors.Forbidden:
