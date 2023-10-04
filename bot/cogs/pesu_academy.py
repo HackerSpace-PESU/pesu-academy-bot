@@ -1,7 +1,9 @@
+import base64
 import datetime
 import logging
 import re
 import traceback
+from io import BytesIO
 from pathlib import Path
 from typing import Optional
 
@@ -166,10 +168,17 @@ class PESUAcademyCog(commands.Cog):
                     date = date_block.text.strip()
                     date_object = datetime.datetime.strptime(date, "%d-%B-%Y").date()
                     text_blocks = announcement_block.find("div", attrs={"class": "col-md-12"})
+                    images = list()
                     if text_blocks:
                         text_blocks = text_blocks.find_all("p")
                     else:
                         text_blocks = announcement_block.find("div", attrs={"class": "col-md-8"})
+                        img_block = announcement_block.find("div", attrs={"class": "col-md-4"})
+                        img_data = img_block.find("img").attrs["src"]
+                        if img_data:
+                            img_data = img_data.split(",")[1]
+                            images.append(BytesIO(base64.b64decode(img_data)))
+                            
                     text_blocks = list(map(lambda x: x.text.strip(), text_blocks))
                     text = "\n".join(text_blocks)
                     attachment_links = [link for link in announcement_block.find_all("a") if
@@ -192,7 +201,8 @@ class PESUAcademyCog(commands.Cog):
                         "date": date_object,
                         "title": title,
                         "text": text,
-                        "attachments": attachments
+                        "attachments": attachments,
+                        "images": images
                     })
 
                 except Exception as e:
@@ -263,12 +273,20 @@ class PESUAcademyCog(commands.Cog):
                     for channel in channels:
                         # TODO: Enable this while not testing
                         # await channel.send("@everyone", embed=embed)
+                        file = None
+                        if announcement["images"]:
+                            file = discord.File(announcement["images"][0], filename="image.png")
+                        try:
+                            await channel.send(file=file, embed=embed)
+                        except discord.errors.Forbidden:
+                            logging.error(f"Unable to send announcement to {channel.id} in '{channel.guild.name}'")
+                            continue
                         if announcement["attachments"]:
                             for attachment in announcement["attachments"]:
+                                files = []
                                 with open(f"announcements/{attachment}", "rb") as f:
-                                    await channel.send(file=discord.File(f), embed=embed)
-                        else:
-                            await channel.send(embed=embed)
+                                    files.append(discord.File(f))
+                                await channel.send(files=files)
                     self.posted_announcements.append(announcement)
         else:
             logging.error("Unable to update announcements")

@@ -2,6 +2,7 @@ import logging
 import subprocess
 import sys
 import yaml
+from io import BytesIO
 from typing import Optional, Union
 
 import discord
@@ -153,8 +154,9 @@ class DeveloperCog(commands.Cog):
         else:
             logs = open("bot.log", "r").readlines()
             logs = logs[-lines:]
-            logs = f"```log\n{''.join(logs)}```"
-            await interaction.followup.send(logs)
+            logs = f"{'='*20}LATEST {lines} LINES OF LOGS{'='*20}\n\n" + "".join(logs)
+            buffer = BytesIO(logs.encode("utf-8"))
+            await interaction.followup.send(file=discord.File(buffer, filename="bot.log"))
 
     @dev_commands.command(name="shutdown", description="Shutdown the bot")
     @check_developer_permissions.__func__()

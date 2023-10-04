@@ -39,6 +39,14 @@ class ModeratorCog(commands.Cog):
                 color=discord.Color.red(),
             )
             await interaction.response.send_message(embed=embed)
+        elif channel.permissions_for(interaction.guild.me).send_messages is False:
+            embed = discord.Embed(
+                title="Cannot subscribe on this channel",
+                description="I do not have permissions to send messages on this channel. "
+                            "Please choose another channel",
+                color=discord.Color.red(),
+            )
+            await interaction.response.send_message(embed=embed)
         else:
             self.db.add_subscription(guild_id=interaction.guild_id, channel_id=channel.id, mode=mode.value)
             embed = discord.Embed(
