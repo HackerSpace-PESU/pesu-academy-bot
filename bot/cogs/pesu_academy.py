@@ -32,6 +32,10 @@ class PESUAcademyCog(commands.Cog):
         self.update_announcements_loop.start()
         self.reset_announcements_loop.start()
 
+    def cog_unload(self):
+        self.update_announcements_loop.cancel()
+        self.reset_announcements_loop.cancel()
+
     def get_announcement_embed(self, date: datetime.date, title: str, text: str):
         """
         Formats the announcement into an embed
@@ -232,7 +236,7 @@ class PESUAcademyCog(commands.Cog):
                 embed.add_field(name=key, value=value, inline=False)
             await interaction.response.send_message(embed=embed)
 
-    @tasks.loop(minutes=5)
+    @tasks.loop(minutes=10)
     async def update_announcements_loop(self):
         """
         Updates the available announcements every 5 minutes and posts any new announcements
@@ -269,7 +273,7 @@ class PESUAcademyCog(commands.Cog):
         else:
             logging.error("Unable to update announcements")
 
-    @tasks.loop(minutes=35)
+    @tasks.loop(hours=1)
     async def reset_announcements_loop(self):
         """
         Resets the posted announcements list at 12:00 AM IST
