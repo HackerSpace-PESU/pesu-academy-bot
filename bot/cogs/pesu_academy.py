@@ -276,21 +276,21 @@ class PESUAcademyCog(commands.Cog):
                         # TODO: Enable this while not testing
                         # await channel.send("@everyone", embed=embed)
                         file = None
-                    if announcement["images"]:
-                        buffer = announcement["images"][0]
-                        buffer.seek(0)
-                        file = discord.File(buffer, filename="image.png")
-                    try:
-                        await channel.send(file=file, embed=embed)
-                    except discord.errors.Forbidden:
-                        logging.error(f"Unable to send announcement to {channel.id} in '{channel.guild.name}'")
-                        continue
-                    if announcement["attachments"]:
-                        for attachment in announcement["attachments"]:
-                            files = []
-                            with open(f"announcements/{attachment}", "rb") as f:
-                                files.append(discord.File(f))
-                            await channel.send(files=files)
+                        if announcement["images"]:
+                            buffer = announcement["images"][0]
+                            buffer.seek(0)
+                            file = discord.File(buffer, filename="image.png")
+                        try:
+                            await channel.send(file=file, embed=embed)
+                        except discord.errors.Forbidden:
+                            logging.error(f"Unable to send announcement to {channel.id} in '{channel.guild.name}'")
+                            continue
+                        if announcement["attachments"]:
+                            for attachment in announcement["attachments"]:
+                                files = []
+                                with open(f"announcements/{attachment}", "rb") as f:
+                                    files.append(discord.File(f))
+                                await channel.send(files=files)
                     self.posted_announcements.append(check_announcement)
         else:
             logging.error("Unable to update announcements")
