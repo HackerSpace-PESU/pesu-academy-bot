@@ -248,7 +248,7 @@ class PESUAcademyCog(commands.Cog):
             current_date = datetime.datetime.now(IST).date()
             for announcement in self.all_announcements:
                 # TODO: Enable this while not testing
-                if announcement not in self.posted_announcements:  # and announcement["date"] == current_date:
+                if announcement not in self.posted_announcements and announcement["date"] == current_date:
                     channel_ids = self.db.get_channels_with_mode("announcements")
                     channels = [self.client.get_channel(int(channel_id)) for channel_id in channel_ids]
                     embed = self.get_announcement_embed(
