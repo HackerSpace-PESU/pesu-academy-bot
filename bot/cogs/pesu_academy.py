@@ -1,7 +1,9 @@
+import base64
 import datetime
 import logging
 import re
 import traceback
+from io import BytesIO
 from pathlib import Path
 from typing import Optional
 
@@ -22,15 +24,19 @@ class PESUAcademyCog(commands.Cog):
     This cog contains all commands and functionalities to interact with PESU Academy
     """
 
-    def __init__(self, client: commands.Bot, config: dict, db: DatabaseCog):
+    def __init__(self, client: commands.Bot):
         self.client = client
-        self.config = config
-        self.db = db
+        self.config = client.config
+        self.db = client.db
         self.all_announcements = list()
         self.posted_announcements = list()
 
         self.update_announcements_loop.start()
         self.reset_announcements_loop.start()
+
+    def cog_unload(self):
+        self.update_announcements_loop.cancel()
+        self.reset_announcements_loop.cancel()
 
     def get_announcement_embed(self, date: datetime.date, title: str, text: str):
         """
@@ -45,12 +51,8 @@ class PESUAcademyCog(commands.Cog):
         else:
             embed = discord.Embed(title=title, color=discord.Color.blue())
 
-        if len(text) > 1024:
-            text_bodies = list(filter(lambda x: x != "", map(lambda x: x.strip(), text.split("\n"))))
-            for body in text_bodies:
-                embed.add_field(name="\u200b", value=body, inline=False)
-        else:
-            embed.add_field(name="\u200b", value=text, inline=False)
+        embed.description = text if len(text) < 4096 else text[:4093] + "..."
+
         embed.set_footer(text=date.strftime('%d %B %Y'))
         return embed
 
@@ -159,36 +161,53 @@ class PESUAcademyCog(commands.Cog):
             soup = BeautifulSoup(response.text, "lxml")
             announcement_blocks = soup.find_all("div", attrs={"class": "elem-info-wrapper"})
             for announcement_block in announcement_blocks:
-                title_block = announcement_block.find("h4", attrs={"class": "text-info"})
-                title = title_block.text.strip()
-                date_block = announcement_block.find("span", attrs={"class": "text-muted text-date pull-right"})
-                date = date_block.text.strip()
-                date_object = datetime.datetime.strptime(date, "%d-%B-%Y").date()
-                text_blocks = announcement_block.find("div", attrs={"class": "col-md-12"}).find_all("p")
-                text_blocks = list(map(lambda x: x.text.strip(), text_blocks))
-                text = "\n".join(text_blocks)
-                attachment_links = [link for link in announcement_block.find_all("a") if
-                                    link.text.strip().endswith(".pdf")]
-                attachments = list()
+                try:
+                    title_block = announcement_block.find("h4", attrs={"class": "text-info"})
+                    title = title_block.text.strip()
+                    date_block = announcement_block.find("span", attrs={"class": "text-muted text-date pull-right"})
+                    date = date_block.text.strip()
+                    date_object = datetime.datetime.strptime(date, "%d-%B-%Y").date()
+                    text_blocks = announcement_block.find("div", attrs={"class": "col-md-12"})
+                    images = list()
+                    if text_blocks:
+                        text_blocks = text_blocks.find_all("p")
+                    else:
+                        text_blocks = announcement_block.find("div", attrs={"class": "col-md-8"})
+                        img_block = announcement_block.find("div", attrs={"class": "col-md-4"})
+                        img_data = img_block.find("img").attrs["src"]
+                        if img_data:
+                            img_data = img_data.split(",")[1]
+                            images.append(BytesIO(base64.b64decode(img_data)))
+                            
+                    text_blocks = list(map(lambda x: x.text.strip(), text_blocks))
+                    text = "\n".join(text_blocks)
+                    attachment_links = [link for link in announcement_block.find_all("a") if
+                                        link.text.strip().endswith(".pdf")]
+                    attachments = list()
 
-                for attachment_link in attachment_links:
-                    attachment_file_id = re.findall(r"\d+", attachment_link.attrs["href"])[0]
-                    attachment_filename = Path(attachment_link.text.strip()).name
-                    response = session.get(
-                        f"https://pesuacademy.com/Academy/s/studentProfilePESUAdmin/downloadAnoncemntdoc/{attachment_file_id}",
-                        headers={"x-csrf-token": csrf_token},
-                        verify=False
-                    )
-                    Path("announcements").mkdir(parents=True, exist_ok=True)
-                    with open(f"announcements/{attachment_filename}", "wb") as f:
-                        f.write(response.content)
-                    attachments.append(attachment_filename)
-                announcements.append({
-                    "date": date_object,
-                    "title": title,
-                    "text": text,
-                    "attachments": attachments
-                })
+                    for attachment_link in attachment_links:
+                        attachment_file_id = re.findall(r"\d+", attachment_link.attrs["href"])[0]
+                        attachment_filename = Path(attachment_link.text.strip()).name
+                        response = session.get(
+                            f"https://pesuacademy.com/Academy/s/studentProfilePESUAdmin/downloadAnoncemntdoc/{attachment_file_id}",
+                            headers={"x-csrf-token": csrf_token},
+                            verify=False
+                        )
+                        Path("announcements").mkdir(parents=True, exist_ok=True)
+                        with open(f"announcements/{attachment_filename}", "wb") as f:
+                            f.write(response.content)
+                        attachments.append(attachment_filename)
+                    announcements.append({
+                        "date": date_object,
+                        "title": title,
+                        "text": text,
+                        "attachments": attachments,
+                        "images": images
+                    })
+
+                except Exception as e:
+                    logging.error(f"Unable to parse announcement: {traceback.format_exc()}")
+                    continue
 
             session.close()
             return announcements
@@ -227,7 +246,7 @@ class PESUAcademyCog(commands.Cog):
                 embed.add_field(name=key, value=value, inline=False)
             await interaction.response.send_message(embed=embed)
 
-    @tasks.loop(minutes=5)
+    @tasks.loop(minutes=10)
     async def update_announcements_loop(self):
         """
         Updates the available announcements every 5 minutes and posts any new announcements
@@ -254,16 +273,25 @@ class PESUAcademyCog(commands.Cog):
                     for channel in channels:
                         # TODO: Enable this while not testing
                         # await channel.send("@everyone", embed=embed)
-                        await channel.send(embed=embed)
+                        file = None
+                        if announcement["images"]:
+                            file = discord.File(announcement["images"][0], filename="image.png")
+                        try:
+                            await channel.send(file=file, embed=embed)
+                        except discord.errors.Forbidden:
+                            logging.error(f"Unable to send announcement to {channel.id} in '{channel.guild.name}'")
+                            continue
                         if announcement["attachments"]:
                             for attachment in announcement["attachments"]:
+                                files = []
                                 with open(f"announcements/{attachment}", "rb") as f:
-                                    await channel.send(file=discord.File(f))
+                                    files.append(discord.File(f))
+                                await channel.send(files=files)
                     self.posted_announcements.append(announcement)
         else:
             logging.error("Unable to update announcements")
 
-    @tasks.loop(minutes=35)
+    @tasks.loop(hours=1)
     async def reset_announcements_loop(self):
         """
         Resets the posted announcements list at 12:00 AM IST
@@ -311,3 +339,10 @@ class PESUAcademyCog(commands.Cog):
                 cgpa_sum += gpa * credits
                 total_credits_taken += credits
         await interaction.followup.send("Your CGPA is "+"`{:.2f}`".format(round(cgpa_sum/total_credits_taken,2)))
+
+
+async def setup(client: commands.Bot):
+    """
+    Adds the cog to the bot
+    """
+    await client.add_cog(PESUAcademyCog(client))

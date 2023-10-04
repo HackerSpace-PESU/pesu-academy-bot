@@ -12,9 +12,9 @@ class BaseCog(commands.Cog):
     This cog contains all base functions
     """
 
-    def __init__(self, client: commands.Bot, db: DatabaseCog):
+    def __init__(self, client: commands.Bot):
         self.client = client
-        self.db = db
+        self.db = client.db
         self.statuses = cycle([
             "with the PRIDE of PESU",
             "with lives",
@@ -28,7 +28,6 @@ class BaseCog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         logging.info(f"Logged in as {self.client.user.name}#{self.client.user.discriminator}")
-        # TODO: Change status periodically
 
         # TODO: Send log to all log channels
 
@@ -50,3 +49,10 @@ class BaseCog(commands.Cog):
         await self.client.wait_until_ready()
         logging.info("Changing bot status")
         await self.client.change_presence(activity=discord.Game(next(self.statuses)))
+
+
+async def setup(client: commands.Bot):
+    """
+    Adds the cog to the bot
+    """
+    await client.add_cog(BaseCog(client))

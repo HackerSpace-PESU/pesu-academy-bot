@@ -12,9 +12,9 @@ class ModeratorCog(commands.Cog):
     This cog contains all commands and functionalities available to server admins
     """
 
-    def __init__(self, client: commands.Bot, db: DatabaseCog):
+    def __init__(self, client: commands.Bot):
         self.client = client
-        self.db = db
+        self.db = client.db
 
     @app_commands.command(name="subscribe", description="Subscribe to announcements or logs on a channel")
     @app_commands.default_permissions(administrator=True)
@@ -36,6 +36,14 @@ class ModeratorCog(commands.Cog):
                 title="Already subscribed on this channel",
                 description="You are already subscribed on this channel. "
                             "Please unsubscribe first or choose another channel",
+                color=discord.Color.red(),
+            )
+            await interaction.response.send_message(embed=embed)
+        elif channel.permissions_for(interaction.guild.me).send_messages is False:
+            embed = discord.Embed(
+                title="Cannot subscribe on this channel",
+                description="I do not have permissions to send messages on this channel. "
+                            "Please choose another channel",
                 color=discord.Color.red(),
             )
             await interaction.response.send_message(embed=embed)
@@ -142,3 +150,10 @@ class ModeratorCog(commands.Cog):
             color=discord.Color.green(),
         )
         await interaction.followup.send(embed=embed, ephemeral=True)
+
+
+async def setup(client: commands.Bot):
+    """
+    Adds the cog to the bot
+    """
+    await client.add_cog(ModeratorCog(client))

@@ -111,3 +111,10 @@ class HelpPagination(discord.ui.View):
             i.disabled = True
         self.stop()
         await interaction.response.edit_message(view=self)
+
+
+async def setup(client: commands.Bot):
+    """
+    Adds the cog to the bot
+    """
+    await client.add_cog(PublicCog(client))
