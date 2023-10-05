@@ -41,8 +41,8 @@ Other features involving auth will be added later
 - [ ] Logs
 
 ### Miscellaneous
-- [ ] SGPA Calculator
-- [ ] CGPA Calculator
+- [x] SGPA Calculator
+- [x] CGPA Calculator
 - [ ] Dictionary
 - [ ] MOSS Plagiarism Checker
 - [ ] JDoodle Code Compiler

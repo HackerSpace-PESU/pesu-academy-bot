@@ -8,9 +8,9 @@ class DatabaseCog(commands.Cog):
     This cog contains all database utilities
     """
 
-    def __init__(self, client: commands.Bot, config: dict):
+    def __init__(self, client: commands.Bot):
         self.client = client
-        self.mongo_client = MongoClient(config["db"])
+        self.mongo_client = MongoClient(client.config["db"])
         self.db = self.mongo_client["pesu_academy_bot_db"]
         self.subscription_collection = self.db["subscription"]
         self.task_collection = self.db["tasks"]
@@ -30,12 +30,12 @@ class DatabaseCog(commands.Cog):
             {"guild_id": guild_id, f"subscriptions.{channel_id}": {"$exists": True}})
 
     def add_subscription(self, guild_id: int, channel_id: int, mode: str):
-        if not self.check_subscription(guild_id, channel_id):
-            self.subscription_collection.update_one({"guild_id": guild_id},
-                                                    {"$set": {f"subscriptions.{channel_id}": mode}})
-            return True
-        else:
+        if not self.subscription_collection.find_one({"guild_id": guild_id}):
+            self.add_server(guild_id)
+        elif self.check_subscription(guild_id, channel_id):
             return False
+        self.subscription_collection.update_one({"guild_id": guild_id}, {"$set": {f"subscriptions.{channel_id}": mode}})
+        return True
 
     def remove_subscription(self, guild_id: int, channel_id: int):
         self.subscription_collection.update_one({"guild_id": guild_id}, {"$unset": {f"subscriptions.{channel_id}": ""}})
@@ -51,3 +51,10 @@ class DatabaseCog(commands.Cog):
                 if channel_mode == mode:
                     announcement_channels.append(channel_id)
         return announcement_channels
+
+
+async def setup(client: commands.Bot):
+    """
+    Adds the cog to the bot
+    """
+    await client.add_cog(DatabaseCog(client))
