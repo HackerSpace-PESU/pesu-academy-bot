@@ -23,7 +23,7 @@ async def setup():
     logging.info(f"Adding cogs to bot")
     database_cog = DatabaseCog(client)
     client.db = database_cog
-    client.extns = ['cogs.base', 'cogs.developer', 'cogs.moderator', 'cogs.pesu_academy', 'cogs.public']
+    client.extns = ['cogs.base', 'cogs.developer', 'cogs.moderator', 'cogs.pesu_academy', 'cogs.public', 'cogs.reddit']
     for extn in client.extns:
         await client.load_extension(extn)
     logging.info(f"Successfully added all cogs. Starting bot now")
