@@ -92,8 +92,8 @@ class RedditCog(commands.Cog):
         Generates the choices for the question autocomplete
         """
         options = [
-            app_commands.Choice(name=post["question"], value=post["question"]) for post in self.posts
-            if question.lower() in post["question"].lower()
+            app_commands.Choice(name=post["title"], value=post["title"]) for post in self.posts
+            if question.lower() in post["title"].lower()
         ]
         return options
 
@@ -107,7 +107,7 @@ class RedditCog(commands.Cog):
             color=0xff6314,
             url=link,
         )
-        if len(content) > 1024:
+        if len(content) > 4096:
             blocks = content.split("\n")
             for block in blocks:
                 if not block:
@@ -123,17 +123,19 @@ class RedditCog(commands.Cog):
         """
         Get the answer to a frequently asked question
         """
-        default_embed = discord.Embed(
-            # title="FAQ",
-            color=0xff6314,
-            # url=self.faq_url,
-        )
+        default_embed = discord.Embed(color=0xff6314)
+        if "question" in posts[0]:
+            question_key = "question"
+            answer_key = "answer"
+        else:
+            question_key = "title"
+            answer_key = "content"
         for post in posts:
-            if post["question"] == question:
+            if post[question_key] == question:
                 try:
                     embed = await self.format_embed_for_post(
-                        post["question"],
-                        post["answer"],
+                        post[question_key],
+                        post[answer_key],
                         post["upvotes"],
                         post["link"],
                         post["timestamp"],
@@ -141,8 +143,8 @@ class RedditCog(commands.Cog):
                     await interaction.followup.send(embed=embed)
                 except Exception as e:
                     logging.error(f"Failed to send post: {e}\n{traceback.format_exc()}")
-                    default_embed.title = post["question"]
-                    default_embed.description = post["answer"][0:1020] + "..."
+                    default_embed.title = post[question_key]
+                    default_embed.description = post[answer_key][0:1020] + "..."
                     default_embed.url = post["link"]
                     timestamp = datetime.datetime.fromtimestamp(post["timestamp"]).strftime("%d %B %Y")
                     default_embed.set_footer(text=f"Upvotes: {post['upvotes']} | Posted on {timestamp}\n"
