@@ -180,7 +180,9 @@ class PESUAcademyCog(commands.Cog):
                             images.append(BytesIO(base64.b64decode(img_data)))
                             
                     text_blocks = list(map(lambda x: x.text.strip(), text_blocks))
-                    text = "\n".join(text_blocks)
+                    text = "\n\n".join(text_blocks)
+                    text = text.split("Read more")[0]
+                    text.replace("\n\n\n\n", "\n\n\n")
                     attachment_links = [link for link in announcement_block.find_all("a") if
                                         link.text.strip().endswith(".pdf")]
                     attachments = list()
