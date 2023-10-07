@@ -48,7 +48,7 @@ Other features involving auth will be added later
 - [ ] JDoodle Code Compiler
 - [ ] Grammar corrector
 - [ ] Text translator
-- [ ] Reddit FAQ
+- [x] Reddit FAQ
 - [ ] PESU Guide
 - [x] Periodically change bot status
 - [ ] On server join, send message to logs

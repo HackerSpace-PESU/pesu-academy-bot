@@ -180,7 +180,9 @@ class PESUAcademyCog(commands.Cog):
                             images.append(BytesIO(base64.b64decode(img_data)))
                             
                     text_blocks = list(map(lambda x: x.text.strip(), text_blocks))
-                    text = "\n".join(text_blocks)
+                    text = "\n\n".join(text_blocks)
+                    text = text.split("Read more")[0]
+                    text.replace("\n\n\n\n", "\n\n\n")
                     attachment_links = [link for link in announcement_block.find_all("a") if
                                         link.text.strip().endswith(".pdf")]
                     attachments = list()
@@ -266,7 +268,14 @@ class PESUAcademyCog(commands.Cog):
                 check_announcement.pop("images")
                 if check_announcement not in self.posted_announcements and announcement["date"] == current_date:
                     channel_ids = self.db.get_channels_with_mode("announcements")
-                    channels = [self.client.get_channel(int(channel_id)) for channel_id in channel_ids]
+                    channels = list()
+                    for channel_id in channel_ids:
+                        channel = self.client.get_channel(int(channel_id))
+                        if channel is None:
+                            logging.warning(f"Unable to find channel with id {channel_id}")
+                        else:
+                            channels.append(channel)
+
                     embed = self.get_announcement_embed(
                         date=announcement["date"],
                         title=announcement["title"],
