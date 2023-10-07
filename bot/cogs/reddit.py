@@ -19,6 +19,7 @@ class RedditCog(commands.Cog):
 
     def __init__(self, client: commands.Bot):
         self.client = client
+        self.db = client.db
         self.reddit = asyncpraw.Reddit(
             client_id=RedditCog.config["reddit"]["client_id"],
             client_secret=RedditCog.config["reddit"]["client_secret"],
@@ -30,6 +31,7 @@ class RedditCog(commands.Cog):
 
         self.update_faq_loop.start()
         self.update_posts_loop.start()
+        self.update_new_posts_loop.start()
 
     def cog_unload(self):
         self.update_faq_loop.cancel()
@@ -101,8 +103,8 @@ class RedditCog(commands.Cog):
                 embed.add_field(name="\u200b", value=block, inline=False)
         else:
             embed.description = content
-        timestamp = datetime.datetime.fromtimestamp(timestamp).strftime("%d %B %Y")
-        embed.set_footer(text=f"Upvotes: {upvotes} | Posted on {timestamp}")
+        timestamp = datetime.datetime.fromtimestamp(timestamp).strftime("%I:%M %p, %d %B %Y")
+        embed.set_footer(text=f"Upvotes: {upvotes} | Posted at {timestamp}")
         return embed
 
     async def handle_question(self, interaction: discord.Interaction, posts: list, question: str):
@@ -185,7 +187,7 @@ class RedditCog(commands.Cog):
         """
         if not question.strip():
             options = [
-            app_commands.Choice(name=post["title"], value=post["title"]) for post in self.posts
+                app_commands.Choice(name=post["title"], value=post["title"]) for post in self.posts
             ]
         else:
             options = [
@@ -199,6 +201,7 @@ class RedditCog(commands.Cog):
         """
         Updates the FAQ list from the subreddit every 6 hours
         """
+        await self.client.wait_until_ready()
         await self.update_faqs()
 
     @tasks.loop(hours=24)
@@ -206,7 +209,39 @@ class RedditCog(commands.Cog):
         """
         Updates the posts list from the subreddit every day
         """
+        await self.client.wait_until_ready()
         await self.update_posts()
+
+    @tasks.loop(minutes=15)
+    async def update_new_posts_loop(self):
+        """
+        Checks for new posts every 15 minutes
+        """
+        await self.client.wait_until_ready()
+        logging.info(f"Checking for new new reddit posts")
+        current_time = datetime.datetime.utcnow()
+        channel_ids = self.db.get_channels_with_mode("announcements")
+        subreddit = await self.reddit.subreddit("PESU")
+        posts = subreddit.new(limit=10)
+        async for post in posts:
+            post_timestamp = datetime.datetime.fromtimestamp(post.created_utc)
+            if current_time - post_timestamp <= datetime.timedelta(minutes=15):
+                embed = await self.format_embed_for_post(
+                    post.title,
+                    post.selftext,
+                    post.score,
+                    post.url,
+                    post.created_utc,
+                )
+                for channel_id in channel_ids:
+                    channel = self.client.get_channel(int(channel_id))
+                    if channel is None:
+                        logging.warning(f"Unable to find channel with id {channel_id}")
+                        continue
+                    try:
+                        await channel.send(embed=embed)
+                    except Exception as e:
+                        logging.error(f"Failed to send post: {e}\n{traceback.format_exc()}")
 
 
 async def setup(client: commands.Bot):

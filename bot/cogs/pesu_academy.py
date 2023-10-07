@@ -248,7 +248,7 @@ class PESUAcademyCog(commands.Cog):
                 embed.add_field(name=key, value=value, inline=False)
             await interaction.response.send_message(embed=embed)
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=5)
     async def update_announcements_loop(self):
         """
         Updates the available announcements every 5 minutes and posts any new announcements
@@ -268,20 +268,17 @@ class PESUAcademyCog(commands.Cog):
                 check_announcement.pop("images")
                 if check_announcement not in self.posted_announcements and announcement["date"] == current_date:
                     channel_ids = self.db.get_channels_with_mode("announcements")
-                    channels = list()
-                    for channel_id in channel_ids:
-                        channel = self.client.get_channel(int(channel_id))
-                        if channel is None:
-                            logging.warning(f"Unable to find channel with id {channel_id}")
-                        else:
-                            channels.append(channel)
-
                     embed = self.get_announcement_embed(
                         date=announcement["date"],
                         title=announcement["title"],
                         text=announcement["text"]
                     )
-                    for channel in channels:
+                    # TODO: Wrap the below code into a function since pesu_academy, reddit and instagram reuse it
+                    for channel_id in channel_ids:
+                        channel = self.client.get_channel(int(channel_id))
+                        if channel is None:
+                            logging.warning(f"Unable to find channel with id {channel_id}")
+                            continue
                         # TODO: Enable this while not testing
                         # await channel.send("@everyone", embed=embed)
                         file = None
