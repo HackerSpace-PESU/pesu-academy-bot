@@ -31,6 +31,10 @@ class RedditCog(commands.Cog):
         self.update_faq_loop.start()
         self.update_posts_loop.start()
 
+    def cog_unload(self):
+        self.update_faq_loop.cancel()
+        self.update_posts_loop.cancel()
+
     async def update_faqs(self):
         """
         Updates the FAQ list from the subreddit
@@ -63,10 +67,12 @@ class RedditCog(commands.Cog):
         Updates all posts from the subreddit
         """
         subreddit = await self.reddit.subreddit("PESU")
-        posts = subreddit.new(limit=500)
+        posts = subreddit.new(limit=1000)
         updated_posts = list()
         async for post in posts:
             title = post.title
+            if len(title) > 100:
+                title = title[0:97] + "..."
             content = post.selftext
             updated_posts.append({
                 "title": title,
@@ -76,26 +82,6 @@ class RedditCog(commands.Cog):
                 "timestamp": post.created_utc,
             })
         self.posts = updated_posts
-
-    async def generate_faq_question_choices(self, interaction: discord.Interaction, question: str):
-        """
-        Generates the choices for the question autocomplete
-        """
-        options = [
-            app_commands.Choice(name=faq["question"], value=faq["question"]) for faq in self.faqs
-            if question.lower() in faq["question"].lower()
-        ]
-        return options
-
-    async def generate_all_question_choices(self, interaction: discord.Interaction, question: str):
-        """
-        Generates the choices for the question autocomplete
-        """
-        options = [
-            app_commands.Choice(name=post["question"], value=post["question"]) for post in self.posts
-            if question.lower() in post["question"].lower()
-        ]
-        return options
 
     @staticmethod
     async def format_embed_for_post(title, content, upvotes, link, timestamp):
@@ -107,7 +93,7 @@ class RedditCog(commands.Cog):
             color=0xff6314,
             url=link,
         )
-        if len(content) > 1024:
+        if len(content) > 4096:
             blocks = content.split("\n")
             for block in blocks:
                 if not block:
@@ -123,17 +109,19 @@ class RedditCog(commands.Cog):
         """
         Get the answer to a frequently asked question
         """
-        default_embed = discord.Embed(
-            # title="FAQ",
-            color=0xff6314,
-            # url=self.faq_url,
-        )
+        default_embed = discord.Embed(color=0xff6314)
+        if "question" in posts[0]:
+            question_key = "question"
+            answer_key = "answer"
+        else:
+            question_key = "title"
+            answer_key = "content"
         for post in posts:
-            if post["question"] == question:
+            if post[question_key] == question:
                 try:
                     embed = await self.format_embed_for_post(
-                        post["question"],
-                        post["answer"],
+                        post[question_key],
+                        post[answer_key],
                         post["upvotes"],
                         post["link"],
                         post["timestamp"],
@@ -141,18 +129,19 @@ class RedditCog(commands.Cog):
                     await interaction.followup.send(embed=embed)
                 except Exception as e:
                     logging.error(f"Failed to send post: {e}\n{traceback.format_exc()}")
-                    default_embed.title = post["question"]
-                    default_embed.description = post["answer"][0:1020] + "..."
+                    default_embed.title = post[question_key]
+                    default_embed.description = post[answer_key][0:1020] + "..."
                     default_embed.url = post["link"]
                     timestamp = datetime.datetime.fromtimestamp(post["timestamp"]).strftime("%d %B %Y")
                     default_embed.set_footer(text=f"Upvotes: {post['upvotes']} | Posted on {timestamp}\n"
                                                   "Failed to send the full answer. Please visit the link for the full answer.")
                     await interaction.followup.send(embed=default_embed)
                 break
+        else:
+            await interaction.followup.send("No such question found!")
 
     @app_commands.command(name="faq", description="Get the answer to a frequently asked question")
     @app_commands.describe(question="Your question")
-    @app_commands.autocomplete(question=generate_faq_question_choices)
     async def faq(self, interaction: discord.Interaction, question: Optional[str] = None):
         """
         Get the answer to a frequently asked question
@@ -171,13 +160,39 @@ class RedditCog(commands.Cog):
 
     @app_commands.command(name="search", description="Get the answer to a previously asked question")
     @app_commands.describe(question="Your question")
-    @app_commands.autocomplete(question=generate_all_question_choices)
     async def search(self, interaction: discord.Interaction, question: str):
         """
         Get the answer to a previously asked question
         """
         await interaction.response.defer()
         await self.handle_question(interaction, self.posts, question)
+
+    @faq.autocomplete('question')
+    async def generate_faq_question_choices(self, interaction: discord.Interaction, question: str):
+        """
+        Generates the choices for the question autocomplete
+        """
+        options = [
+            app_commands.Choice(name=faq["question"], value=faq["question"]) for faq in self.faqs
+            if question.lower() in faq["question"].lower()
+        ]
+        return options[:25]
+
+    @search.autocomplete('question')
+    async def generate_all_question_choices(self, interaction: discord.Interaction, question: str):
+        """
+        Generates the choices for the question autocomplete
+        """
+        if not question.strip():
+            options = [
+            app_commands.Choice(name=post["title"], value=post["title"]) for post in self.posts
+            ]
+        else:
+            options = [
+                app_commands.Choice(name=post["title"], value=post["title"]) for post in self.posts
+                if question.lower() in post["title"].lower()
+            ]
+        return options[:25]
 
     @tasks.loop(hours=6)
     async def update_faq_loop(self):
