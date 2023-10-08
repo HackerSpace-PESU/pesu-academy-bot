@@ -36,6 +36,7 @@ class RedditCog(commands.Cog):
     def cog_unload(self):
         self.update_faq_loop.cancel()
         self.update_posts_loop.cancel()
+        self.update_new_posts_loop.cancel()
 
     async def update_faqs(self):
         """
