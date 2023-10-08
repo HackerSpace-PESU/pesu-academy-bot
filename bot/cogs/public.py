@@ -26,7 +26,7 @@ class PublicCog(commands.Cog):
         return app_cmds
 
     def help_embed_gen(self, page):
-        embed = discord.Embed(title='Help' , color=0xbd2b1c)
+        embed = discord.Embed(title='Help', color=0xbd2b1c)
         if self.client.user.avatar:
             embed.set_thumbnail(url=self.client.user.avatar.url)
         for cmd in self.app_commands[page * 5 - 5:page * 5]:
@@ -59,6 +59,20 @@ class PublicCog(commands.Cog):
             pages -= 1
         view = HelpPagination(pages=pages, em_gen_fn=self.help_embed_gen, interaction=interaction)
         await interaction.followup.send(embed=embed, view=view)
+
+    @app_commands.command(name='guide', description="Get the link to The Ultimate Guide to PESU")
+    async def guide(self, interaction: discord.Interaction):
+        logging.info(f"Sending guide link")
+        embed = discord.Embed(
+            title="The Ultimate Guide to PESU",
+            url="https://hackerspace-pesu.github.io/pesu-for-dummies/",
+            description="So you've joined PES, and you're all geared up for starting a beautiful 4-year journey "
+                        "in here. But then, you gotta know stuff about PES so that you won't wander around like a lost "
+                        "kid! Dont worry, this guide is specifically for that. Let's get started!",
+            color=discord.Color.blue(),
+        )
+        await interaction.response.send_message(embed=embed)
+
 
 class HelpPagination(discord.ui.View):
     def __init__(self, pages, em_gen_fn, interaction: discord.Interaction):
