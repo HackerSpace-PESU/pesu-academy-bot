@@ -18,7 +18,7 @@ The bot is undergoing a complete rewrite and will be available soon.
 ## TODO:
 
 ### PESU Academy Features
-- [ ] PESU Announcements - img, links
+- [x] PESU Announcements - img, links
 - [ ] PESU Calendar
 - [ ] Video Archives (might be removed)
 - [x] Know your class and section
@@ -27,7 +27,7 @@ Other features involving auth will be added later
 
 ### Social Media
 - [ ] Instagram
-- [ ] Reddit
+- [x] Reddit
 
 ### Moderator Commands
 - [x] Clear
@@ -36,9 +36,9 @@ Other features involving auth will be added later
 
 ### Developer Commands
 - [ ] Cleanup
-- [ ] Shutdown
-- [ ] Restart
-- [ ] Logs
+- [x] Shutdown
+- [x] Restart
+- [x] Logs
 
 ### Miscellaneous
 - [x] SGPA Calculator
@@ -49,9 +49,9 @@ Other features involving auth will be added later
 - [ ] Grammar corrector
 - [ ] Text translator
 - [x] Reddit FAQ
-- [ ] PESU Guide
+- [x] PESU Guide
 - [x] Periodically change bot status
-- [ ] On server join, send message to logs
+- [x] On server join, send message to logs
 
 
 

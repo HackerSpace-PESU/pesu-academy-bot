@@ -143,7 +143,9 @@ class RedditCog(commands.Cog):
         else:
             await interaction.followup.send("No such question found!")
 
-    @app_commands.command(name="faq", description="Get the answer to a frequently asked question")
+    reddit = app_commands.Group(name="reddit", description="Commands for interacting with Reddit")
+
+    @reddit.command(name="faq", description="Get the answer to a frequently asked question")
     @app_commands.describe(question="Your question")
     async def faq(self, interaction: discord.Interaction, question: Optional[str] = None):
         """
@@ -161,7 +163,7 @@ class RedditCog(commands.Cog):
         else:
             await self.handle_question(interaction, self.faqs, question)
 
-    @app_commands.command(name="search", description="Get the answer to a previously asked question")
+    @reddit.command(name="search", description="Get the answer to a previously asked question")
     @app_commands.describe(question="Your question")
     async def search(self, interaction: discord.Interaction, question: str):
         """
