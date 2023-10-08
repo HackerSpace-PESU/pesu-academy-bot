@@ -17,6 +17,8 @@ class RedditCog(commands.Cog):
     """
     config = yaml.safe_load(open("config.yml"))
 
+    reddit = commands.Group(name="reddit", description="Commands for interacting with Reddit")
+
     def __init__(self, client: commands.Bot):
         self.client = client
         self.db = client.db
@@ -142,8 +144,6 @@ class RedditCog(commands.Cog):
                 break
         else:
             await interaction.followup.send("No such question found!")
-
-    reddit = app_commands.Group(name="reddit", description="Commands for interacting with Reddit")
 
     @reddit.command(name="faq", description="Get the answer to a frequently asked question")
     @app_commands.describe(question="Your question")
