@@ -17,7 +17,7 @@ class RedditCog(commands.Cog):
     """
     config = yaml.safe_load(open("config.yml"))
 
-    reddit = commands.Group(name="reddit", description="Commands for interacting with Reddit")
+    reddit = app_commands.Group(name="reddit", description="Commands for interacting with Reddit")
 
     def __init__(self, client: commands.Bot):
         self.client = client
